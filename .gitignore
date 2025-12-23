@@ -10,6 +10,31 @@
 !.yarn/releases
 !.yarn/versions
 
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyo
+*.pyd
+/.venv
+venv/
+ENV/
+env/
+pip-log.txt
+# mypy and other typing temp files
+.mypy_cache/
+.pyre/
+.pytype/
+coverage.xml
+*.cover
+.hypothesis/
+*.sqlite3
+
+
 # testing
 /coverage
 
