@@ -1,0 +1,37 @@
+{
+  "os": "macOS-14.1-arm64-arm-64bit",
+  "python": "CPython 3.11.5",
+  "startedAt": "2025-12-27T04:34:40.188481Z",
+  "program": "/Users/silen/Desktop/Learning/silen-ai/projects/transformer/transformer.ipynb",
+  "codePath": "/Users/silen/Desktop/Learning/silen-ai/projects/transformer/transformer.ipynb",
+  "codePathLocal": "transformer.ipynb",
+  "git": {
+    "remote": "https://github.com/SilenNaihin/silen-ai.git",
+    "commit": "61a144a5418e9760943c053394d87e1a1fff91b6"
+  },
+  "email": "silen.naihin@gmail.com",
+  "root": "/Users/silen/Desktop/Learning/silen-ai/projects/transformer",
+  "host": "MacBook-Pro-79.local",
+  "executable": "/Users/silen/anaconda3/bin/python",
+  "cpu_count": 16,
+  "cpu_count_logical": 16,
+  "disk": {
+    "/": {
+      "total": "1995218165760",
+      "used": "1029865738240"
+    }
+  },
+  "memory": {
+    "total": "137438953472"
+  },
+  "apple": {
+    "name": "Apple M3 Max",
+    "ecpuCores": 4,
+    "pcpuCores": 12,
+    "gpuCores": 40,
+    "memoryGb": 128,
+    "swapTotalBytes": "16106127360",
+    "ramTotalBytes": "137438953472"
+  },
+  "writerId": "78iql0feklsu0k7bioo9pm1dzhtl27yn"
+}
