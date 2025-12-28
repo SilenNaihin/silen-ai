@@ -50,11 +50,11 @@ A section wrapper for article content with optional right-side panels.
 - `rightContent`: ReactNode - Optional content for right margin (e.g., code panels, diagrams)
 - `className`: string - Optional additional classes
 
-### `CodePanel`
+### `CodePanel` & `NotebookCell`
 
-Elegant code display panel with automatic copy functionality and optional GitHub link.
+Elegant code display panels with automatic copy functionality.
 
-**Usage:**
+**Manual Usage (CodePanel):**
 
 ```tsx
 <CodePanel
@@ -65,20 +65,22 @@ Elegant code display panel with automatic copy functionality and optional GitHub
 />
 ```
 
-**Props:**
+**Automatic Usage (NotebookCell):**
 
-- `code`: string - The code to display (automatically copied when clicking Copy button)
-- `language`: string - Programming language (for syntax highlighting context)
-- `output`: string - Optional output to display below code
-- `githubUrl`: string - Optional GitHub URL (shows GitHub button if provided)
-- `className`: string - Optional additional classes
+Most of the time, you don't need to use `CodePanel` directly. Instead, use the notebook integration system which automatically renders cells from Jupyter notebooks:
 
-**Features:**
+```tsx
+import { UseNotebook } from '@/contexts/NotebookContext';
 
-- **Automatic Copy**: Copy button automatically copies the code to clipboard
-- **GitHub Link**: GitHub button (optional) opens the URL in a new tab
-- **Smart Layout**: Buttons positioned in top-right corner with padding to avoid text overlap
-- **Clean Design**: Small, subtle buttons that don't distract from content
+<>
+  <UseNotebook path="projects/notebook.ipynb" />
+  <ArticleSection>
+    <p id="my-cell">Text here...</p> {/* Code appears automatically! */}
+  </ArticleSection>
+</>;
+```
+
+See **[Notebook Integration Guide](../lib/README.md)** for complete documentation on linking Jupyter notebooks to articles.
 
 ## Layout Structure
 
