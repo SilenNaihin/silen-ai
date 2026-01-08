@@ -37,7 +37,6 @@ import {
   SingleSineAnimation,
   MultiFrequencyAnimation,
   CircleTracerAnimation,
-  BlankAnimation,
   SummaryAnimation,
   LearnedEmbeddingsAnimation,
   RotationAnimation,
@@ -86,7 +85,7 @@ export default function PositionalEncodingArticle() {
                           render: (p) => (
                             <PermutationProblemAnimation progress={p} />
                           ),
-                          duration: 1,
+                          startElementId: 'the-problem',
                           overlap: 0.15,
                         },
                         {
@@ -94,63 +93,63 @@ export default function PositionalEncodingArticle() {
                           render: (p) => (
                             <IntegerExplosionAnimation progress={p} />
                           ),
-                          duration: 1,
+                          startElementId: 'first-attempt',
                           overlap: 0.15,
                         },
                         {
                           // Enter the Sine section
                           render: (p) => <SingleSineAnimation progress={p} />,
-                          duration: 1,
+                          startElementId: 'enter-sine',
                           overlap: 0.15,
                         },
                         {
-                          // Adjusting Frequency + Multiple Frequencies
+                          // Adjusting Frequency section
                           render: (p) => (
                             <MultiFrequencyAnimation progress={p} />
                           ),
-                          duration: 1.2,
+                          startElementId: 'adjusting-frequency',
                           overlap: 0.15,
                         },
                         {
-                          // Multiple Frequencies continued
+                          // Multiple Frequencies section
                           render: (p) => <ClockAnalogyAnimation progress={p} />,
-                          duration: 1,
+                          startElementId: 'multiple-frequencies',
                           overlap: 0.15,
                         },
                         {
-                          // Adding Cosine: The Circle Trick
+                          // Adding Cosine section
                           render: (p) => <CircleTracerAnimation progress={p} />,
-                          duration: 1.2,
+                          startElementId: 'sin-cos',
                           overlap: 0.15,
                         },
                         {
-                          // The Frequency Formula (large section with table)
+                          // The Frequency Formula section
                           render: (p) => <GeometricProgressionAnimation progress={p} />,
-                          duration: 2,
+                          startElementId: 'the-formula',
                           overlap: 0.15,
                         },
                         {
-                          // Putting It All Together + PE Matrix visualization
+                          // Putting It All Together section
                           render: (p) => <UniquenessAnimation progress={p} />,
-                          duration: 2.5,
+                          startElementId: 'full-implementation',
                           overlap: 0.15,
                         },
                         {
-                          // Verification + Relative Position sections
+                          // PE Matrix + Verification sections
                           render: (p) => <SmoothnessAnimation progress={p} />,
-                          duration: 2.5,
+                          startElementId: 'pe-matrix',
                           overlap: 0.15,
                         },
                         {
                           // PyTorch Implementation section
                           render: (p) => <FourTermsAnimation progress={p} />,
-                          duration: 2,
+                          startElementId: 'pytorch-impl',
                           overlap: 0.15,
                         },
                         {
-                          // Limitations of Additive PE section (end)
+                          // Limitations of Additive PE section
                           render: (p) => <SummaryAnimation progress={p} />,
-                          duration: 2.5,
+                          startElementId: 'limitations',
                           overlap: 0.1,
                         },
                       ]}
@@ -165,19 +164,19 @@ export default function PositionalEncodingArticle() {
                           render: (p) => (
                             <LearnedEmbeddingsAnimation progress={p} />
                           ),
-                          duration: 1.2,
+                          startElementId: 'learned-embeddings',
                           overlap: 0.15,
                         },
                         {
-                          // From Addition to Rotation + 2D Rotation sections
+                          // From Addition to Rotation section
                           render: (p) => <RotationAnimation progress={p} />,
-                          duration: 1.5,
+                          startElementId: 'rotation-intro',
                           overlap: 0.15,
                         },
                         {
                           // The Magic Property section
                           render: (p) => <RoPEInsightAnimation progress={p} />,
-                          duration: 1.5,
+                          startElementId: 'magic-property',
                           overlap: 0.15,
                         },
                         {
@@ -185,31 +184,31 @@ export default function PositionalEncodingArticle() {
                           render: (p) => (
                             <RoPEDimensionPairsAnimation progress={p} />
                           ),
-                          duration: 2,
+                          startElementId: 'rope-impl',
                           overlap: 0.15,
                         },
                         {
                           // RoPE vs Additive PE section
                           render: (p) => <AdditivVsRoPEAnimation progress={p} />,
-                          duration: 2,
+                          startElementId: 'comparison',
                           overlap: 0.15,
                         },
                         {
                           // Verifying RoPE Requirements section
                           render: (p) => <MagnitudePreservationAnimation progress={p} />,
-                          duration: 1.5,
+                          startElementId: 'rope-verification',
                           overlap: 0.15,
                         },
                         {
                           // PyTorch RoPE Class section
                           render: (p) => <CleanAttentionAnimation progress={p} />,
-                          duration: 2,
+                          startElementId: 'rope-pytorch',
                           overlap: 0.15,
                         },
                         {
-                          // Summary: Why RoPE Won + Modern Extensions
+                          // Summary: Why RoPE Won section
                           render: (p) => <RoPEClosingAnimation progress={p} />,
-                          duration: 2.5,
+                          startElementId: 'summary',
                           overlap: 0.1,
                         },
                       ]}

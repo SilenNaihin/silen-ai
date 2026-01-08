@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState, useCallback } from 'react';
 
 /**
  * Configuration for a single animation in the sequence
@@ -12,10 +12,20 @@ export interface AnimationConfig {
   render: (progress: number) => ReactNode;
 
   /**
+   * Element ID that triggers this animation to start.
+   * When provided, the animation begins when this element reaches the viewport center.
+   * This takes precedence over duration-based positioning.
+   */
+  startElementId?: string;
+
+  /**
    * Duration can be:
    * - number: weight relative to other animations (default: 1)
    * - string ending in 'px': pixel amount (e.g., '500px')
    * - string ending in '%': percentage of total scroll (e.g., '30%')
+   *
+   * When startElementId is used, duration controls how long (in scroll distance)
+   * this animation plays before transitioning to the next.
    */
   duration?: number | string;
 
@@ -30,6 +40,7 @@ export interface AnimationConfig {
  * Orchestrates multiple animations in sequence based on scroll progress
  *
  * Features:
+ * - Element-based triggers via startElementId for precise content synchronization
  * - Automatic distribution of scroll progress across animations
  * - Pixel-based or percentage-based duration control
  * - Smooth transitions with configurable overlap
@@ -41,20 +52,16 @@ export interface AnimationConfig {
  *   scrollProgress={scrollProgress}
  *   animations={[
  *     {
- *       render: (p) => <SpiralAnimation progress={p} startOffset={0.15} />,
- *       duration: 2, // Weighted 2x relative to others
- *       overlap: 0.2 // 20% overlap with next animation
+ *       render: (p) => <IntroAnimation progress={p} />,
+ *       startElementId: 'intro-section', // Starts when #intro-section is in view
  *     },
  *     {
- *       render: (p) => <NetworkAnimation progress={p} />,
- *       duration: 1 // Default weight
+ *       render: (p) => <SummaryAnimation progress={p} />,
+ *       startElementId: 'summary-section', // Starts when #summary-section is in view
  *     }
  *   ]}
  * />
  * ```
- *
- * Note: Pixel-based durations ('500px') require passing scrollableHeight prop,
- * which should be the article's scrollable range (elementHeight - viewportHeight)
  */
 export function AnimationSequence({
   scrollProgress,
@@ -65,10 +72,61 @@ export function AnimationSequence({
   scrollableHeight?: number;
   animations: AnimationConfig[];
 }) {
+  // Track element positions for element-based triggers
+  const [elementPositions, setElementPositions] = useState<Map<string, number>>(new Map());
+
+  // Calculate element positions on mount and scroll
+  const updateElementPositions = useCallback(() => {
+    const positions = new Map<string, number>();
+
+    // Get the article container to calculate relative positions
+    const articleElement = document.querySelector('[class*="min-h-screen"]');
+    if (!articleElement) return;
+
+    const articleRect = articleElement.getBoundingClientRect();
+    const articleTop = window.scrollY + articleRect.top;
+    const articleHeight = articleRect.height;
+    const viewportHeight = window.innerHeight;
+    const scrollableDistance = Math.max(1, articleHeight - viewportHeight);
+
+    animations.forEach((anim) => {
+      if (anim.startElementId) {
+        const element = document.getElementById(anim.startElementId);
+        if (element) {
+          const elementRect = element.getBoundingClientRect();
+          // Calculate where this element is as a percentage of total scroll
+          // Element triggers when it reaches viewport center
+          const elementTop = window.scrollY + elementRect.top - articleTop;
+          const triggerPoint = elementTop - viewportHeight / 2;
+          const normalizedPosition = Math.max(0, Math.min(1, triggerPoint / scrollableDistance));
+          positions.set(anim.startElementId, normalizedPosition);
+        }
+      }
+    });
+
+    setElementPositions(positions);
+  }, [animations]);
+
+  useEffect(() => {
+    updateElementPositions();
+
+    // Update on resize (element positions may change)
+    window.addEventListener('resize', updateElementPositions);
+
+    // Initial delay to ensure elements are rendered
+    const timeout = setTimeout(updateElementPositions, 100);
+
+    return () => {
+      window.removeEventListener('resize', updateElementPositions);
+      clearTimeout(timeout);
+    };
+  }, [updateElementPositions]);
+
   // Calculate normalized ranges for each animation
   const animationRanges = calculateAnimationRanges(
     animations,
-    scrollableHeight
+    scrollableHeight,
+    elementPositions
   );
 
   // Find which animation(s) should be rendered based on current progress
@@ -123,17 +181,102 @@ interface AnimationRange {
 
 /**
  * Calculate the scroll progress ranges for each animation
+ * Uses element positions when startElementId is provided
  */
 function calculateAnimationRanges(
   animations: AnimationConfig[],
-  scrollableHeight?: number
+  scrollableHeight?: number,
+  elementPositions?: Map<string, number>
 ): AnimationRange[] {
-  // First, normalize all durations to weights
+  const ranges: AnimationRange[] = [];
+
+  // Check if any animations use element-based positioning
+  const hasElementBasedAnimations = animations.some(
+    (a) => a.startElementId && elementPositions?.has(a.startElementId)
+  );
+
+  if (hasElementBasedAnimations && elementPositions && elementPositions.size > 0) {
+    // Element-based positioning: use element positions to determine ranges
+    // First, collect all animations with their start positions
+    const animationsWithPositions: Array<{
+      index: number;
+      startPosition: number;
+      animation: AnimationConfig;
+    }> = [];
+
+    let lastKnownPosition = 0;
+
+    animations.forEach((animation, index) => {
+      let startPosition: number;
+
+      if (animation.startElementId && elementPositions.has(animation.startElementId)) {
+        // Use element position
+        startPosition = elementPositions.get(animation.startElementId)!;
+        lastKnownPosition = startPosition;
+      } else if (index === 0) {
+        // First animation starts at 0
+        startPosition = 0;
+      } else {
+        // No element ID - this animation will be positioned after the previous one
+        // Use a small increment from last known position
+        startPosition = lastKnownPosition;
+      }
+
+      animationsWithPositions.push({
+        index,
+        startPosition,
+        animation,
+      });
+    });
+
+    // Sort by start position to handle any out-of-order element positions
+    animationsWithPositions.sort((a, b) => a.startPosition - b.startPosition);
+
+    // Calculate ranges based on sorted positions
+    animationsWithPositions.forEach((item, sortedIndex) => {
+      const { animation, startPosition } = item;
+      const overlap = animation.overlap ?? 0;
+
+      // End position is either the next animation's start or 1.0
+      let endPosition: number;
+      if (sortedIndex < animationsWithPositions.length - 1) {
+        endPosition = animationsWithPositions[sortedIndex + 1].startPosition;
+      } else {
+        endPosition = 1.0;
+      }
+
+      // Ensure minimum duration
+      const duration = Math.max(0.02, endPosition - startPosition);
+      const actualEnd = startPosition + duration;
+
+      // Calculate overlap
+      const overlapDuration = sortedIndex < animationsWithPositions.length - 1
+        ? duration * overlap
+        : 0;
+      const fadeOutStart = actualEnd - overlapDuration;
+
+      // Fade in over first 15% of animation
+      const fadeInDuration = Math.min(duration * 0.15, 0.05);
+      const peak = startPosition + fadeInDuration;
+
+      // Store range at original index position
+      ranges[item.index] = {
+        start: startPosition,
+        peak: peak,
+        end: actualEnd,
+        fadeOut: fadeOutStart,
+      };
+    });
+
+    return ranges;
+  }
+
+  // Fallback: Duration-based positioning (original behavior)
   const weights = animations.map((anim) => {
     const duration = anim.duration ?? 1;
 
     if (typeof duration === 'number') {
-      return duration; // Already a weight
+      return duration;
     }
 
     if (typeof duration === 'string') {
@@ -154,14 +297,10 @@ function calculateAnimationRanges(
       }
     }
 
-    return 1; // Default weight
+    return 1;
   });
 
-  // Calculate total weight
   const totalWeight = weights.reduce((sum, w) => sum + w, 0);
-
-  // Calculate ranges for each animation
-  const ranges: AnimationRange[] = [];
   let currentStart = 0;
 
   animations.forEach((animation, index) => {
@@ -169,15 +308,12 @@ function calculateAnimationRanges(
     const duration = weight / totalWeight;
     const overlap = animation.overlap ?? 0;
 
-    // Calculate the overlap duration with next animation
     const overlapDuration =
       index < animations.length - 1 ? duration * overlap : 0;
 
-    // Start fading out before the end if there's overlap
     const fadeOutStart = currentStart + duration - overlapDuration;
     const end = currentStart + duration;
 
-    // Fade in over first 20% of animation (or less if animation is short)
     const fadeInDuration = Math.min(duration * 0.2, 0.1);
     const peak = currentStart + fadeInDuration;
 
@@ -188,7 +324,6 @@ function calculateAnimationRanges(
       fadeOut: fadeOutStart,
     });
 
-    // Next animation starts where overlap begins
     currentStart = fadeOutStart;
   });
 
