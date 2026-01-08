@@ -59,12 +59,18 @@ const TABS = [
   { id: 'rope', label: 'RoPE' },
 ];
 
+const NOTEBOOK_GITHUB_URL =
+  'https://github.com/SilenNaihin/silen-ai/blob/main/projects/transformer/positional_emb.ipynb';
+
 export default function PositionalEncodingArticle() {
   return (
     <TOCProvider>
       <TabsProvider tabs={TABS} defaultTab="sinusoidal">
         <PyodideProvider packages={['numpy']} autoLoad>
-          <UseNotebook path="projects/transformer/positional_emb.ipynb" />
+          <UseNotebook
+            path="projects/transformer/positional_emb.ipynb"
+            githubUrl={NOTEBOOK_GITHUB_URL}
+          />
 
           <StickyHeader
             title="Positional Embeddings"

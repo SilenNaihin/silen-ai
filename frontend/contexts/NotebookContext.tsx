@@ -9,6 +9,8 @@ interface NotebookContextType {
   error: string | null;
   loadNotebook: (path: string, forceReload?: boolean) => void;
   currentNotebookPath: string | null;
+  githubUrl: string | null;
+  setGithubUrl: (url: string | null) => void;
 }
 
 const NotebookContext = createContext<NotebookContextType | null>(null);
@@ -26,6 +28,7 @@ export function GlobalNotebookProvider({ children }: GlobalNotebookProviderProps
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentNotebookPath, setCurrentNotebookPath] = useState<string | null>(null);
+  const [githubUrl, setGithubUrl] = useState<string | null>(null);
 
   const loadNotebook = async (path: string, forceReload: boolean = false) => {
     // If already loaded and not forcing reload, just set as current
@@ -69,13 +72,15 @@ export function GlobalNotebookProvider({ children }: GlobalNotebookProviderProps
     : {};
 
   return (
-    <NotebookContext.Provider 
-      value={{ 
-        cells, 
-        loading, 
-        error, 
+    <NotebookContext.Provider
+      value={{
+        cells,
+        loading,
+        error,
         loadNotebook,
         currentNotebookPath,
+        githubUrl,
+        setGithubUrl,
       }}
     >
       {children}
@@ -90,23 +95,31 @@ export function useNotebookContext() {
   const context = useContext(NotebookContext);
   if (!context) {
     // Return empty state if no provider
-    return { 
-      cells: {}, 
-      loading: false, 
-      error: null, 
+    return {
+      cells: {},
+      loading: false,
+      error: null,
       loadNotebook: () => {},
       currentNotebookPath: null,
+      githubUrl: null,
+      setGithubUrl: () => {},
     };
   }
   return context;
+}
+
+interface UseNotebookProps {
+  path: string;
+  /** GitHub URL to link to for all code cells */
+  githubUrl?: string;
 }
 
 /**
  * Component to declare which notebook an article uses
  * Place at the top of your article component
  */
-export function UseNotebook({ path }: { path: string }) {
-  const { loadNotebook } = useNotebookContext();
+export function UseNotebook({ path, githubUrl }: UseNotebookProps) {
+  const { loadNotebook, setGithubUrl } = useNotebookContext();
 
   useEffect(() => {
     // Load on mount and when path changes
@@ -114,6 +127,13 @@ export function UseNotebook({ path }: { path: string }) {
     const forceReload = process.env.NODE_ENV === 'development';
     loadNotebook(path, forceReload);
   }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (githubUrl) {
+      setGithubUrl(githubUrl);
+    }
+    return () => setGithubUrl(null);
+  }, [githubUrl, setGithubUrl]);
 
   return null;
 }

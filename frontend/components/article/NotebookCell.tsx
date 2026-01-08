@@ -2,6 +2,7 @@
 
 import { CodePanel } from './CodePanel';
 import { NotebookCell as NotebookCellType } from '@/lib/notebook-parser';
+import { useNotebookContext } from '@/contexts/NotebookContext';
 
 interface NotebookCellProps {
   cell?: NotebookCellType;
@@ -18,6 +19,8 @@ interface NotebookCellProps {
   onCollapsedChange?: (collapsed: boolean) => void;
   /** Show first N lines when collapsed (for preview mode) */
   previewLines?: number;
+  /** Override GitHub URL (defaults to context value) */
+  githubUrl?: string;
 }
 
 /**
@@ -36,7 +39,10 @@ export function NotebookCell({
   defaultCollapsed = false,
   onCollapsedChange,
   previewLines = 0,
+  githubUrl: githubUrlProp,
 }: NotebookCellProps) {
+  const { githubUrl: contextGithubUrl } = useNotebookContext();
+  const githubUrl = githubUrlProp ?? contextGithubUrl;
   // Loading state
   if (loading) {
     return (
@@ -78,6 +84,7 @@ export function NotebookCell({
       defaultCollapsed={defaultCollapsed}
       onCollapsedChange={onCollapsedChange}
       previewLines={previewLines}
+      githubUrl={githubUrl ?? undefined}
     />
   );
 }

@@ -205,12 +205,16 @@ export default function AdvancedArticle() {
 Declares which notebook an article uses. Place at the top of your article component.
 
 ```tsx
-<UseNotebook path="projects/example.ipynb" />
+<UseNotebook
+  path="projects/example.ipynb"
+  githubUrl="https://github.com/user/repo/blob/main/projects/example.ipynb"
+/>
 ```
 
 **Props:**
 
 - `path`: string - Path to notebook relative to project root
+- `githubUrl`: string (optional) - GitHub URL for all code cells (adds "View on GitHub" button)
 
 ### `GlobalNotebookProvider`
 
