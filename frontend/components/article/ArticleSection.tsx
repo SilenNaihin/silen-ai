@@ -33,12 +33,14 @@ export function ArticleSection({
   const [detectedId, setDetectedId] = useState<string | null>(null);
   const [isInView, setIsInView] = useState(false);
 
-  // Detect IDs in children
+  // Detect IDs in children (skip headings which are for TOC navigation)
   useEffect(() => {
     if (!contentRef.current) return;
 
-    // Find any element with an ID attribute
-    const elementWithId = contentRef.current.querySelector('[id]');
+    // Find paragraph or div element with ID (skip headings which are for TOC)
+    const elementWithId = contentRef.current.querySelector(
+      'p[id], div[id], span[id]'
+    );
     if (elementWithId) {
       setDetectedId(elementWithId.id);
     }
@@ -117,8 +119,11 @@ export function ArticleSection({
     return null;
   };
 
+  // Reduce margin when cell is inline (flows better with content)
+  const marginClass = isInline ? 'mb-4' : 'mb-8';
+
   return (
-    <div className={`relative mb-16 ${className}`}>
+    <div className={`relative ${marginClass} ${className}`}>
       {/* Main text content */}
       <div ref={contentRef} className="prose prose-lg max-w-none">
         {children}
@@ -126,7 +131,7 @@ export function ArticleSection({
 
       {/* Inline code cell - renders in article body on all screen sizes */}
       {isInline && cell && (
-        <div className="mt-6">
+        <div className="mt-4">
           <NotebookCell
             cell={cell}
             loading={loading}
@@ -150,9 +155,7 @@ export function ArticleSection({
 
       {/* Mobile: Inline code below content, collapsed by default */}
       {hasRightContent && (
-        <div className="xl:hidden mt-6">
-          {renderRightContent(true)}
-        </div>
+        <div className="xl:hidden mt-6">{renderRightContent(true)}</div>
       )}
     </div>
   );
