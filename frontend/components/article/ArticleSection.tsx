@@ -120,18 +120,18 @@ export function ArticleSection({
   };
 
   // Reduce margin when cell is inline (flows better with content)
-  const marginClass = isInline ? 'mb-4' : 'mb-8';
+  const marginClass = isInline ? 'mb-2' : 'mb-6';
 
   return (
     <div className={`relative ${marginClass} ${className}`}>
       {/* Main text content */}
-      <div ref={contentRef} className="prose prose-lg max-w-none">
+      <div ref={contentRef} className="prose prose-base max-w-none">
         {children}
       </div>
 
       {/* Inline code cell - renders in article body on all screen sizes */}
       {isInline && cell && (
-        <div className="mt-4">
+        <div className="mt-3">
           <NotebookCell
             cell={cell}
             loading={loading}
@@ -155,7 +155,7 @@ export function ArticleSection({
 
       {/* Mobile: Inline code below content, collapsed by default */}
       {hasRightContent && (
-        <div className="xl:hidden mt-6">{renderRightContent(true)}</div>
+        <div className="xl:hidden mt-4">{renderRightContent(true)}</div>
       )}
     </div>
   );
