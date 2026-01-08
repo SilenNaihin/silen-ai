@@ -7,7 +7,7 @@ interface NotebookContextType {
   cells: Record<string, NotebookCell>;
   loading: boolean;
   error: string | null;
-  loadNotebook: (path: string) => void;
+  loadNotebook: (path: string, forceReload?: boolean) => void;
   currentNotebookPath: string | null;
 }
 
@@ -27,9 +27,9 @@ export function GlobalNotebookProvider({ children }: GlobalNotebookProviderProps
   const [error, setError] = useState<string | null>(null);
   const [currentNotebookPath, setCurrentNotebookPath] = useState<string | null>(null);
 
-  const loadNotebook = async (path: string) => {
-    // If already loaded, just set as current
-    if (notebooks[path]) {
+  const loadNotebook = async (path: string, forceReload: boolean = false) => {
+    // If already loaded and not forcing reload, just set as current
+    if (notebooks[path] && !forceReload) {
       setCurrentNotebookPath(path);
       return;
     }
@@ -40,7 +40,9 @@ export function GlobalNotebookProvider({ children }: GlobalNotebookProviderProps
       setError(null);
       setCurrentNotebookPath(path);
 
-      const response = await fetch(`/api/notebooks?path=${encodeURIComponent(path)}`);
+      // Add cache buster for development
+      const cacheBuster = process.env.NODE_ENV === 'development' ? `&_t=${Date.now()}` : '';
+      const response = await fetch(`/api/notebooks?path=${encodeURIComponent(path)}${cacheBuster}`);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -104,13 +106,14 @@ export function useNotebookContext() {
  * Place at the top of your article component
  */
 export function UseNotebook({ path }: { path: string }) {
-  const { loadNotebook, currentNotebookPath } = useNotebookContext();
+  const { loadNotebook } = useNotebookContext();
 
   useEffect(() => {
-    if (currentNotebookPath !== path) {
-      loadNotebook(path);
-    }
-  }, [path, loadNotebook, currentNotebookPath]);
+    // Load on mount and when path changes
+    // In development, force reload to pick up notebook changes
+    const forceReload = process.env.NODE_ENV === 'development';
+    loadNotebook(path, forceReload);
+  }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }

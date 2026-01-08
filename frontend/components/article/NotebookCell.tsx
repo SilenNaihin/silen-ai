@@ -1,28 +1,41 @@
 'use client';
 
-import { CodePanel, CodeActionButton } from './CodePanel';
+import { CodePanel } from './CodePanel';
 import { NotebookCell as NotebookCellType } from '@/lib/notebook-parser';
 
 interface NotebookCellProps {
   cell?: NotebookCellType;
   loading?: boolean;
   error?: string | null;
-  onCopy?: (code: string) => void;
-  onViewNotebook?: (cell: NotebookCellType) => void;
   className?: string;
+  /** Enable collapsible behavior */
+  collapsible?: boolean;
+  /** Controlled collapsed state */
+  collapsed?: boolean;
+  /** Start in collapsed state */
+  defaultCollapsed?: boolean;
+  /** Callback when collapse state changes */
+  onCollapsedChange?: (collapsed: boolean) => void;
+  /** Show first N lines when collapsed (for preview mode) */
+  previewLines?: number;
 }
 
 /**
  * Component to render a Jupyter notebook cell as a CodePanel
  * Automatically handles loading and error states
+ *
+ * Supports collapsible mode for mobile layouts
  */
 export function NotebookCell({
   cell,
   loading,
   error,
-  onCopy,
-  onViewNotebook,
   className = '',
+  collapsible = false,
+  collapsed,
+  defaultCollapsed = false,
+  onCollapsedChange,
+  previewLines = 0,
 }: NotebookCellProps) {
   // Loading state
   if (loading) {
@@ -48,48 +61,23 @@ export function NotebookCell({
     );
   }
 
-  // Cell not found
+  // Cell not found - return null instead of placeholder
   if (!cell) {
-    return (
-      <div className={`border border-neutral-200 rounded-lg p-4 bg-neutral-50 ${className}`}>
-        <div className="text-sm text-neutral-500">
-          No notebook cell found for this section
-        </div>
-      </div>
-    );
+    return null;
   }
-
-  // Render cell
-  const handleCopy = () => {
-    if (onCopy) {
-      onCopy(cell.code);
-    } else {
-      navigator.clipboard.writeText(cell.code);
-    }
-  };
-
-  const handleViewNotebook = () => {
-    if (onViewNotebook) {
-      onViewNotebook(cell);
-    }
-  };
 
   return (
     <CodePanel
       code={cell.code}
       language={cell.language}
       output={cell.output}
-      actions={
-        <>
-          <CodeActionButton onClick={handleCopy}>Copy</CodeActionButton>
-          {onViewNotebook && (
-            <CodeActionButton onClick={handleViewNotebook}>
-              Notebook
-            </CodeActionButton>
-          )}
-        </>
-      }
+      outputImage={cell.outputImage}
       className={className}
+      collapsible={collapsible}
+      collapsed={collapsed}
+      defaultCollapsed={defaultCollapsed}
+      onCollapsedChange={onCollapsedChange}
+      previewLines={previewLines}
     />
   );
 }

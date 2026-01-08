@@ -10,7 +10,10 @@ export interface NotebookCell {
   code: string;
   language: string;
   output?: string;
+  outputImage?: string; // Base64 encoded image from cell output
   executionCount?: number;
+  inline?: boolean; // If true, render inline in article instead of side panel
+  expanded?: boolean; // If true, start expanded instead of collapsed
 }
 
 export interface NotebookData {
@@ -20,6 +23,11 @@ export interface NotebookData {
 
 /**
  * Parse a Jupyter notebook JSON and extract cells with article directives
+ *
+ * Directive formats:
+ * - # | targetId                  - Standard cell, shown in side panel
+ * - # | targetId inline           - Shown inline in article body (collapsed)
+ * - # | targetId inline expanded  - Shown inline, expanded by default
  */
 export function parseNotebook(notebookJson: any, notebookPath: string): NotebookData {
   const cells: Record<string, NotebookCell> = {};
@@ -32,16 +40,18 @@ export function parseNotebook(notebookJson: any, notebookPath: string): Notebook
     if (cell.cell_type !== 'code') return;
 
     // Get the cell source (can be string or array of strings)
-    const source = Array.isArray(cell.source) 
-      ? cell.source.join('') 
+    const source = Array.isArray(cell.source)
+      ? cell.source.join('')
       : cell.source;
 
-    // Look for directive: # | targetId (with optional trailing >)
-    const directiveMatch = source.match(/^#\s*\|\s*([\w-]+)\s*>?\s*$/m);
-    
+    // Look for directive: # | targetId [inline] [expanded] (with optional trailing >)
+    const directiveMatch = source.match(/^#\s*\|\s*([\w-]+)(?:\s+(inline))?(?:\s+(expanded))?\s*>?\s*$/m);
+
     if (!directiveMatch) return;
 
-    const [, targetId] = directiveMatch;
+    const [, targetId, inlineFlag, expandedFlag] = directiveMatch;
+    const isInline = inlineFlag === 'inline';
+    const isExpanded = expandedFlag === 'expanded';
 
     // Extract code without the directive line
     const codeLines = source.split('\n');
@@ -50,10 +60,13 @@ export function parseNotebook(notebookJson: any, notebookPath: string): Notebook
       .join('\n')
       .trim();
 
-    // Extract output
+    // Extract output (text and/or image)
     let output: string | undefined;
+    let outputImage: string | undefined;
     if (cell.outputs && Array.isArray(cell.outputs) && cell.outputs.length > 0) {
-      output = extractOutput(cell.outputs);
+      const extracted = extractOutput(cell.outputs);
+      output = extracted.text;
+      outputImage = extracted.image;
     }
 
     // Determine language
@@ -64,7 +77,10 @@ export function parseNotebook(notebookJson: any, notebookPath: string): Notebook
       code: codeWithoutDirective,
       language,
       output,
+      outputImage,
       executionCount: cell.execution_count,
+      inline: isInline,
+      expanded: isExpanded,
     };
   });
 
@@ -73,30 +89,46 @@ export function parseNotebook(notebookJson: any, notebookPath: string): Notebook
 
 /**
  * Extract output from Jupyter notebook output format
+ * Returns both text and image outputs if available
  */
-function extractOutput(outputs: any[]): string | undefined {
-  const output = outputs[0];
-  
-  if (!output) return undefined;
+function extractOutput(outputs: any[]): { text?: string; image?: string } {
+  let text: string | undefined;
+  let image: string | undefined;
 
-  // Handle different output types
-  if (output.output_type === 'execute_result' || output.output_type === 'display_data') {
-    // Check for text/plain output
-    if (output.data && output.data['text/plain']) {
-      const text = output.data['text/plain'];
-      return Array.isArray(text) ? text.join('').trim() : text.trim();
+  for (const output of outputs) {
+    if (!output) continue;
+
+    // Handle different output types
+    if (output.output_type === 'execute_result' || output.output_type === 'display_data') {
+      // Check for image output (PNG or JPEG)
+      if (output.data) {
+        if (output.data['image/png']) {
+          const imgData = output.data['image/png'];
+          image = `data:image/png;base64,${Array.isArray(imgData) ? imgData.join('') : imgData}`;
+        } else if (output.data['image/jpeg']) {
+          const imgData = output.data['image/jpeg'];
+          image = `data:image/jpeg;base64,${Array.isArray(imgData) ? imgData.join('') : imgData}`;
+        }
+
+        // Check for text/plain output
+        if (output.data['text/plain'] && !text) {
+          const textData = output.data['text/plain'];
+          text = Array.isArray(textData) ? textData.join('').trim() : textData.trim();
+        }
+      }
+    } else if (output.output_type === 'stream') {
+      // Handle print statements
+      const textData = output.text;
+      const streamText = Array.isArray(textData) ? textData.join('').trim() : textData.trim();
+      text = text ? text + '\n' + streamText : streamText;
+    } else if (output.output_type === 'error') {
+      // Handle errors
+      const traceback = output.traceback;
+      text = Array.isArray(traceback) ? traceback.join('\n') : traceback;
     }
-  } else if (output.output_type === 'stream') {
-    // Handle print statements
-    const text = output.text;
-    return Array.isArray(text) ? text.join('').trim() : text.trim();
-  } else if (output.output_type === 'error') {
-    // Handle errors
-    const traceback = output.traceback;
-    return Array.isArray(traceback) ? traceback.join('\n') : traceback;
   }
 
-  return undefined;
+  return { text, image };
 }
 
 /**

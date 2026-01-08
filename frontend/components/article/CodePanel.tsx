@@ -1,13 +1,28 @@
 'use client';
 
-import { FiCopy, FiGithub } from 'react-icons/fi';
+import { useState } from 'react';
+import { FiCopy, FiGithub, FiCode, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CodePanelProps {
   code: string;
   language?: string;
   output?: string;
+  outputImage?: string;
   githubUrl?: string;
   className?: string;
+  /** Enable collapsible behavior */
+  collapsible?: boolean;
+  /** Controlled collapsed state (overrides internal state) */
+  collapsed?: boolean;
+  /** Start in collapsed state (only applies when collapsible is true and collapsed is not controlled) */
+  defaultCollapsed?: boolean;
+  /** Callback when collapse state changes */
+  onCollapsedChange?: (collapsed: boolean) => void;
+  /** Label shown in collapsed bar */
+  collapsedLabel?: string;
+  /** Show first N lines in collapsed preview mode */
+  previewLines?: number;
 }
 
 /**
@@ -108,14 +123,35 @@ function highlightPython(code: string): React.ReactNode {
 /**
  * Elegant code panel for displaying code snippets with optional output
  * Automatically handles copying code and linking to GitHub
+ * Supports collapsible mode for mobile or space-constrained layouts
  */
 export function CodePanel({
   code,
   language = 'python',
   output,
+  outputImage,
   githubUrl,
   className = '',
+  collapsible = false,
+  collapsed,
+  defaultCollapsed = false,
+  onCollapsedChange,
+  collapsedLabel = 'View Code',
+  previewLines = 0,
 }: CodePanelProps) {
+  const [internalCollapsed, setInternalCollapsed] = useState(collapsible && defaultCollapsed);
+
+  // Support both controlled and uncontrolled modes
+  const isControlled = collapsed !== undefined;
+  const isCollapsed = isControlled ? collapsed : internalCollapsed;
+
+  const setIsCollapsed = (value: boolean) => {
+    if (!isControlled) {
+      setInternalCollapsed(value);
+    }
+    onCollapsedChange?.(value);
+  };
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(code);
@@ -125,12 +161,99 @@ export function CodePanel({
   };
 
   const handleGitHub = () => {
-    if (githubUrl) {
-      window.open(githubUrl, '_blank');
-    }
+    // Default to main repo if no specific URL provided
+    const url = githubUrl || 'https://github.com/silen-z/silen-ai';
+    window.open(url, '_blank');
   };
 
   const highlightedCode = language === 'python' ? highlightPython(code) : code;
+  const codeLines = code.split('\n');
+  const hasMoreLines = previewLines > 0 && codeLines.length > previewLines;
+  const previewCode = previewLines > 0 ? codeLines.slice(0, previewLines).join('\n') : code;
+  const highlightedPreview = language === 'python' ? highlightPython(previewCode) : previewCode;
+
+  // Collapsed view: show preview lines if specified, otherwise just a bar
+  if (collapsible && isCollapsed) {
+    // Preview mode: show first N lines collapsed
+    if (previewLines > 0) {
+      return (
+        <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white ${className}`}>
+          {/* Code preview with action buttons */}
+          <div className="relative">
+            <div className="absolute top-2 right-2 flex gap-1 z-10">
+              <button
+                onClick={handleCopy}
+                className="p-1.5 text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-50 border border-neutral-200 rounded shadow-sm transition-colors"
+                title="Copy code"
+              >
+                <FiCopy className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={handleGitHub}
+                className="p-1.5 text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-50 border border-neutral-200 rounded shadow-sm transition-colors"
+                title="View on GitHub"
+              >
+                <FiGithub className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="p-4 pr-20 font-mono text-sm leading-relaxed">
+              <pre className="whitespace-pre-wrap text-neutral-900">
+                {highlightedPreview}
+              </pre>
+              {hasMoreLines && (
+                <div className="text-neutral-400 mt-1">...</div>
+              )}
+            </div>
+          </div>
+
+          {/* Expand button - right under the code */}
+          <button
+            onClick={() => setIsCollapsed(false)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 border-t border-neutral-200 bg-neutral-50 hover:bg-neutral-100 transition-colors text-neutral-600 text-sm"
+          >
+            <span>Show full code</span>
+            <FiChevronDown className="w-4 h-4" />
+          </button>
+
+          {/* Output/Image if present - shown below expand button */}
+          {(output || outputImage) && (
+            <>
+              <div className="border-t border-neutral-200" />
+              <div className="px-4 py-3 bg-neutral-50">
+                {outputImage && (
+                  <img
+                    src={outputImage}
+                    alt="Output"
+                    className="max-w-full h-auto rounded mb-2"
+                  />
+                )}
+                {output && (
+                  <>
+                    <div className="text-xs text-neutral-500 mb-1">Output:</div>
+                    <pre className="font-mono text-sm text-neutral-900 whitespace-pre-wrap">{output}</pre>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    // Simple collapsed bar
+    return (
+      <button
+        onClick={() => setIsCollapsed(false)}
+        className={`w-full flex items-center justify-between px-4 py-3 border border-neutral-200 rounded-lg bg-white hover:bg-neutral-50 transition-colors ${className}`}
+      >
+        <div className="flex items-center gap-2 text-neutral-600">
+          <FiCode className="w-4 h-4" />
+          <span className="text-sm font-medium">{collapsedLabel}</span>
+        </div>
+        <FiChevronDown className="w-4 h-4 text-neutral-400" />
+      </button>
+    );
+  }
 
   return (
     <div
@@ -138,6 +261,15 @@ export function CodePanel({
     >
       {/* Action buttons in top right */}
       <div className="absolute top-2 right-2 flex gap-1 z-10">
+        {collapsible && (
+          <button
+            onClick={() => setIsCollapsed(true)}
+            className="p-1.5 text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-50 border border-neutral-200 rounded shadow-sm transition-colors"
+            title="Collapse"
+          >
+            <FiChevronUp className="w-3.5 h-3.5" />
+          </button>
+        )}
         <button
           onClick={handleCopy}
           className="p-1.5 text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-50 border border-neutral-200 rounded shadow-sm transition-colors"
@@ -145,31 +277,48 @@ export function CodePanel({
         >
           <FiCopy className="w-3.5 h-3.5" />
         </button>
-        {githubUrl && (
-          <button
-            onClick={handleGitHub}
-            className="p-1.5 text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-50 border border-neutral-200 rounded shadow-sm transition-colors"
-            title="View on GitHub"
-          >
-            <FiGithub className="w-3.5 h-3.5" />
-          </button>
-        )}
+        <button
+          onClick={handleGitHub}
+          className="p-1.5 text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-50 border border-neutral-200 rounded shadow-sm transition-colors"
+          title="View on GitHub"
+        >
+          <FiGithub className="w-3.5 h-3.5" />
+        </button>
       </div>
 
       {/* Code section with padding to avoid button overlap */}
-      <div className="p-4 pr-20 font-mono text-sm leading-relaxed">
-        <pre className="whitespace-pre-wrap text-neutral-900">
-          {highlightedCode}
-        </pre>
-      </div>
+      <AnimatePresence initial={false}>
+        <motion.div
+          initial={collapsible ? { height: 0, opacity: 0 } : false}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="p-4 pr-20 font-mono text-sm leading-relaxed"
+        >
+          <pre className="whitespace-pre-wrap text-neutral-900">
+            {highlightedCode}
+          </pre>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Output section */}
-      {output && (
+      {(output || outputImage) && (
         <>
           <div className="border-t border-neutral-200" />
           <div className="px-4 py-3 bg-neutral-50">
-            <div className="text-xs text-neutral-500 mb-1">Output:</div>
-            <pre className="font-mono text-sm text-neutral-900">{output}</pre>
+            {outputImage && (
+              <img
+                src={outputImage}
+                alt="Output"
+                className="max-w-full h-auto rounded mb-2"
+              />
+            )}
+            {output && (
+              <>
+                <div className="text-xs text-neutral-500 mb-1">Output:</div>
+                <pre className="font-mono text-sm text-neutral-900 whitespace-pre-wrap">{output}</pre>
+              </>
+            )}
           </div>
         </>
       )}
