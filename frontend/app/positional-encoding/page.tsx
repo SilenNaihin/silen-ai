@@ -44,6 +44,14 @@ import {
   RoPEInsightAnimation,
   RoPEDimensionPairsAnimation,
   RoPEClosingAnimation,
+  AdditivVsRoPEAnimation,
+  ClockAnalogyAnimation,
+  UniquenessAnimation,
+  SmoothnessAnimation,
+  FourTermsAnimation,
+  GeometricProgressionAnimation,
+  MagnitudePreservationAnimation,
+  CleanAttentionAnimation,
 } from '@/components/positional-encoding/PEAnimations';
 import { TabSwitchButton } from '@/components/navigation/Tabs';
 
@@ -74,13 +82,15 @@ export default function PositionalEncodingArticle() {
                       scrollProgress={scrollProgress}
                       animations={[
                         {
+                          // The Problem section
                           render: (p) => (
                             <PermutationProblemAnimation progress={p} />
                           ),
-                          duration: 1.5,
+                          duration: 1,
                           overlap: 0.15,
                         },
                         {
+                          // First Attempt section
                           render: (p) => (
                             <IntegerExplosionAnimation progress={p} />
                           ),
@@ -88,30 +98,59 @@ export default function PositionalEncodingArticle() {
                           overlap: 0.15,
                         },
                         {
+                          // Enter the Sine section
                           render: (p) => <SingleSineAnimation progress={p} />,
-                          duration: 1.5,
+                          duration: 1,
                           overlap: 0.15,
                         },
                         {
+                          // Adjusting Frequency + Multiple Frequencies
                           render: (p) => (
                             <MultiFrequencyAnimation progress={p} />
                           ),
-                          duration: 1.5,
+                          duration: 1.2,
                           overlap: 0.15,
                         },
                         {
+                          // Multiple Frequencies continued
+                          render: (p) => <ClockAnalogyAnimation progress={p} />,
+                          duration: 1,
+                          overlap: 0.15,
+                        },
+                        {
+                          // Adding Cosine: The Circle Trick
                           render: (p) => <CircleTracerAnimation progress={p} />,
+                          duration: 1.2,
+                          overlap: 0.15,
+                        },
+                        {
+                          // The Frequency Formula (large section with table)
+                          render: (p) => <GeometricProgressionAnimation progress={p} />,
                           duration: 2,
                           overlap: 0.15,
                         },
                         {
-                          render: (p) => <BlankAnimation progress={p} />,
-                          duration: 2,
-                          overlap: 0.1,
+                          // Putting It All Together + PE Matrix visualization
+                          render: (p) => <UniquenessAnimation progress={p} />,
+                          duration: 2.5,
+                          overlap: 0.15,
                         },
                         {
-                          render: (p) => <SummaryAnimation progress={p} />,
+                          // Verification + Relative Position sections
+                          render: (p) => <SmoothnessAnimation progress={p} />,
+                          duration: 2.5,
+                          overlap: 0.15,
+                        },
+                        {
+                          // PyTorch Implementation section
+                          render: (p) => <FourTermsAnimation progress={p} />,
                           duration: 2,
+                          overlap: 0.15,
+                        },
+                        {
+                          // Limitations of Additive PE section (end)
+                          render: (p) => <SummaryAnimation progress={p} />,
+                          duration: 2.5,
                           overlap: 0.1,
                         },
                       ]}
@@ -122,23 +161,27 @@ export default function PositionalEncodingArticle() {
                       scrollProgress={scrollProgress}
                       animations={[
                         {
+                          // Learned Positional Embeddings section
                           render: (p) => (
                             <LearnedEmbeddingsAnimation progress={p} />
                           ),
+                          duration: 1.2,
+                          overlap: 0.15,
+                        },
+                        {
+                          // From Addition to Rotation + 2D Rotation sections
+                          render: (p) => <RotationAnimation progress={p} />,
                           duration: 1.5,
                           overlap: 0.15,
                         },
                         {
-                          render: (p) => <RotationAnimation progress={p} />,
-                          duration: 2,
-                          overlap: 0.15,
-                        },
-                        {
+                          // The Magic Property section
                           render: (p) => <RoPEInsightAnimation progress={p} />,
-                          duration: 2,
+                          duration: 1.5,
                           overlap: 0.15,
                         },
                         {
+                          // RoPE Implementation section
                           render: (p) => (
                             <RoPEDimensionPairsAnimation progress={p} />
                           ),
@@ -146,8 +189,27 @@ export default function PositionalEncodingArticle() {
                           overlap: 0.15,
                         },
                         {
-                          render: (p) => <RoPEClosingAnimation progress={p} />,
+                          // RoPE vs Additive PE section
+                          render: (p) => <AdditivVsRoPEAnimation progress={p} />,
                           duration: 2,
+                          overlap: 0.15,
+                        },
+                        {
+                          // Verifying RoPE Requirements section
+                          render: (p) => <MagnitudePreservationAnimation progress={p} />,
+                          duration: 1.5,
+                          overlap: 0.15,
+                        },
+                        {
+                          // PyTorch RoPE Class section
+                          render: (p) => <CleanAttentionAnimation progress={p} />,
+                          duration: 2,
+                          overlap: 0.15,
+                        },
+                        {
+                          // Summary: Why RoPE Won + Modern Extensions
+                          render: (p) => <RoPEClosingAnimation progress={p} />,
+                          duration: 2.5,
                           overlap: 0.1,
                         },
                       ]}
@@ -175,7 +237,7 @@ export default function PositionalEncodingArticle() {
                 <RoPEContent />
               </TabContent>
 
-              <div className="h-64" />
+              <div className="h-32" />
             </ArticleLayout>
           </div>
         </PyodideProvider>
@@ -287,15 +349,9 @@ function SinusoidalPEContent() {
             One fix: normalize positions to [0, 1]. But this creates its own
             problems:
           </p>
-          <ul className="list-disc list-inside space-y-2 ml-4">
-            <li>
-              Different sequence lengths get different position values for the
-              same relative position
-            </li>
-            <li>
-              The scale becomes dependent on max_len, which we may not know at
-              training time
-            </li>
+          <ul className="list-disc list-inside space-y-1 ml-4">
+            <li>Different sequence lengths get different position values for the same relative position</li>
+            <li>The scale becomes dependent on max_len, which we may not know at training time</li>
           </ul>
         </div>
       </ArticleSection>
@@ -311,27 +367,12 @@ function SinusoidalPEContent() {
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>Let's think about what a good positional encoding requires:</p>
-          <ol className="list-decimal list-inside space-y-3 ml-4">
-            <li>
-              <strong>Bounded values</strong>: Should not explode for long
-              sequences
-            </li>
-            <li>
-              <strong>Unique per position</strong>: Each position must be
-              distinguishable
-            </li>
-            <li>
-              <strong>Consistent scale</strong>: Same encoding scheme works for
-              any sequence length
-            </li>
-            <li>
-              <strong>Smooth</strong>: Nearby positions should have similar
-              encodings
-            </li>
-            <li>
-              <strong>Learnable patterns</strong>: The model should be able to
-              learn relative positions
-            </li>
+          <ol className="list-decimal list-inside space-y-1 ml-4">
+            <li><strong>Bounded values</strong>: Should not explode for long sequences</li>
+            <li><strong>Unique per position</strong>: Each position must be distinguishable</li>
+            <li><strong>Consistent scale</strong>: Same encoding scheme works for any sequence length</li>
+            <li><strong>Smooth</strong>: Nearby positions should have similar encodings</li>
+            <li><strong>Learnable patterns</strong>: The model should be able to learn relative positions</li>
           </ol>
         </div>
       </ArticleSection>
@@ -512,13 +553,25 @@ function SinusoidalPEContent() {
             {'\\omega_i = \\frac{1}{10000^{2i/d}}'}
           </FormulaBox>
           <p>
-            Where{' '}
-            <code className="bg-neutral-100 px-1.5 py-0.5 rounded">i</code> is
-            the dimension index and{' '}
-            <code className="bg-neutral-100 px-1.5 py-0.5 rounded">d</code> is
-            the model dimension. This creates a geometric progression of
-            wavelengths from 2π to 10000·2π.
+            Where <code className="bg-neutral-100 px-1.5 py-0.5 rounded">i</code> is the dimension index and <code className="bg-neutral-100 px-1.5 py-0.5 rounded">d</code> is the model dimension. This creates a <strong>geometric progression</strong> of wavelengths:
           </p>
+          <div className="overflow-x-auto my-3">
+            <table className="min-w-full text-sm border border-neutral-200">
+              <thead className="bg-neutral-50">
+                <tr>
+                  <th className="px-3 py-2 text-left border-b">Dim (i)</th>
+                  <th className="px-3 py-2 text-left border-b">Frequency ω</th>
+                  <th className="px-3 py-2 text-left border-b">Wavelength (positions)</th>
+                  <th className="px-3 py-2 text-left border-b">Purpose</th>
+                </tr>
+              </thead>
+              <tbody className="font-mono text-xs">
+                <tr><td className="px-3 py-1.5 border-b">0</td><td className="px-3 py-1.5 border-b">1.0</td><td className="px-3 py-1.5 border-b">~6 positions</td><td className="px-3 py-1.5 border-b">Fine-grained: adjacent tokens</td></tr>
+                <tr><td className="px-3 py-1.5 border-b">d/4</td><td className="px-3 py-1.5 border-b">0.01</td><td className="px-3 py-1.5 border-b">~600 positions</td><td className="px-3 py-1.5 border-b">Medium: sentence structure</td></tr>
+                <tr><td className="px-3 py-1.5">d/2</td><td className="px-3 py-1.5">0.0001</td><td className="px-3 py-1.5">~60,000 positions</td><td className="px-3 py-1.5">Coarse: document structure</td></tr>
+              </tbody>
+            </table>
+          </div>
           <p id="frequency-formula">
             Let's compute these frequencies for a small embedding dimension:
           </p>
@@ -768,14 +821,24 @@ print(f"  Frequency = {freq:.6f}")`}
           <FormulaBox>
             {'q \\cdot k + q \\cdot pe_k + pe_q \\cdot k + pe_q \\cdot pe_k'}
           </FormulaBox>
+          <div className="overflow-x-auto my-4">
+            <table className="min-w-full text-sm border border-neutral-200">
+              <thead className="bg-neutral-50">
+                <tr>
+                  <th className="px-3 py-2 text-left border-b">Term</th>
+                  <th className="px-3 py-2 text-left border-b">What it measures</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td className="px-3 py-2 border-b font-mono">q · k</td><td className="px-3 py-2 border-b">Pure semantic similarity — how related are these tokens?</td></tr>
+                <tr><td className="px-3 py-2 border-b font-mono">q · pe_j</td><td className="px-3 py-2 border-b">How much the query content "likes" position j</td></tr>
+                <tr><td className="px-3 py-2 border-b font-mono">pe_i · k</td><td className="px-3 py-2 border-b">How much position i "likes" the key content</td></tr>
+                <tr><td className="px-3 py-2 font-mono">pe_i · pe_j</td><td className="px-3 py-2">Pure positional relationship (depends on i - j)</td></tr>
+              </tbody>
+            </table>
+          </div>
           <p>
-            The cross terms{' '}
-            <code className="bg-neutral-100 px-1.5 py-0.5 rounded">q·pe_k</code>{' '}
-            and
-            <code className="bg-neutral-100 px-1.5 py-0.5 rounded ml-1">
-              pe_q·k
-            </code>{' '}
-            mix semantic content with position in potentially undesirable ways.
+            The cross terms mix semantic content with position. The model has to learn to extract the useful relative position signal from <code className="bg-neutral-100 px-1.5 py-0.5 rounded">pe_i · pe_j</code> while disentangling it from the content-position interactions.
           </p>
         </div>
       </ArticleSection>
@@ -801,7 +864,7 @@ print(f"  Frequency = {freq:.6f}")`}
       </ArticleSection>
 
       {/* Tab switch button */}
-      <div className="mt-16 flex justify-center">
+      <div className="mt-10 flex justify-center">
         <TabSwitchButton targetTab="rope" label="Continue to RoPE" />
       </div>
     </>
@@ -919,8 +982,7 @@ function RoPEContent() {
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
-            Here is the key insight that makes RoPE work. When we take the dot
-            product of two vectors rotated by different angles:
+            Here is the key insight that makes RoPE work. When we take the dot product of two rotated vectors:
           </p>
           <FormulaBox label="The Magic Property">
             {
@@ -928,10 +990,12 @@ function RoPEContent() {
             }
           </FormulaBox>
           <p>
-            The dot product depends only on the <strong>difference</strong> in
-            rotation angles, not the absolute angles!
+            The dot product depends only on the <strong>difference</strong> in rotation angles! This follows from rotation matrices being orthogonal: <Math>{'R(\\theta)^T = R(-\\theta)'}</Math>. So:
           </p>
-          <p id="magic-property-verify">Let's verify this property:</p>
+          <div className="bg-neutral-50 p-3 rounded border border-neutral-200 font-mono text-sm">
+            R(θ₁)q · R(θ₂)k = qᵀ R(θ₁)ᵀ R(θ₂) k = qᵀ R(-θ₁) R(θ₂) k = qᵀ R(θ₂ - θ₁) k
+          </div>
+          <p id="magic-property-verify">Let's verify this property numerically:</p>
         </div>
       </ArticleSection>
 
@@ -1117,30 +1181,33 @@ function RoPEContent() {
         >
           Summary: Why RoPE Won
         </TOCHeading>
-        <div className="leading-relaxed space-y-2 text-neutral-900">
-          <p>RoPE has several advantages over additive encodings:</p>
-          <ul className="list-disc list-inside ml-4">
-            <li>
-              <strong>Clean separation</strong>: Position and content do not mix
-              in the dot product
-            </li>
-            <li>
-              <strong>Relative by design</strong>: Attention naturally captures
-              relative position
-            </li>
-            <li>
-              <strong>Extrapolation</strong>: Works better on longer sequences
-              than trained
-            </li>
-            <li>
-              <strong>No parameters</strong>: Computed deterministically (like
-              sinusoidal)
-            </li>
+        <div className="leading-relaxed space-y-3 text-neutral-900">
+          <div className="overflow-x-auto my-4">
+            <table className="min-w-full text-sm border border-neutral-200">
+              <thead className="bg-neutral-50">
+                <tr>
+                  <th className="px-3 py-2 text-left border-b">Property</th>
+                  <th className="px-3 py-2 text-left border-b">Sinusoidal PE</th>
+                  <th className="px-3 py-2 text-left border-b">Learned PE</th>
+                  <th className="px-3 py-2 text-left border-b">RoPE</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td className="px-3 py-2 border-b">Relative position</td><td className="px-3 py-2 border-b">Implicit (needs to be learned)</td><td className="px-3 py-2 border-b">No</td><td className="px-3 py-2 border-b text-green-700 font-medium">Direct (built-in)</td></tr>
+                <tr><td className="px-3 py-2 border-b">Content/position separation</td><td className="px-3 py-2 border-b">Mixed (4 terms)</td><td className="px-3 py-2 border-b">Mixed (4 terms)</td><td className="px-3 py-2 border-b text-green-700 font-medium">Clean (2 terms)</td></tr>
+                <tr><td className="px-3 py-2 border-b">Extrapolation</td><td className="px-3 py-2 border-b">Moderate</td><td className="px-3 py-2 border-b">Poor</td><td className="px-3 py-2 border-b text-green-700 font-medium">Good</td></tr>
+                <tr><td className="px-3 py-2 border-b">Learnable parameters</td><td className="px-3 py-2 border-b">0</td><td className="px-3 py-2 border-b">max_len × d</td><td className="px-3 py-2 border-b">0</td></tr>
+                <tr><td className="px-3 py-2">Where applied</td><td className="px-3 py-2">Embeddings</td><td className="px-3 py-2">Embeddings</td><td className="px-3 py-2">Q/K only</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>RoPE is now the industry standard, used in LLaMA, Mistral, Qwen, and most modern LLMs. The key advantages:</p>
+          <ul className="list-disc list-inside ml-4 space-y-1">
+            <li><strong>Clean separation</strong>: Position and content do not mix in the dot product</li>
+            <li><strong>Relative by design</strong>: Attention naturally captures relative position</li>
+            <li><strong>Extrapolation</strong>: Works better on longer sequences than trained</li>
+            <li><strong>No parameters</strong>: Computed deterministically (like sinusoidal)</li>
           </ul>
-          <p>
-            RoPE is now the industry standard, used in LLaMA, Mistral, Qwen, and
-            most modern LLMs.
-          </p>
         </div>
       </ArticleSection>
 

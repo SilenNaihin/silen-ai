@@ -95,11 +95,11 @@ export function PermutationProblemAnimation({ progress }: { progress: number }) 
 
     // Bottom text
     ctx.fillStyle = '#000';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('Same attention scores!', centerX, height - 35);
-    ctx.fillStyle = '#6b7280';
-    ctx.font = '11px sans-serif';
-    ctx.fillText('Model cannot distinguish token order.', centerX, height - 15);
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillText('Same attention scores!', centerX, height - 38);
+    ctx.fillStyle = '#374151';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('Model cannot distinguish token order.', centerX, height - 18);
   };
 
   return (
@@ -249,9 +249,9 @@ export function SingleSineAnimation({ progress }: { progress: number }) {
       });
 
       ctx.fillStyle = `rgba(0, 0, 0, ${collisionOpacity})`;
-      ctx.font = '12px sans-serif';
+      ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Repeats every 2π positions!', width / 2, height - 20);
+      ctx.fillText('Repeats every 2π positions!', width / 2, height - 18);
     }
 
     // Position markers
@@ -773,15 +773,15 @@ export function LearnedEmbeddingsAnimation({ progress }: { progress: number }) {
     }
 
     // Limitation note
-    ctx.fillStyle = '#6b7280';
-    ctx.font = '11px sans-serif';
+    ctx.fillStyle = '#ef4444';
+    ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Fixed size! Cannot exceed max_position.', width / 2, height - 30);
+    ctx.fillText('Fixed size! Cannot exceed max_position.', width / 2, height - 35);
 
     // Title annotation
     ctx.fillStyle = '#374151';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('nn.Embedding(max_pos, d_model)', width / 2, height - 10);
+    ctx.font = '13px monospace';
+    ctx.fillText('nn.Embedding(max_pos, d_model)', width / 2, height - 15);
   };
 
   return (
@@ -870,9 +870,9 @@ export function RotationAnimation({ progress }: { progress: number }) {
     ctx.fillText(`\u03B8 = ${Math.round((rotationAngle * 180) / Math.PI)}\u00B0`, centerX, height - 30);
 
     // Magnitude preservation
-    ctx.font = '11px sans-serif';
-    ctx.fillStyle = '#6b7280';
-    ctx.fillText('|R(\u03B8)v| = |v|  (magnitude preserved)', centerX, height - 12);
+    ctx.font = '14px sans-serif';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('|R(θ)v| = |v|  (magnitude preserved)', centerX, height - 15);
 
     // Title
     ctx.fillStyle = '#374151';
@@ -986,8 +986,8 @@ export function RoPEInsightAnimation({ progress }: { progress: number }) {
     ctx.fillText('Same Relative Angle = Same Dot Product', width / 2, 25);
 
     // Subtitle
-    ctx.font = '11px sans-serif';
-    ctx.fillStyle = '#6b7280';
+    ctx.font = '14px sans-serif';
+    ctx.fillStyle = '#374151';
     ctx.fillText('Different absolute positions, same relative distance', width / 2, height - 15);
   };
 
@@ -1055,11 +1055,12 @@ export function SummaryAnimation({ progress }: { progress: number }) {
     ctx.fillText('position', centerX + 120, 165);
 
     // Explanation
-    ctx.fillStyle = '#000';
-    ctx.font = '11px sans-serif';
-    ctx.fillText('Cross terms mix semantic content with position', centerX, height - 35);
+    ctx.fillStyle = '#374151';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText('Cross terms mix semantic content with position', centerX, height - 38);
     ctx.fillStyle = '#6b7280';
-    ctx.fillText('RoPE solves this via rotation instead of addition', centerX, height - 15);
+    ctx.font = '14px sans-serif';
+    ctx.fillText('RoPE solves this via rotation instead of addition', centerX, height - 18);
   };
 
   return (
@@ -1070,7 +1071,213 @@ export function SummaryAnimation({ progress }: { progress: number }) {
 }
 
 /**
- * Closing animation for RoPE section showing why rotation wins
+ * Animation showing RoPE magnitude preservation property
+ */
+export function MagnitudePreservationAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    // Title
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('RoPE Preserves Information', centerX, 25);
+
+    const radius = Math.min(width, height) * 0.22;
+
+    // Draw coordinate system
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(centerX - radius - 20, centerY);
+    ctx.lineTo(centerX + radius + 20, centerY);
+    ctx.moveTo(centerX, centerY - radius - 20);
+    ctx.lineTo(centerX, centerY + radius + 20);
+    ctx.stroke();
+
+    // Unit circle
+    ctx.strokeStyle = '#d4d4d4';
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.9, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Original vector (fixed)
+    const originalAngle = Math.PI / 5;
+    const vectorLength = radius * 0.8;
+    const originalEndX = centerX + Math.cos(originalAngle) * vectorLength;
+    const originalEndY = centerY - Math.sin(originalAngle) * vectorLength;
+
+    // Draw original vector faded
+    ctx.strokeStyle = '#d4d4d4';
+    ctx.lineWidth = 2;
+    drawArrow(ctx, centerX, centerY, originalEndX, originalEndY);
+
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '12px sans-serif';
+    ctx.fillText('original', originalEndX + 15, originalEndY - 5);
+
+    // Animated rotation
+    const rotationAngle = progress * Math.PI * 2;
+    const rotatedAngle = originalAngle + rotationAngle;
+    const rotatedEndX = centerX + Math.cos(rotatedAngle) * vectorLength;
+    const rotatedEndY = centerY - Math.sin(rotatedAngle) * vectorLength;
+
+    // Draw rotated vector
+    ctx.strokeStyle = '#8b5cf6';
+    ctx.lineWidth = 3;
+    drawArrow(ctx, centerX, centerY, rotatedEndX, rotatedEndY);
+
+    // Draw magnitude indicator
+    const magX = width - 80;
+    const barHeight = 100;
+    const barY = centerY - barHeight / 2;
+
+    ctx.fillStyle = '#f3f4f6';
+    ctx.fillRect(magX, barY, 30, barHeight);
+
+    // Magnitude bar (constant)
+    ctx.fillStyle = '#10b981';
+    ctx.fillRect(magX, barY + 20, 30, barHeight - 40);
+
+    ctx.fillStyle = '#374151';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('|v|', magX + 15, barY - 5);
+    ctx.fillText('const', magX + 15, barY + barHeight + 15);
+
+    // Bottom text
+    ctx.fillStyle = '#374151';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('Rotation changes direction, not magnitude', centerX, height - 32);
+    ctx.fillStyle = '#10b981';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText('Semantic information is preserved!', centerX, height - 12);
+  };
+
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
+}
+
+/**
+ * Animation showing clean q·k computation with RoPE
+ */
+export function CleanAttentionAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+    const centerX = width / 2;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    // Title
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('Clean Attention Computation', centerX, 25);
+
+    // Phase 1: Show additive PE problem (0-0.4)
+    if (progress < 0.4) {
+      const phase = progress / 0.4;
+      ctx.globalAlpha = phase;
+
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '12px monospace';
+      ctx.fillText('Additive: (q + pe) · (k + pe)', centerX, 60);
+
+      ctx.font = '11px monospace';
+      ctx.fillStyle = '#6b7280';
+      ctx.fillText('= q·k + q·pe + pe·k + pe·pe', centerX, 85);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '11px sans-serif';
+      ctx.fillText('4 terms! Content and position mixed', centerX, 110);
+
+      ctx.globalAlpha = 1;
+    }
+
+    // Phase 2: Show RoPE solution (0.4-1.0)
+    if (progress >= 0.4) {
+      const phase = (progress - 0.4) / 0.6;
+
+      // Fade out additive
+      ctx.globalAlpha = 1 - phase * 0.7;
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '11px monospace';
+      ctx.fillText('Additive: 4 terms mixed', centerX, 60);
+      ctx.globalAlpha = 1;
+
+      // Show RoPE
+      ctx.globalAlpha = Math.min(1, phase * 2);
+
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 13px monospace';
+      ctx.fillText('RoPE: R(θ_m)q · R(θ_n)k', centerX, 100);
+
+      ctx.font = '18px sans-serif';
+      ctx.fillStyle = '#6b7280';
+      ctx.fillText('↓', centerX, 125);
+
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 13px monospace';
+      ctx.fillText('= q · R(θ_n - θ_m)k', centerX, 150);
+
+      // Highlight the key insight
+      if (phase > 0.5) {
+        const highlightPhase = (phase - 0.5) / 0.5;
+        ctx.globalAlpha = highlightPhase;
+
+        // Draw highlight box
+        ctx.fillStyle = '#dcfce7';
+        ctx.fillRect(centerX - 120, 165, 240, 40);
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(centerX - 120, 165, 240, 40);
+
+        ctx.fillStyle = '#166534';
+        ctx.font = 'bold 13px sans-serif';
+        ctx.fillText('Only 2 terms!', centerX, 182);
+        ctx.font = '11px sans-serif';
+        ctx.fillText('Depends only on (n - m) = relative position', centerX, 198);
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    // Bottom comparison
+    ctx.fillStyle = '#374151';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('No cross terms = cleaner gradients', centerX, height - 12);
+  };
+
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
+}
+
+/**
+ * Closing animation for RoPE section showing why rotation wins - improved version
  */
 export function RoPEClosingAnimation({ progress }: { progress: number }) {
   const renderAnimation = (
@@ -1085,46 +1292,87 @@ export function RoPEClosingAnimation({ progress }: { progress: number }) {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
-    ctx.font = '14px sans-serif';
+    // Title with gradient effect
+    ctx.font = 'bold 16px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#000';
-    ctx.fillText('Why Rotation Wins', centerX, 30);
+    ctx.fillStyle = '#10b981';
+    ctx.fillText('🏆 Why RoPE Wins', centerX, 28);
 
-    // Show advantages
+    // Animated advantages appearing one by one
     const advantages = [
-      { label: 'Clean separation', desc: 'Position and content stay separate' },
-      { label: 'Relative by design', desc: 'Dot product depends on distance only' },
-      { label: 'No parameters', desc: 'Computed deterministically' },
-      { label: 'Better extrapolation', desc: 'Works on longer sequences' },
+      { icon: '🔄', label: 'Clean Separation', desc: 'q·k stays pure', color: '#8b5cf6' },
+      { icon: '📏', label: 'Relative Position', desc: 'Built-in, not learned', color: '#3b82f6' },
+      { icon: '📈', label: 'Extrapolation', desc: 'Works beyond training length', color: '#10b981' },
+      { icon: '⚡', label: 'Zero Parameters', desc: 'Computed on the fly', color: '#f59e0b' },
     ];
 
-    ctx.font = '11px sans-serif';
-    advantages.forEach((item, i) => {
-      const y = 65 + i * 40;
+    const startY = 55;
+    const itemHeight = 42;
 
-      // Checkmark
-      ctx.fillStyle = '#10b981';
-      ctx.font = '14px sans-serif';
-      ctx.fillText('✓', centerX - 100, y);
+    advantages.forEach((item, i) => {
+      const itemProgress = Math.max(0, Math.min(1, progress * 5 - i));
+      if (itemProgress <= 0) return;
+
+      const y = startY + i * itemHeight;
+
+      // Slide in from left with fade
+      const slideOffset = (1 - itemProgress) * 30;
+      ctx.globalAlpha = itemProgress;
+
+      // Background highlight
+      ctx.fillStyle = item.color + '15';
+      ctx.fillRect(centerX - 130 + slideOffset, y - 8, 260, 38);
+
+      // Left border accent
+      ctx.fillStyle = item.color;
+      ctx.fillRect(centerX - 130 + slideOffset, y - 8, 4, 38);
+
+      // Icon
+      ctx.font = '18px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(item.icon, centerX - 115 + slideOffset, y + 12);
 
       // Label
       ctx.fillStyle = '#000';
-      ctx.font = '12px sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText(item.label, centerX - 80, y);
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText(item.label, centerX - 85 + slideOffset, y + 8);
 
       // Description
       ctx.fillStyle = '#6b7280';
-      ctx.font = '10px sans-serif';
-      ctx.fillText(item.desc, centerX - 80, y + 15);
+      ctx.font = '11px sans-serif';
+      ctx.fillText(item.desc, centerX - 85 + slideOffset, y + 24);
 
-      ctx.textAlign = 'center';
+      ctx.globalAlpha = 1;
     });
 
-    // Bottom note
-    ctx.fillStyle = '#6b7280';
-    ctx.font = '11px sans-serif';
-    ctx.fillText('Used by LLaMA, Mistral, Qwen, and most modern LLMs', centerX, height - 20);
+    // Final reveal: Model names
+    if (progress > 0.8) {
+      const finalPhase = (progress - 0.8) / 0.2;
+      ctx.globalAlpha = finalPhase;
+
+      // Models badge
+      ctx.fillStyle = '#f3f4f6';
+      ctx.fillRect(centerX - 150, height - 48, 300, 38);
+      ctx.strokeStyle = '#d4d4d4';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(centerX - 150, height - 48, 300, 38);
+
+      ctx.fillStyle = '#374151';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Used by', centerX, height - 32);
+
+      // Model logos/names
+      const models = ['LLaMA', 'Mistral', 'Qwen', 'Gemma'];
+      ctx.font = 'bold 12px monospace';
+      models.forEach((model, i) => {
+        const colors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b'];
+        ctx.fillStyle = colors[i];
+        ctx.fillText(model, centerX - 90 + i * 60, height - 17);
+      });
+
+      ctx.globalAlpha = 1;
+    }
   };
 
   return (
@@ -1234,6 +1482,675 @@ export function RoPEDimensionPairsAnimation({ progress }: { progress: number }) 
     ctx.fillStyle = '#374151';
     ctx.font = '14px sans-serif';
     ctx.fillText('RoPE: Different Frequencies per Dimension Pair', width / 2, 25);
+  };
+
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
+}
+
+/**
+ * Animation showing uniqueness of PE - each position has a unique fingerprint
+ */
+export function UniquenessAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    // Title
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('Unique Position Fingerprints', width / 2, 25);
+
+    const numPositions = 8;
+    const barHeight = 18;
+    const barSpacing = 28;
+    const startY = 55;
+    const barMaxWidth = width * 0.6;
+    const startX = width * 0.2;
+    const dModel = 16;
+
+    // Animate which positions are shown
+    const visiblePositions = Math.min(numPositions, Math.ceil(progress * numPositions * 1.5));
+
+    for (let pos = 0; pos < visiblePositions; pos++) {
+      const y = startY + pos * barSpacing;
+
+      // Position label
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '11px monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(`pos ${pos}`, startX - 10, y + barHeight / 2 + 4);
+
+      // Draw PE fingerprint as colored bars
+      for (let dim = 0; dim < dModel; dim++) {
+        const dimIndex = Math.floor(dim / 2);
+        const freq = 1 / Math.pow(10000, (2 * dimIndex) / dModel);
+        const angle = pos * freq;
+        const value = dim % 2 === 0 ? Math.sin(angle) : Math.cos(angle);
+
+        const cellWidth = barMaxWidth / dModel;
+        const x = startX + dim * cellWidth;
+
+        // Color based on value
+        const normalized = (value + 1) / 2;
+        const hue = 240 - normalized * 240; // Blue to red
+        ctx.fillStyle = `hsl(${hue}, 70%, 50%)`;
+        ctx.fillRect(x, y, cellWidth - 1, barHeight);
+      }
+    }
+
+    // Legend
+    ctx.font = '14px sans-serif';
+    ctx.fillStyle = '#374151';
+    ctx.textAlign = 'center';
+    ctx.fillText('Each row is unique — no two positions have the same pattern', width / 2, height - 15);
+  };
+
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
+}
+
+/**
+ * Animation showing smoothness - nearby positions have similar encodings
+ */
+export function SmoothnessAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    // Title
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('Smoothness: Similar Positions → Similar Encodings', width / 2, 25);
+
+    const dModel = 32;
+    const centerY = height / 2;
+    const graphWidth = width * 0.8;
+    const startX = width * 0.1;
+
+    // Compute PE for a reference position
+    const refPos = 10;
+    const computePE = (pos: number) => {
+      const pe: number[] = [];
+      for (let i = 0; i < dModel; i++) {
+        const dimIndex = Math.floor(i / 2);
+        const freq = 1 / Math.pow(10000, (2 * dimIndex) / dModel);
+        const angle = pos * freq;
+        pe.push(i % 2 === 0 ? Math.sin(angle) : Math.cos(angle));
+      }
+      return pe;
+    };
+
+    const cosineSimilarity = (a: number[], b: number[]) => {
+      const dot = a.reduce((sum, val, i) => sum + val * b[i], 0);
+      const magA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+      const magB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+      return dot / (magA * magB);
+    };
+
+    const refPE = computePE(refPos);
+    const numPoints = Math.floor(progress * 40);
+
+    // Draw similarity curve
+    ctx.strokeStyle = '#8b5cf6';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    const amplitude = height * 0.25;
+    for (let i = 0; i <= numPoints; i++) {
+      const pos = i;
+      const similarity = cosineSimilarity(refPE, computePE(pos));
+      const x = startX + (i / 40) * graphWidth;
+      const y = centerY - similarity * amplitude;
+
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Reference position marker
+    if (progress > 0.25) {
+      const refX = startX + (refPos / 40) * graphWidth;
+      ctx.strokeStyle = '#ef4444';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(refX, centerY - amplitude);
+      ctx.lineTo(refX, centerY + amplitude * 0.3);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`ref=${refPos}`, refX, centerY + amplitude * 0.5);
+    }
+
+    // Axis
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(startX, centerY);
+    ctx.lineTo(startX + graphWidth, centerY);
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Position', startX, height - 15);
+    ctx.save();
+    ctx.translate(15, centerY);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText('Similarity', 0, 0);
+    ctx.restore();
+
+    // Insight
+    ctx.fillStyle = '#374151';
+    ctx.textAlign = 'center';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('Peak at reference, gradual decay with distance', width / 2, height - 15);
+  };
+
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
+}
+
+/**
+ * Animation showing the geometric progression of wavelengths
+ */
+export function GeometricProgressionAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    // Title
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('Geometric Progression of Wavelengths', width / 2, 25);
+
+    const numDims = 6;
+    const rowHeight = (height - 80) / numDims;
+    const marginX = 60;
+    const graphWidth = width - marginX * 2;
+
+    // Each dimension pair has exponentially increasing wavelength
+    for (let d = 0; d < numDims; d++) {
+      const dimProgress = Math.max(0, Math.min(1, progress * (numDims + 1) - d));
+      if (dimProgress <= 0) continue;
+
+      const y = 50 + d * rowHeight + rowHeight / 2;
+      const wavelength = Math.pow(2, d) * 6; // 6, 12, 24, 48, 96, 192
+      const freq = 1 / wavelength;
+
+      // Label
+      ctx.globalAlpha = dimProgress;
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(`dim ${d * 2}`, marginX - 8, y + 4);
+
+      // Draw wave
+      const amplitude = rowHeight * 0.35;
+      const color = `hsl(${260 - d * 30}, 70%, 50%)`;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      for (let x = 0; x <= graphWidth; x++) {
+        const t = (x / graphWidth) * 100;
+        const val = Math.sin(t * freq * Math.PI * 2);
+        const px = marginX + x;
+        const py = y - val * amplitude;
+
+        if (x === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      // Wavelength label
+      ctx.fillStyle = color;
+      ctx.font = '9px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`λ=${wavelength}`, width - marginX + 5, y + 4);
+
+      ctx.globalAlpha = 1;
+    }
+
+    // Bottom text
+    ctx.fillStyle = '#374151';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Low dimensions: fine detail | High dimensions: global structure', width / 2, height - 15);
+  };
+
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
+}
+
+/**
+ * Animation showing the 4-term expansion problem visually
+ */
+export function FourTermsAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+    const centerX = width / 2;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    // Phase 1: Show original formula (0-0.2)
+    const phase1 = Math.min(1, progress / 0.2);
+
+    // Title
+    ctx.globalAlpha = phase1;
+    ctx.font = 'bold 15px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('The Attention Score Expansion', centerX, 28);
+
+    // Original formula with background
+    const formulaY = 58;
+    ctx.fillStyle = '#f3f4f6';
+    ctx.fillRect(centerX - 110, formulaY - 18, 220, 30);
+    ctx.font = 'bold 16px monospace';
+    ctx.fillStyle = '#000';
+    ctx.fillText('(q + pe) · (k + pe)', centerX, formulaY);
+    ctx.globalAlpha = 1;
+
+    // Phase 2: Arrow appears with "expands to" text (0.2-0.3)
+    if (progress > 0.2) {
+      const phase2 = Math.min(1, (progress - 0.2) / 0.1);
+      ctx.globalAlpha = phase2;
+      ctx.font = '22px sans-serif';
+      ctx.fillStyle = '#6b7280';
+      ctx.fillText('↓', centerX, 95);
+      ctx.globalAlpha = 1;
+    }
+
+    // Phase 3-6: Terms appear one by one (0.3-0.75)
+    const terms = [
+      { label: 'q · k', color: '#10b981', desc: 'semantic', startPhase: 0.3 },
+      { label: 'q · pe', color: '#f59e0b', desc: 'mixed', startPhase: 0.4 },
+      { label: 'pe · k', color: '#f59e0b', desc: 'mixed', startPhase: 0.5 },
+      { label: 'pe · pe', color: '#3b82f6', desc: 'position', startPhase: 0.6 },
+    ];
+
+    const boxWidth = 72;
+    const boxHeight = 52;
+    const boxY = 115;
+    const gap = 14;
+    const totalWidth = boxWidth * 4 + gap * 3;
+    const startX = centerX - totalWidth / 2;
+
+    terms.forEach((term, i) => {
+      if (progress < term.startPhase) return;
+
+      const termProgress = Math.min(1, (progress - term.startPhase) / 0.1);
+      const x = startX + i * (boxWidth + gap);
+
+      // Animate box appearing with scale and slight bounce
+      const scale = termProgress < 0.5
+        ? 0.5 + termProgress * 1.1  // Overshoot
+        : 1.05 - (termProgress - 0.5) * 0.1;  // Settle back
+      const boxCenterX = x + boxWidth / 2;
+      const boxCenterY = boxY + boxHeight / 2;
+
+      ctx.save();
+      ctx.translate(boxCenterX, boxCenterY);
+      ctx.scale(scale, scale);
+      ctx.translate(-boxCenterX, -boxCenterY);
+      ctx.globalAlpha = Math.min(1, termProgress * 1.5);
+
+      // Box shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.1)';
+      ctx.fillRect(x + 3, boxY + 3, boxWidth, boxHeight);
+
+      // Box background
+      ctx.fillStyle = term.color + '25';
+      ctx.fillRect(x, boxY, boxWidth, boxHeight);
+
+      // Box border
+      ctx.strokeStyle = term.color;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x, boxY, boxWidth, boxHeight);
+
+      // Label
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 14px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(term.label, boxCenterX, boxCenterY + 5);
+
+      // Description badge
+      ctx.fillStyle = term.color;
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText(term.desc, boxCenterX, boxY + boxHeight + 16);
+
+      // Plus signs between boxes
+      if (i < 3 && termProgress > 0.5) {
+        ctx.fillStyle = '#374151';
+        ctx.font = 'bold 18px sans-serif';
+        ctx.fillText('+', x + boxWidth + gap / 2, boxCenterY + 6);
+      }
+
+      ctx.restore();
+    });
+
+    // Phase 7: Highlight cross terms with animated glow (0.75-0.88)
+    if (progress > 0.75) {
+      const highlightProgress = Math.min(1, (progress - 0.75) / 0.13);
+      const pulseIntensity = 0.5 + 0.5 * Math.sin(highlightProgress * Math.PI * 2);
+
+      // Draw glowing brackets around cross terms
+      ctx.globalAlpha = highlightProgress;
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 4;
+
+      const bracketX1 = startX + boxWidth + gap - 8;
+      const bracketX2 = startX + boxWidth * 3 + gap * 2 + 8;
+      const bracketY1 = boxY - 12;
+      const bracketY2 = boxY + boxHeight + 12;
+
+      // Glow effect
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 8 * pulseIntensity;
+
+      // Left bracket
+      ctx.beginPath();
+      ctx.moveTo(bracketX1 + 12, bracketY1);
+      ctx.lineTo(bracketX1, bracketY1);
+      ctx.lineTo(bracketX1, bracketY2);
+      ctx.lineTo(bracketX1 + 12, bracketY2);
+      ctx.stroke();
+
+      // Right bracket
+      ctx.beginPath();
+      ctx.moveTo(bracketX2 - 12, bracketY1);
+      ctx.lineTo(bracketX2, bracketY1);
+      ctx.lineTo(bracketX2, bracketY2);
+      ctx.lineTo(bracketX2 - 12, bracketY2);
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+    }
+
+    // Phase 8: Problem text (0.88-1.0)
+    if (progress > 0.88) {
+      const textProgress = Math.min(1, (progress - 0.88) / 0.12);
+      ctx.globalAlpha = textProgress;
+
+      // Warning background
+      ctx.fillStyle = '#fef3c7';
+      ctx.fillRect(centerX - 160, height - 55, 320, 45);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(centerX - 160, height - 55, 320, 45);
+
+      ctx.fillStyle = '#92400e';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('⚠ Cross terms mix content with position!', centerX, height - 35);
+
+      ctx.fillStyle = '#78350f';
+      ctx.font = '13px sans-serif';
+      ctx.fillText('The model must learn to disentangle them', centerX, height - 17);
+
+      ctx.globalAlpha = 1;
+    }
+  };
+
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
+}
+
+/**
+ * Animation comparing additive PE vs RoPE attention computation
+ */
+export function AdditivVsRoPEAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    const leftX = width * 0.25;
+    const rightX = width * 0.75;
+    const startY = 60;
+
+    // Title
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#000';
+    ctx.fillText('Additive PE', leftX, 30);
+    ctx.fillText('RoPE', rightX, 30);
+
+    // Left side: Additive PE formula
+    ctx.font = '11px monospace';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('(q + pe_i) · (k + pe_j)', leftX, startY);
+
+    // Expansion arrow
+    ctx.fillText('↓', leftX, startY + 20);
+
+    // Four terms
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#000';
+    ctx.fillText('q·k', leftX - 50, startY + 45);
+    ctx.fillStyle = '#8b5cf6';
+    ctx.fillText('q·pe', leftX - 15, startY + 45);
+    ctx.fillStyle = '#8b5cf6';
+    ctx.fillText('pe·k', leftX + 20, startY + 45);
+    ctx.fillStyle = '#000';
+    ctx.fillText('pe·pe', leftX + 55, startY + 45);
+
+    // Labels
+    ctx.font = '9px sans-serif';
+    ctx.fillStyle = '#6b7280';
+    ctx.fillText('4 terms (mixed)', leftX, startY + 65);
+
+    // Right side: RoPE formula
+    ctx.font = '11px monospace';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('R(θ_i)q · R(θ_j)k', rightX, startY);
+
+    // Equals
+    ctx.fillText('=', rightX, startY + 20);
+
+    // Two terms
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#10b981';
+    ctx.fillText('q · R(θ_j - θ_i)k', rightX, startY + 45);
+
+    // Labels
+    ctx.font = '9px sans-serif';
+    ctx.fillStyle = '#6b7280';
+    ctx.fillText('2 terms (clean)', rightX, startY + 65);
+
+    // Visual: show attention score pattern
+    const matrixY = startY + 100;
+    const gridSize = 20;
+    const numCells = 5;
+
+    // Draw simplified attention matrix for both
+    for (let side = 0; side < 2; side++) {
+      const centerX = side === 0 ? leftX : rightX;
+      const startGridX = centerX - (numCells * gridSize) / 2;
+
+      ctx.font = '9px sans-serif';
+      ctx.fillStyle = '#6b7280';
+      ctx.fillText('Attention', centerX, matrixY - 10);
+
+      for (let i = 0; i < numCells; i++) {
+        for (let j = 0; j < numCells; j++) {
+          const x = startGridX + j * gridSize;
+          const y = matrixY + i * gridSize;
+
+          // Generate attention pattern
+          let intensity;
+          if (side === 0) {
+            // Additive: more diffuse pattern
+            intensity = 0.3 + 0.4 * Math.exp(-Math.abs(i - j) * 0.5);
+          } else {
+            // RoPE: cleaner diagonal pattern
+            intensity = 0.8 * Math.exp(-Math.abs(i - j) * 0.8);
+          }
+
+          ctx.fillStyle = `rgba(59, 130, 246, ${intensity})`;
+          ctx.fillRect(x, y, gridSize - 2, gridSize - 2);
+        }
+      }
+    }
+
+    // Bottom comparison
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ef4444';
+    ctx.fillText('Content/position mixed', leftX, height - 15);
+    ctx.fillStyle = '#10b981';
+    ctx.fillText('Pure relative distance', rightX, height - 15);
+  };
+
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
+}
+
+/**
+ * Clock analogy animation for multi-frequency encoding
+ */
+export function ClockAnalogyAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    const clockRadius = Math.min(width, height) * 0.18;
+    const clocks = [
+      { label: 'Hour', freq: 1 / 12, color: '#8b5cf6', x: width * 0.2 },
+      { label: 'Minute', freq: 1, color: '#3b82f6', x: width * 0.5 },
+      { label: 'Second', freq: 60, color: '#10b981', x: width * 0.8 },
+    ];
+
+    const centerY = height / 2;
+
+    // Title
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('Clock Analogy: Multiple Frequencies', width / 2, 25);
+
+    // Draw each clock
+    clocks.forEach(({ label, freq, color, x }) => {
+      // Clock face
+      ctx.strokeStyle = '#e5e7eb';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, centerY, clockRadius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Hour marks
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
+        const innerR = clockRadius * 0.85;
+        const outerR = clockRadius * 0.95;
+        ctx.beginPath();
+        ctx.moveTo(x + Math.cos(angle) * innerR, centerY + Math.sin(angle) * innerR);
+        ctx.lineTo(x + Math.cos(angle) * outerR, centerY + Math.sin(angle) * outerR);
+        ctx.stroke();
+      }
+
+      // Hand - slower rotation
+      const handAngle = progress * Math.PI * 0.8 * freq - Math.PI / 2;
+      const handLength = clockRadius * 0.7;
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x, centerY);
+      ctx.lineTo(
+        x + Math.cos(handAngle) * handLength,
+        centerY + Math.sin(handAngle) * handLength
+      );
+      ctx.stroke();
+
+      // Center dot
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x, centerY, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Label
+      ctx.font = '12px sans-serif';
+      ctx.fillStyle = color;
+      ctx.textAlign = 'center';
+      ctx.fillText(label, x, centerY + clockRadius + 25);
+    });
+
+    // Explanation
+    ctx.font = '14px sans-serif';
+    ctx.fillStyle = '#374151';
+    ctx.fillText('Each "hand" (dimension) moves at different speed', width / 2, height - 32);
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('Together they uniquely identify any position', width / 2, height - 14);
   };
 
   return (
