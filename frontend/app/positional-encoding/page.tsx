@@ -32,6 +32,15 @@ import {
 } from '@/components/positional-encoding/PEMatrixViz';
 import { Math, FormulaBox } from '@/components/article/Math';
 import {
+  Prose,
+  InsightBox,
+  QuoteBox,
+  DataFlow,
+  OrderedList,
+  UnorderedList,
+  MutedText,
+} from '@/components/article/Callouts';
+import {
   PermutationProblemAnimation,
   IntegerExplosionAnimation,
   SingleSineAnimation,
@@ -240,24 +249,6 @@ export default function PositionalEncodingArticle() {
                 Building Intuition from First Principles
               </p>
 
-              {/* Hook - the mystery */}
-              <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 mb-8">
-                <p className="text-neutral-700 text-sm mb-3">
-                  Shuffle the words in "The cat sat on the mat" and a
-                  transformer sees <strong>no difference</strong>. It processes
-                  tokens in parallel with no notion of order. So how do models
-                  like GPT know that "cat" comes before "sat"?
-                </p>
-                <p className="text-sm font-mono text-neutral-500 mb-2">
-                  PE<sub>(pos, 2i)</sub> = sin(pos / 10000<sup>2i/d</sup>)
-                </p>
-                <p className="text-neutral-600 text-sm">
-                  This formula. But <em>why</em> sine? Why 10000? Why alternate
-                  sin/cos? We'll derive this from scratch — each choice will
-                  feel inevitable.
-                </p>
-              </div>
-
               {/* Tab 1: Sinusoidal PE */}
               <TabContent tabId="sinusoidal">
                 <SinusoidalPEContent />
@@ -282,14 +273,30 @@ function SinusoidalPEContent() {
     <>
       {/* ========== THE PROBLEM ========== */}
       <ArticleSection>
+        {/* Hook - the mystery */}
+        <InsightBox className="mb-8">
+          <p className="mb-3">
+            Shuffle the words in "The cat sat on the mat" and a transformer sees{' '}
+            <strong>no difference</strong>. It processes tokens in parallel with
+            no notion of order. So how do models like GPT know that "cat" comes
+            before "sat"?
+          </p>
+          <p className="font-mono text-neutral-500 mb-2">
+            PE<sub>(pos, 2i)</sub> = sin(pos / 10000<sup>2i/d</sup>)
+          </p>
+          <p>
+            This formula. But <em>why</em> sine? Why 10000? Why alternate
+            sin/cos? We'll derive this from scratch, and each choice will feel
+            inevitable.
+          </p>
+        </InsightBox>
         <TOCHeading
           id="the-problem"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           The Problem: Transformers Are Blind to Order
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             A transformer's self-attention treats input as a{' '}
             <strong>set</strong>, not a sequence. Unlike RNNs which process
@@ -303,39 +310,39 @@ function SinusoidalPEContent() {
             <em>"mat the on sat cat The"</em>
             produce identical attention patterns.
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="toy-attention-original">
             Let's prove this. We'll create three token embeddings and compute
             their attention scores:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>Now shuffle the token order and recompute:</p>
           <InlineCode id="toy-attention-shuffled" />
-          <p className="text-neutral-600 italic">
-            Identical attention patterns — just permuted. The model genuinely
+          <MutedText>
+            Identical attention patterns, just permuted. The model genuinely
             cannot distinguish these orderings.
-          </p>
-        </div>
+          </MutedText>
+        </Prose>
       </ArticleSection>
 
       {/* Goal framing */}
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             <strong>Our goal:</strong> inject position information into
             embeddings so that tokens the same distance apart in the sequence
             are "pushed together" in embedding space. The model can then learn
             to attend based on both content <em>and</em> position.
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== FIRST ATTEMPT ========== */}
@@ -343,11 +350,10 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="first-attempt"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           First Attempt: Just Add Integers
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             The simplest idea: add the position number directly. Position 0 adds
             0, position 1 adds 1, and so on.
@@ -356,30 +362,30 @@ function SinusoidalPEContent() {
             Here's a small example — three token embeddings with values around
             [-1, 1]:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="integer-positions">
             Adding positions 0, 1, 2 works fine for short sequences. But what
             about position 9999?
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <InlineCode id="scale-explosion" />
-          <p className="text-neutral-600 italic">
+          <MutedText>
             The position signal drowns out the semantics. "Cat" and "dog" at
             position 9999 become indistinguishable.
-          </p>
+          </MutedText>
           <p id="normalized-positions" className="mt-4">
             We could normalize to [0, 1], but then "position 5" means different
             things in different length sequences. We need something better.
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== WHAT WE NEED ========== */}
@@ -387,13 +393,12 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="requirements"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           What Do We Actually Need?
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>Let's think about what a good positional encoding requires:</p>
-          <ol className="list-decimal list-inside space-y-1 ml-4">
+          <OrderedList>
             <li>
               <strong>Bounded values</strong>: Should not explode for long
               sequences
@@ -414,8 +419,8 @@ function SinusoidalPEContent() {
               <strong>Learnable patterns</strong>: The model should be able to
               learn relative positions
             </li>
-          </ol>
-        </div>
+          </OrderedList>
+        </Prose>
       </ArticleSection>
 
       {/* ========== ENTER SINE ========== */}
@@ -423,11 +428,10 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="enter-sine"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Enter the Sine Function
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             Sine is bounded [-1, 1], smooth, and consistent regardless of
             sequence length. Let's try{' '}
@@ -439,26 +443,26 @@ function SinusoidalPEContent() {
           <p id="sin-encoding-basic">
             Positions 0, 1, 2 get values 0, 0.84, 0.91 — distinct and bounded:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="sin-visualization">
             Promising! But sine has a period of 2π ≈ 6.28. What happens at
             position 6?
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <InlineCode id="sin-periodicity-problem" />
-          <p className="text-neutral-600 italic">
+          <MutedText>
             Position 0 and 6 get nearly identical encodings. For sequences
             longer than ~6 tokens, we're back to ambiguity.
-          </p>
-        </div>
+          </MutedText>
+        </Prose>
       </ArticleSection>
 
       {/* ========== ADJUSTING FREQUENCY ========== */}
@@ -466,11 +470,10 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="adjusting-frequency"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Adjusting the Frequency
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             We can control how fast sine repeats with a frequency multiplier{' '}
             <Math>{'\\omega'}</Math>:
@@ -480,21 +483,21 @@ function SinusoidalPEContent() {
             Lower ω = slower oscillation = longer before it repeats. Let's try ω
             = 0.1:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             No more collisions at position 6! But now positions 0 and 1 are
             almost identical:
           </p>
           <InlineCode id="frequency-tradeoff" />
-          <p className="text-neutral-600 italic">
-            High frequency → good local discrimination, bad global. Low
-            frequency → opposite. We need both.
-          </p>
-        </div>
+          <MutedText>
+            High frequency means good local discrimination but bad global. Low
+            frequency is the opposite. We need both.
+          </MutedText>
+        </Prose>
       </ArticleSection>
 
       {/* ========== MULTIPLE FREQUENCIES ========== */}
@@ -502,11 +505,10 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="multiple-frequencies"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           The Key Insight: Multiple Frequencies
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             Think of a clock: the hour hand (slow), minute hand (medium), and
             second hand (fast) together uniquely identify any moment. We can do
@@ -517,25 +519,25 @@ function SinusoidalPEContent() {
             Two dimensions — one high frequency (ω=1) for local, one low (ω=0.1)
             for global:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="two-freq-applied">
             Now each position has a unique 2D signature. Position 0 ≠ position 6
             because even though the high-frequency component repeats, the
             low-frequency one doesn't:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="two-freq-visualization">
             Plotting both frequencies shows how they complement each other:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== SIN + COS ========== */}
@@ -543,11 +545,10 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="sin-cos"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Adding Cosine: The Circle Trick
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             There's still a subtle issue: sin(θ) = sin(π - θ). Two different
             positions can have the same sine value. The fix? Add cosine — which
@@ -556,25 +557,25 @@ function SinusoidalPEContent() {
           <p id="sin-cos-ambiguity">
             When sine values collide, cosine values differ:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="circle-visualization">
             Geometrically, (sin(θ), cos(θ)) traces a circle. Each position is a
             unique point — no collisions possible:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="sin-cos-embedding-viz">
             With sin/cos pairs at multiple frequencies, we have a complete
             encoding scheme:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== THE FORMULA ========== */}
@@ -582,11 +583,10 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="the-formula"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           The Frequency Formula
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             The original Transformer paper uses a specific formula for
             frequencies:
@@ -649,25 +649,25 @@ function SinusoidalPEContent() {
           <p id="frequency-formula">
             Let's compute these frequencies for a small embedding dimension:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="high-low-freq-comparison">
             High frequency dimensions change rapidly (good for nearby
             positions). Low frequency dimensions barely change (but stay unique
             over long distances):
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* Interactive dimension analysis */}
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>Explore how different dimension pairs behave:</p>
           <PEDimensionAnalysis className="my-6" />
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== PUTTING IT TOGETHER ========== */}
@@ -675,11 +675,10 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="full-implementation"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Putting It All Together
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>The complete formula from "Attention Is All You Need":</p>
           <FormulaBox label="Sinusoidal Positional Encoding">
             {
@@ -687,24 +686,24 @@ function SinusoidalPEContent() {
             }
           </FormulaBox>
           <p id="pe-function">Here is the complete implementation:</p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="pe-added-to-embeddings">
             Adding positional encoding to token embeddings:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="same-token-diff-positions">
             The same token at different positions now has different
             representations:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== THE MATRIX ========== */}
@@ -712,37 +711,36 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="pe-matrix"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Visualizing the Full Matrix
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="pe-matrix-heatmap">
             The positional encoding forms a beautiful pattern. Each row is a
             position, each column is a dimension. Notice the different
             wavelengths across dimensions:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* Interactive PE Matrix */}
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             Explore the matrix interactively. Adjust sequence length and model
             dimension:
           </p>
           <PEMatrixViz className="my-6" />
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="pe-dimension-analysis">
             Looking at specific dimension pairs to see the frequency
             differences:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== VERIFICATION ========== */}
@@ -750,11 +748,10 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="verification"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Verifying Our Requirements
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             Does our encoding satisfy the requirements we set out? Let's check:
           </p>
@@ -762,25 +759,25 @@ function SinusoidalPEContent() {
             <strong>Bounded:</strong> Values stay in [-1, 1] regardless of
             position:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="verify-unique">
             <strong>Unique:</strong> Each position gets a distinct encoding
             (measuring pairwise distances):
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="verify-smooth">
             <strong>Smooth:</strong> Nearby positions have similar encodings
             (small distance), far positions differ more:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== RELATIVE POSITION ========== */}
@@ -788,11 +785,10 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="relative-position"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           The Relative Position Property
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             A beautiful property: PE(i) · PE(j) depends mainly on |i - j|, the{' '}
             <strong>relative</strong>
@@ -801,31 +797,31 @@ function SinusoidalPEContent() {
           <p id="dot-product-heatmap">
             Computing dot products between all position pairs:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="relative-distance-proof">
             PE(5) · PE(8) ≈ PE(10) · PE(13) because both pairs have distance 3:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* Interactive relative position viz */}
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>Explore how dot product varies with relative distance:</p>
           <RelativePositionViz className="my-6" />
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="dot-vs-distance">
             Plotting dot product as a function of relative distance:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== PYTORCH IMPLEMENTATION ========== */}
@@ -833,20 +829,19 @@ function SinusoidalPEContent() {
         <TOCHeading
           id="pytorch-impl"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           PyTorch Implementation
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="pytorch-implementation">
             A clean PyTorch implementation you can use in your models:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* Try it yourself */}
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>Try computing positional encodings yourself:</p>
           <InteractiveCode
             code={`import numpy as np
@@ -869,7 +864,7 @@ print(f"  Frequency = {freq:.6f}")`}
             packages={['numpy']}
             className="my-6"
           />
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== LIMITATIONS ========== */}
@@ -877,24 +872,23 @@ print(f"  Frequency = {freq:.6f}")`}
         <TOCHeading
           id="limitations"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Limitations of Additive PE
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             Sinusoidal PE works well, but has a subtle issue.{' '}
             <strong>What we ideally want</strong> is for attention scores to
             cleanly separate into:
           </p>
-          <ol className="list-decimal list-inside ml-4 space-y-1">
+          <OrderedList>
             <li>
               <strong>Semantic similarity</strong>: How related are the tokens?
             </li>
             <li>
               <strong>Relative position</strong>: How far apart are they?
             </li>
-          </ol>
+          </OrderedList>
           <p>
             But when we <em>add</em> positional encodings and compute attention:
           </p>
@@ -904,11 +898,11 @@ print(f"  Frequency = {freq:.6f}")`}
           <p id="additive-pe-attention">
             Let's see what this expansion actually produces:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>This expands to four terms:</p>
           <InlineCode id="attention-four-terms" />
           <FormulaBox>
@@ -960,29 +954,29 @@ print(f"  Frequency = {freq:.6f}")`}
             </code>{' '}
             while disentangling it from the content-position interactions.
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="concatenation-approach">
             One alternative is concatenation instead of addition:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             But concatenation doubles the dimension, increasing computation:
           </p>
           <InlineCode id="concatenation-cost" />
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* Transition to RoPE */}
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             We've built up sinusoidal PE piece by piece: bounded values →
             multiple frequencies → sin/cos pairs → the 10000 base. It works! But
@@ -993,7 +987,7 @@ print(f"  Frequency = {freq:.6f}")`}
             <em>rotation</em>. What if instead of <em>adding</em> position to
             embeddings, we <em>rotated</em> the query and key vectors?
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* Tab switch button */}
@@ -1012,11 +1006,10 @@ function RoPEContent() {
         <TOCHeading
           id="learned-embeddings"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Learned Positional Embeddings
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             Before diving into RoPE, let's cover another common approach:
             <strong> learned positional embeddings</strong>, used by GPT-2 and
@@ -1027,19 +1020,19 @@ function RoPEContent() {
             <em>learn</em> them. It's a lookup table: position 0 maps to learned
             vector E_0, position 1 to E_1, etc.
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* GPT-2 Visualization */}
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>Explore how GPT-2's learned embeddings work:</p>
           <GPT2EmbeddingsViz className="my-6" />
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="learned-embed-class">The implementation is simple:</p>
           <GPT2ImplementationCode />
           <p className="mt-6">
@@ -1047,7 +1040,7 @@ function RoPEContent() {
             position limit comes from this lookup table size. You cannot process
             sequences longer than you trained on.
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== ROTATION INTRO ========== */}
@@ -1055,11 +1048,10 @@ function RoPEContent() {
         <TOCHeading
           id="rotation-intro"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           From Addition to Rotation
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             Both sinusoidal and learned embeddings <em>add</em> position
             information to tokens. But remember the four-term expansion problem?
@@ -1069,7 +1061,7 @@ function RoPEContent() {
             Recall that (cos(θ), sin(θ)) traces a circle. This is a rotation by
             angle θ:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== 2D ROTATION ========== */}
@@ -1077,11 +1069,10 @@ function RoPEContent() {
         <TOCHeading
           id="2d-rotation"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           2D Rotation Refresher
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             To understand RoPE, we need to revisit 2D rotation — which is
             exactly what our (sin, cos) pairs represent! A 2D rotation matrix
@@ -1098,16 +1089,16 @@ function RoPEContent() {
             means we don't distort the semantic information in our embeddings.
           </p>
           <p id="rotation-2d-function">Let's implement 2D rotation:</p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="rotation-visualization">
             Visualizing rotation at different angles. Notice the magnitude is
             preserved:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== MAGIC PROPERTY ========== */}
@@ -1115,11 +1106,10 @@ function RoPEContent() {
         <TOCHeading
           id="magic-property"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           The Magic Property
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             Here is the key insight that makes RoPE work. When we take the dot
             product of two rotated vectors:
@@ -1135,15 +1125,12 @@ function RoPEContent() {
           </p>
 
           {/* Math derivation */}
-          <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4">
-            <p className="text-sm font-medium text-neutral-700 mb-2">
-              Why does this work?
-            </p>
-            <p className="text-sm text-neutral-600 mb-2">
+          <InsightBox title="Why does this work?">
+            <p className="mb-2">
               Rotation matrices are <strong>orthogonal</strong>, meaning{' '}
               <Math>{'R(\\theta)^T = R(-\\theta)'}</Math>. This gives us:
             </p>
-            <div className="font-mono text-sm space-y-1 text-neutral-800">
+            <div className="font-mono space-y-1 text-neutral-800">
               <p>R(θ₁)q · R(θ₂)k</p>
               <p className="text-neutral-400">
                 = qᵀ R(θ₁)ᵀ R(θ₂) k{' '}
@@ -1161,20 +1148,20 @@ function RoPEContent() {
               </p>
               <p className="text-green-700">= q · R(θ₂ - θ₁) k</p>
             </div>
-            <p className="text-sm text-neutral-600 mt-3">
-              The absolute angles θ₁ and θ₂ disappear — only their{' '}
+            <p className="mt-3">
+              The absolute angles θ₁ and θ₂ disappear. Only their{' '}
               <em>difference</em> remains.
             </p>
-          </div>
+          </InsightBox>
 
           <p id="magic-property-verify">
             Let's verify this property numerically:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             If we set{' '}
             <Math>
@@ -1191,7 +1178,7 @@ function RoPEContent() {
             The attention score between positions m and n depends only on (m -
             n). This is exactly what we want!
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== ROPE IMPLEMENTATION ========== */}
@@ -1199,11 +1186,10 @@ function RoPEContent() {
         <TOCHeading
           id="rope-impl"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           RoPE Implementation
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             RoPE applies this insight to high-dimensional vectors. For a
             d-dimensional vector, we split it into d/2 pairs and rotate each
@@ -1218,50 +1204,47 @@ function RoPEContent() {
           </p>
 
           {/* Data flow diagram */}
-          <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4 font-mono text-sm">
-            <p className="text-neutral-500 text-xs mb-2">
-              Where rotation happens:
-            </p>
-            <div className="space-y-2">
-              <p>
-                <span className="text-neutral-400">Additive PE:</span> x →{' '}
-                <span className="text-amber-600">x + PE</span> → W<sub>q</sub> →
-                q
-              </p>
-              <p>
-                <span className="text-neutral-400">RoPE:</span> x → W
-                <sub>q</sub> → q →{' '}
-                <span className="text-green-600">rotate(q)</span> → q'
-              </p>
-            </div>
-            <p className="text-neutral-500 text-xs mt-3">
-              Key difference: Additive PE modifies the embedding <em>before</em>{' '}
-              projection. RoPE rotates Q/K <em>after</em> projection — the
-              embedding stays untouched.
-            </p>
-          </div>
+          <DataFlow
+            title="Where rotation happens"
+            note={
+              <>
+                Key difference: Additive PE modifies the embedding{' '}
+                <em>before</em> projection. RoPE rotates Q/K <em>after</em>{' '}
+                projection. The embedding stays untouched.
+              </>
+            }
+          >
+            <DataFlow.Step label="Additive PE">
+              x → <span className="text-amber-600">x + PE</span> → W<sub>q</sub>{' '}
+              → q
+            </DataFlow.Step>
+            <DataFlow.Step label="RoPE">
+              x → W<sub>q</sub> → q →{' '}
+              <span className="text-green-600">rotate(q)</span> → q'
+            </DataFlow.Step>
+          </DataFlow>
 
           <p id="rope-apply-function">Here is the apply_rope function:</p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="rope-qk-rotation">
             Let's see the rotation in action — how Q vectors change at different
             positions:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="rope-q-visualization">
             Each dimension pair rotates at its own frequency. High-frequency
             pairs spin fast (for local position), low-frequency pairs spin slow
             (for global):
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== COMPARISON ========== */}
@@ -1269,63 +1252,62 @@ function RoPEContent() {
         <TOCHeading
           id="comparison"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           RoPE vs Additive PE
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           {/* Key intuition quote */}
-          <div className="bg-neutral-50 border-l-4 border-neutral-300 pl-4 py-2 my-4">
-            <p className="text-sm text-neutral-700">
-              <strong>Additive PE:</strong> "Here's some position info — figure
+          <QuoteBox>
+            <p>
+              <strong>Additive PE:</strong> "Here's some position info. Figure
               out how to use it"
             </p>
-            <p className="text-sm text-neutral-700 mt-1">
+            <p>
               <strong>RoPE:</strong> "I'll rotate your vectors so when you dot
               them, relative position naturally falls out"
             </p>
-          </div>
+          </QuoteBox>
           <p id="rope-vs-additive">
             Let's compare what happens in attention with both approaches:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="rope-relative-position">
             The proof is in the dot product. With RoPE, attention between
             positions m and n depends only on (m - n):
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="rope-attention-curve">
             This creates a clean decay pattern — nearby tokens attend strongly,
             distant ones weakly:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             Let's compare additive PE vs RoPE head-to-head. First, with
             identical embeddings to isolate just the positional effect:
           </p>
           <p id="rope-comparison-isolated"></p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="full-attention-comparison">
             And now with real (different) embeddings — the full attention
             computation:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== VERIFICATION ========== */}
@@ -1333,26 +1315,25 @@ function RoPEContent() {
         <TOCHeading
           id="rope-verification"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Verifying RoPE Requirements
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>RoPE still satisfies all our original requirements:</p>
           <p id="rope-verify-bounded">
             <strong>Bounded:</strong> Rotation preserves magnitude — if ||q|| =
             1, then ||R(θ)q|| = 1:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p id="rope-verify-unique">
             <strong>Unique:</strong> Each position still gets a distinct
             encoding:
           </p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== PYTORCH CLASS ========== */}
@@ -1360,18 +1341,17 @@ function RoPEContent() {
         <TOCHeading
           id="rope-pytorch"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           PyTorch RoPE Class
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <p>
             Here's a production-ready implementation. The key insight: we
             precompute the rotation angles (freqs_cis) once, then apply them to
             Q/K on every forward pass:
           </p>
           <p id="rope-class"></p>
-        </div>
+        </Prose>
       </ArticleSection>
 
       {/* ========== SUMMARY ========== */}
@@ -1379,11 +1359,10 @@ function RoPEContent() {
         <TOCHeading
           id="summary"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Summary: Why RoPE Won
         </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
+        <Prose>
           <div className="overflow-x-auto my-4">
             <table className="min-w-full text-sm border border-neutral-200">
               <thead className="bg-neutral-50">
@@ -1444,7 +1423,7 @@ function RoPEContent() {
             RoPE is now the industry standard, used in LLaMA, Mistral, Qwen, and
             most modern LLMs. The key advantages:
           </p>
-          <ul className="list-disc list-inside ml-4 space-y-1">
+          <UnorderedList>
             <li>
               <strong>Clean separation</strong>: Position and content do not mix
               in the dot product
@@ -1461,8 +1440,8 @@ function RoPEContent() {
               <strong>No parameters</strong>: Computed deterministically (like
               sinusoidal)
             </li>
-          </ul>
-        </div>
+          </UnorderedList>
+        </Prose>
       </ArticleSection>
 
       {/* ========== EXTENSIONS ========== */}
@@ -1470,13 +1449,12 @@ function RoPEContent() {
         <TOCHeading
           id="extensions"
           level={2}
-          className="text-2xl font-bold mb-2 text-black"
         >
           Modern Extensions
         </TOCHeading>
-        <div className="leading-relaxed space-y-2 text-neutral-900">
+        <Prose className="space-y-2">
           <p>Research continues to improve positional encoding:</p>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <UnorderedList className="space-y-2">
             <li>
               <strong>ALiBi</strong>: Adds position-based bias to attention
               logits instead of rotating
@@ -1489,13 +1467,13 @@ function RoPEContent() {
               <strong>NTK-aware scaling</strong>: Better frequency scaling for
               extending context length
             </li>
-          </ul>
-          <p className="text-neutral-600 italic">
+          </UnorderedList>
+          <MutedText>
             The journey from "just add integers" to these sophisticated
             techniques shows how simple intuitions, when properly developed,
             lead to elegant solutions.
-          </p>
-        </div>
+          </MutedText>
+        </Prose>
       </ArticleSection>
 
       {/* Tab switch button */}

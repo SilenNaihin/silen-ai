@@ -395,6 +395,26 @@ Use these transitions between code cells:
 - A "journey summary" repeats the detailed explanation above it
 - Two code cells show essentially the same thing
 
+### Writing Style
+
+**Avoid em dashes.** Rewrite sentences instead:
+
+```
+❌ "RoPE rotates vectors — this preserves the dot product."
+✅ "RoPE rotates vectors. This preserves the dot product."
+✅ "RoPE rotates vectors, which preserves the dot product."
+```
+
+**Minimize colons.** Often a period works better:
+
+```
+❌ "Here's the key insight: rotation preserves dot products."
+✅ "The key insight is that rotation preserves dot products."
+✅ "Rotation preserves dot products. That's the key insight."
+```
+
+Colons are fine for introducing code blocks or lists, but avoid them mid-sentence for emphasis.
+
 ---
 
 ## 5. Code Cell Integration
@@ -526,9 +546,76 @@ When content-heavy sections need no animation, use BlankAnimation:
 
 ## 7. Interactive Elements
 
-### Pyodide Setup
+There are three distinct types of visual/interactive elements. Choose based on purpose:
 
-Enable in-browser Python with auto-loading:
+| Type | Location | Control | Best For |
+|------|----------|---------|----------|
+| **Scroll Animation** | Sticky panel (right side) | Scroll progress | Reinforcing narrative, showing evolution |
+| **Inline Interactive Viz** | In article body | User interaction | Exploration, "what if" scenarios |
+| **Pyodide Code** | In article body | User edits code | Practice, verification, experimentation |
+
+### Scroll Animations vs Inline Visualizations
+
+**Scroll animations** (Section 6) are passive — the reader scrolls and watches. Use for:
+- Visualizing the concept being explained in adjacent text
+- Showing progression/evolution as the reader advances
+- Creating a cinematic, guided experience
+
+**Inline interactive visualizations** are active — the reader explores. Use for:
+- "What happens if I change X?" explorations
+- Comparing multiple configurations
+- Building intuition through direct manipulation
+
+```
+Example: Positional Encoding
+
+Scroll animation: Circle tracing sin/cos as reader scrolls through explanation
+Inline interactive: Slider to change position and see PE values update live
+```
+
+### Decision Tree: Which to Use?
+
+```
+Does the reader need to SEE something while reading adjacent text?
+├─ YES → Scroll animation (appears in sticky panel alongside text)
+│
+└─ NO → Does the reader need to EXPLORE or EXPERIMENT?
+    ├─ YES → Is it about tweaking values/parameters?
+    │   ├─ YES → Inline interactive viz (React component with controls)
+    │   └─ NO (code experimentation) → Pyodide InteractiveCode
+    │
+    └─ NO → Static image or no visualization needed
+```
+
+### Inline Interactive Visualization Design
+
+When building custom interactive components:
+
+```tsx
+// Component with clear affordances
+<PEMatrixViz
+  className="my-6"
+  defaultPosition={5}      // Sensible defaults
+  showControls={true}      // Make interactivity obvious
+/>
+
+// Introduce with context explaining WHAT to explore
+<p>
+  Drag the position slider to see how the encoding changes.
+  Notice how lower dimensions (left) change faster than higher ones (right).
+</p>
+<PEExplorer className="my-6" />
+```
+
+**Design principles for inline interactives:**
+1. **Obvious affordances** — User should immediately see what's interactive
+2. **Sensible defaults** — Start in a state that demonstrates the key insight
+3. **Guided exploration** — Tell the reader what to look for
+4. **Fast feedback** — Updates should be instantaneous
+
+### Pyodide Interactive Code
+
+For "try it yourself" code blocks with editable Python:
 
 ```tsx
 <PyodideProvider packages={['numpy', 'matplotlib']} autoLoad>
@@ -536,9 +623,7 @@ Enable in-browser Python with auto-loading:
 </PyodideProvider>
 ```
 
-### InteractiveCode Placement
-
-Place "try it yourself" blocks after explanations, not before:
+**Placement:** After explanations, not before:
 
 ```tsx
 <ArticleSection>
@@ -552,32 +637,35 @@ Place "try it yourself" blocks after explanations, not before:
 </ArticleSection>
 ```
 
-### When Interactivity Adds Value
-
-**Good uses:**
-
-- "Try different values" explorers
+**Good uses for Pyodide:**
+- Practice problems with test assertions
 - Verifying claims the reader might be skeptical of
-- Building intuition through experimentation
+- Experimenting with real computations
 
-**Overkill:**
-
-- Simple computations that don't benefit from tweaking
+**Overkill for Pyodide:**
+- Simple value tweaking (use inline viz with slider instead)
+- Visualizations (Pyodide matplotlib is slow — use React)
 - Code that requires complex setup/context
-- Visualizations that work better as static images
 
-### Custom Visualization Components
+### Combining Multiple Types
 
-For complex interactive visualizations:
+A single section might use all three:
 
 ```tsx
-// Create dedicated component
-<PEMatrixViz className="my-6" />
-<RelativePositionViz className="my-6" />
+{/* Scroll animation shows rotation concept in sticky panel */}
+<TOCHeading id="rotation">The Rotation</TOCHeading>
 
-// Introduce with context
-<p>Explore how different dimension pairs behave:</p>
-<PEDimensionAnalysis className="my-6" />
+<ArticleSection>
+  <p>RoPE rotates query and key vectors by position-dependent angles...</p>
+
+  {/* Inline interactive lets reader explore different positions */}
+  <p>Drag to see how rotation angle changes with position:</p>
+  <RotationExplorer className="my-6" />
+
+  {/* Pyodide for hands-on computation */}
+  <p>Verify the rotation matrix yourself:</p>
+  <InteractiveCode code={`# Compute R(θ) for position 5...`} />
+</ArticleSection>
 ```
 
 ---
@@ -637,49 +725,125 @@ Highlight important formulas with labels:
 </FormulaBox>
 ```
 
-### Callout Boxes for Key Insights
+### Prose Container
 
-Use styled boxes for important takeaways:
+Use `Prose` for all article text content. It provides consistent spacing, line height, and text color:
 
 ```tsx
-// Insight/derivation box
-<div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4">
-  <p className="text-sm font-medium text-neutral-700 mb-2">Why does this work?</p>
-  <p className="text-sm text-neutral-600">
-    Rotation matrices are <strong>orthogonal</strong>...
-  </p>
-</div>
+import { Prose } from '@/components/article/Callouts';
 
-// Quote/comparison box
-<div className="bg-neutral-50 border-l-4 border-neutral-300 pl-4 py-2 my-4">
-  <p className="text-sm text-neutral-700">
-    <strong>Additive PE:</strong> "Here's position info — figure it out"
+<ArticleSection>
+  <Prose>
+    <p>First paragraph with proper spacing.</p>
+    <p>Second paragraph automatically spaced.</p>
+  </Prose>
+</ArticleSection>
+```
+
+Override spacing when needed:
+
+```tsx
+<Prose className="space-y-2">  {/* Tighter spacing */}
+  <p>Compact content here.</p>
+</Prose>
+```
+
+### Callout Components
+
+Use the callout components from `@/components/article/Callouts`:
+
+```tsx
+import { Prose, InsightBox, QuoteBox, DataFlow } from '@/components/article/Callouts';
+```
+
+**InsightBox** for key takeaways and derivations:
+
+```tsx
+<InsightBox title="Why does this work?">
+  <p className="mb-2">
+    Rotation matrices are <strong>orthogonal</strong>, meaning R(θ)ᵀ = R(-θ).
   </p>
-  <p className="text-sm text-neutral-700 mt-1">
+  <p>This means the dot product only depends on the angle difference.</p>
+</InsightBox>
+```
+
+**QuoteBox** for comparisons or quotes (left border accent):
+
+```tsx
+<QuoteBox>
+  <p>
+    <strong>Additive PE:</strong> "Here's position info. Figure it out"
+  </p>
+  <p>
     <strong>RoPE:</strong> "I'll rotate so relative position falls out naturally"
   </p>
-</div>
+</QuoteBox>
 ```
 
-### Data Flow Diagrams
-
-Use monospace boxes for showing data flow:
+**DataFlow** for showing pipelines or transformations:
 
 ```tsx
-<div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 font-mono text-sm">
-  <p className="text-neutral-500 text-xs mb-2">Where rotation happens:</p>
-  <div className="space-y-2">
-    <p>
-      <span className="text-neutral-400">Additive:</span> x →{' '}
-      <span className="text-amber-600">x + PE</span> → W<sub>q</sub> → q
-    </p>
-    <p>
-      <span className="text-neutral-400">RoPE:</span> x → W<sub>q</sub> → q →{' '}
-      <span className="text-green-600">rotate(q)</span> → q'
-    </p>
-  </div>
-</div>
+<DataFlow
+  title="Where rotation happens"
+  note={<>Key difference: Additive modifies <em>before</em>, RoPE <em>after</em>.</>}
+>
+  <DataFlow.Step label="Additive PE">
+    x → <span className="text-amber-600">x + PE</span> → Wq → q
+  </DataFlow.Step>
+  <DataFlow.Step label="RoPE">
+    x → Wq → q → <span className="text-green-600">rotate(q)</span> → q'
+  </DataFlow.Step>
+</DataFlow>
 ```
+
+### Lists and Typography
+
+**OrderedList** and **UnorderedList** for consistent list styling:
+
+```tsx
+import { OrderedList, UnorderedList, MutedText } from '@/components/article/Callouts';
+
+<OrderedList>
+  <li><strong>First item</strong>: Description here</li>
+  <li><strong>Second item</strong>: More details</li>
+</OrderedList>
+
+<UnorderedList>
+  <li>Bullet point one</li>
+  <li>Bullet point two</li>
+</UnorderedList>
+```
+
+**MutedText** for secondary information, asides, or closing thoughts:
+
+```tsx
+<MutedText>
+  The journey from simple intuitions to elegant solutions shows
+  how careful reasoning leads to robust designs.
+</MutedText>
+```
+
+### TOCHeading Default Styles
+
+TOCHeading now has sensible defaults based on level. No className needed:
+
+```tsx
+// Level 2 heading (default): text-2xl font-bold mb-2 text-black
+<TOCHeading id="my-section" level={2}>
+  Section Title
+</TOCHeading>
+
+// Override only if needed
+<TOCHeading id="custom" level={2} className="text-xl font-medium mb-4">
+  Custom Styling
+</TOCHeading>
+```
+
+Default styles by level:
+- Level 1: `text-3xl font-bold mb-4 text-black`
+- Level 2: `text-2xl font-bold mb-2 text-black`
+- Level 3: `text-xl font-semibold mb-2 text-black`
+- Level 4+: Progressively smaller
 
 ---
 
@@ -748,10 +912,14 @@ Use monospace boxes for showing data flow:
 
 ### Visual Polish
 
+- [ ] All text content wrapped in Prose (no inline className for spacing)
+- [ ] Lists use OrderedList/UnorderedList (no inline className)
+- [ ] TOCHeadings use default styles (no className unless overriding)
+- [ ] Muted/italic text uses MutedText component
 - [ ] Key formulas use FormulaBox with labels
-- [ ] Comparisons use tables
-- [ ] Key insights have callout boxes
-- [ ] Consistent spacing throughout
+- [ ] Comparisons use tables or QuoteBox
+- [ ] Key insights use InsightBox
+- [ ] Data pipelines use DataFlow
 
 ### Final Read-Through
 
@@ -793,6 +961,26 @@ Use monospace boxes for showing data flow:
 // Math formula
 <FormulaBox label="Optional Label">{'\\LaTeX here'}</FormulaBox>
 <Math>{'inline \\LaTeX'}</Math>
+
+// Prose container (use for all article text)
+<Prose>
+  <p>Content with consistent spacing and styling.</p>
+</Prose>
+
+// Callout components
+<InsightBox title="Optional Title">Content here</InsightBox>
+<QuoteBox>Comparison or quote content</QuoteBox>
+<DataFlow title="Pipeline" note={<>Optional note</>}>
+  <DataFlow.Step label="Step 1">x → y</DataFlow.Step>
+</DataFlow>
+
+// Lists and typography
+<OrderedList><li>Numbered item</li></OrderedList>
+<UnorderedList><li>Bullet item</li></UnorderedList>
+<MutedText>Secondary, italic text</MutedText>
+
+// TOCHeading (no className needed, defaults applied)
+<TOCHeading id="section" level={2}>Title</TOCHeading>
 ```
 
 ---

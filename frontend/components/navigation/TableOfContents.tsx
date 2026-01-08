@@ -103,20 +103,35 @@ interface TOCHeadingProps {
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
 
+// Default styles for each heading level
+const defaultHeadingStyles: Record<number, string> = {
+  1: 'text-3xl font-bold mb-4 text-black',
+  2: 'text-2xl font-bold mb-2 text-black',
+  3: 'text-xl font-semibold mb-2 text-black',
+  4: 'text-lg font-semibold mb-1 text-black',
+  5: 'text-base font-medium mb-1 text-black',
+  6: 'text-sm font-medium mb-1 text-black',
+};
+
 /**
  * A heading that auto-registers itself with the TOC.
  * Use this instead of raw h1-h6 elements to have them appear in the TOC.
+ *
+ * Default styles are applied based on level, but can be overridden with className.
  */
 export function TOCHeading({
   id,
   level = 2,
   children,
-  className = '',
+  className,
   as,
 }: TOCHeadingProps) {
   const { registerHeading, unregisterHeading } = useTOCContext();
   const Tag = as || (`h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6');
   const text = typeof children === 'string' ? children : '';
+
+  // Use provided className or fall back to default for this level
+  const headingClassName = className ?? defaultHeadingStyles[level] ?? '';
 
   useEffect(() => {
     registerHeading(id, text, level);
@@ -124,7 +139,7 @@ export function TOCHeading({
   }, [id, text, level, registerHeading, unregisterHeading]);
 
   return (
-    <Tag id={id} className={className}>
+    <Tag id={id} className={headingClassName}>
       {children}
     </Tag>
   );
