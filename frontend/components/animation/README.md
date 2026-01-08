@@ -64,24 +64,41 @@ A canvas wrapper component that handles retina displays and automatic resizing.
 
 ### `AnimationSequence`
 
-**NEW**: A powerful orchestrator that manages multiple animations in sequence with automatic timing distribution, smooth transitions, and flexible duration control.
+A powerful orchestrator that manages multiple animations in sequence with element-based triggers or automatic timing distribution.
 
-**Usage:**
+**Element-Based Triggers (Recommended):**
 
 ```tsx
 <AnimationSequence
   scrollProgress={scrollProgress}
   animations={[
     {
-      render: (progress) => (
-        <ParticlesAnimation progress={progress} startOffset={0.15} />
-      ),
-      duration: 2, // Weighted 2x relative to other animations
-      overlap: 0.2, // 20% overlap with next animation
+      render: (p) => <IntroAnimation progress={p} />,
+      startElementId: 'intro-section', // Starts when #intro-section is in view
+      overlap: 0.15,
     },
     {
-      render: (progress) => <NetworkAnimation progress={progress} />,
-      duration: 1, // Default weight
+      render: (p) => <SummaryAnimation progress={p} />,
+      startElementId: 'summary-section', // Starts when #summary-section is in view
+    },
+  ]}
+/>
+```
+
+**Duration-Based (Fallback):**
+
+```tsx
+<AnimationSequence
+  scrollProgress={scrollProgress}
+  animations={[
+    {
+      render: (p) => <ParticlesAnimation progress={p} />,
+      duration: 2, // Weighted 2x relative to others
+      overlap: 0.2,
+    },
+    {
+      render: (p) => <NetworkAnimation progress={p} />,
+      duration: 1,
     },
   ]}
 />
@@ -98,12 +115,20 @@ A canvas wrapper component that handles retina displays and automatic resizing.
 ```tsx
 {
   render: (progress: number) => ReactNode;
-  duration?: number | string; // See duration types below
-  overlap?: number; // 0-1, overlap with next animation
+  startElementId?: string;       // Element ID that triggers animation start
+  duration?: number | string;    // Fallback: weight, '500px', or '30%'
+  overlap?: number;              // 0-1, overlap with next animation
 }
 ```
 
-**Duration Types:**
+**`startElementId` (Recommended):**
+
+- Ties animation to a specific article element by its `id` attribute
+- Animation starts when element reaches viewport center
+- Animation ends when next animation's element comes into view
+- **Best for**: Syncing animations with article sections
+
+**Duration Types (Fallback):**
 
 1. **Weight (number)**: `duration: 2` - Takes 2x scroll space relative to others
 2. **Pixels (string)**: `duration: '500px'` - Exactly 500px of scroll (requires `scrollableHeight`)
@@ -112,18 +137,18 @@ A canvas wrapper component that handles retina displays and automatic resizing.
 
 **Features:**
 
+- **Element-based triggers**: Sync animations precisely with article content
 - **Automatic distribution**: Calculates scroll ranges automatically
 - **Smooth transitions**: Configurable overlap between animations
 - **Normalized progress**: Each animation receives 0-1 progress
 - **First animation**: Visible from start (no fade-in)
 - **Last animation**: Stays visible at end (no fade-out)
-- **Middle animations**: Smooth fade in/out with overlap
 
 ## Creating Scroll-Synced Animations
 
-### Recommended Pattern: AnimationSequence
+### Recommended Pattern: Element-Based Triggers
 
-The modern approach uses `AnimationSequence` to manage multiple animations:
+Use `startElementId` to sync animations with article sections:
 
 ```tsx
 // In your article page
@@ -133,19 +158,31 @@ The modern approach uses `AnimationSequence` to manage multiple animations:
       scrollProgress={scrollProgress}
       animations={[
         {
-          render: (progress) => <ParticlesAnimation progress={progress} />,
-          duration: 2,
-          overlap: 0.2,
+          render: (p) => <IntroAnimation progress={p} />,
+          startElementId: 'intro',      // Syncs with <h2 id="intro">
+          overlap: 0.15,
         },
         {
-          render: (progress) => <NetworkAnimation progress={progress} />,
-          duration: 1,
+          render: (p) => <DetailAnimation progress={p} />,
+          startElementId: 'details',    // Syncs with <h2 id="details">
+          overlap: 0.15,
+        },
+        {
+          render: (p) => <SummaryAnimation progress={p} />,
+          startElementId: 'conclusion', // Syncs with <h2 id="conclusion">
         },
       ]}
     />
   )}
 >
-  {/* Your article content */}
+  <h2 id="intro">Introduction</h2>
+  <p>Content here...</p>
+
+  <h2 id="details">Details</h2>
+  <p>More content...</p>
+
+  <h2 id="conclusion">Conclusion</h2>
+  <p>Final thoughts...</p>
 </ArticleLayout>
 ```
 

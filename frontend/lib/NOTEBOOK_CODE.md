@@ -97,21 +97,34 @@ export default function StardustArticle() {
 ## Directive Format
 
 ```python
-# | targetId
+# | targetId [inline] [expanded]
 ```
 
 - `#` - Python comment
 - `|` - Directive marker
-- `targetId` - Must match an `id` in your article (e.g., `intro`, `step-1`, `matrix-multiplication`)
+- `targetId` - Must match an `id` in your article
+- `inline` - (optional) Render in article body instead of right margin
+- `expanded` - (optional) Start expanded instead of collapsed
 
 **The directive line is automatically removed from displayed code.**
 
-Valid examples:
+**Examples:**
 
-- `# | introduction`
-- `# | step-1`
-- `# | matrix-multiply`
-- `# | barely-understand >` (trailing `>` is optional and ignored)
+```python
+# | step-1                    # Right margin, collapsed
+# | formula inline            # In article body, collapsed
+# | implementation expanded   # Right margin, expanded
+# | demo inline expanded      # In article body, expanded
+```
+
+**Placement Behavior:**
+
+| Directive | Desktop | Mobile |
+|-----------|---------|--------|
+| `# \| id` | Right margin | Inline collapsed |
+| `# \| id inline` | Inline in article | Inline collapsed |
+| `# \| id expanded` | Right margin, expanded | Inline expanded |
+| `# \| id inline expanded` | Inline, expanded | Inline expanded |
 
 ---
 
@@ -242,11 +255,14 @@ Explicitly provide `rightContent` to override auto-detection:
 
 ```typescript
 interface NotebookCell {
-  targetId: string; // ID from directive
-  code: string; // Code without directive line
-  language: string; // e.g., "python", "javascript"
-  output?: string; // Execution output (if cell was run)
+  targetId: string;        // ID from directive
+  code: string;            // Code without directive line
+  language: string;        // e.g., "python", "javascript"
+  output?: string;         // Execution output (if cell was run)
+  imageOutput?: string;    // Base64 image data (PNG/JPEG)
   executionCount?: number; // Execution count from Jupyter
+  inline?: boolean;        // Render in article body (not margin)
+  expanded?: boolean;      // Start expanded (not collapsed)
 }
 ```
 

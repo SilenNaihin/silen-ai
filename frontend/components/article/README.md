@@ -80,7 +80,35 @@ import { UseNotebook } from '@/contexts/NotebookContext';
 </>;
 ```
 
-See **[Notebook Integration Guide](../lib/README.md)** for complete documentation on linking Jupyter notebooks to articles.
+See **[Notebook Integration Guide](../../lib/NOTEBOOK_CODE.md)** for complete documentation.
+
+### `InlineCode`
+
+For precise control over code cell placement, use `InlineCode`:
+
+```tsx
+import { InlineCode } from '@/components/article/InlineCode';
+
+<ArticleSection>
+  <p>Here's how the function works:</p>
+  <InlineCode id="my-function" />  {/* Renders cell exactly here */}
+  <p>And here's what happens next...</p>
+</ArticleSection>
+```
+
+**Props:**
+
+- `id`: string - Cell ID from notebook directive
+- `expanded`: boolean (optional) - Override expanded state
+- `previewLines`: number (optional) - Lines to show when collapsed (default: 3)
+
+**When to use:**
+
+| Scenario | Use |
+|----------|-----|
+| Code next to specific paragraph | `<p id="cell-id">` + ArticleSection |
+| Code at exact position in flow | `<InlineCode id="cell-id" />` |
+| Override notebook's inline/expanded | `<InlineCode id="cell-id" expanded />` |
 
 ## Layout Structure
 

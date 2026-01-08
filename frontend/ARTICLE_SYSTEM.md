@@ -72,14 +72,18 @@ frontend/
 Link Jupyter notebook cells to article sections automatically:
 
 ```python
-# In notebook: # | my-section
-print("Hello")
+# | my-section                  # Right margin
+# | my-section inline           # In article body
+# | my-section expanded         # Starts expanded
+# | my-section inline expanded  # In body, expanded
 ```
 
 ```tsx
-// In article
+// Auto-placement via ID
 <p id="my-section">Text here...</p>
-// Code appears automatically!
+
+// Or precise placement
+<InlineCode id="my-section" />
 ```
 
 ### Responsive Code Display
@@ -98,11 +102,22 @@ print("Hello")
 ### Scroll Animations
 ```tsx
 <ArticleLayout
-  leftContent={(progress) => <MyAnimation progress={progress} />}
+  leftContent={(scrollProgress) => (
+    <AnimationSequence
+      scrollProgress={scrollProgress}
+      animations={[
+        { render: (p) => <IntroAnim progress={p} />, startElementId: 'intro' },
+        { render: (p) => <SummaryAnim progress={p} />, startElementId: 'summary' },
+      ]}
+    />
+  )}
 >
-  {/* content */}
+  <h2 id="intro">Introduction</h2>
+  <h2 id="summary">Summary</h2>
 </ArticleLayout>
 ```
+
+Use `startElementId` to sync animations with article sections precisely.
 
 ### Interactive Python
 ```tsx

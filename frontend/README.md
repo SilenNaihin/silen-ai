@@ -30,12 +30,13 @@ npm run test:coverage # Coverage report
 
 ## Key Features
 
-- Notebook cell integration via directives
-- Scroll-synced left panel animations
-- Tabbed article content
-- Auto-tracking table of contents
-- Responsive code display (desktop margin / mobile inline collapsed)
-- In-browser Python via Pyodide
+- **Notebook integration** via directives (`# | id [inline] [expanded]`)
+- **Element-synced animations** via `startElementId` for precise scroll sync
+- **Tabbed article content** with shared scroll state
+- **Auto-tracking TOC** with smooth scroll navigation
+- **Responsive code** - desktop margin, mobile inline collapsed
+- **InlineCode component** for precise code placement
+- **In-browser Python** via Pyodide with auto-load
 
 ## Tech Stack
 
