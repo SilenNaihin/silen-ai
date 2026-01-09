@@ -524,6 +524,25 @@ animations={[
 ]}
 ```
 
+### When to Animate (and When Not To)
+
+An animation should serve one of two purposes:
+1. **Build intuition** — The concept has inherent time, steps, or transformation that becomes clearer when animated (e.g., a circle being traced, a matrix filling in)
+2. **Keep the reader captivated** — A beautiful, aesthetic animation that makes scrolling feel rewarding (e.g., particles condensing into a shape, smooth transitions between states)
+
+**Do not animate concepts that become MORE confusing through animation.** Many technical concepts are better explained with static diagrams or inline interactive visualizations. If you find yourself forcing an animation, it probably should not be animated.
+
+**Options when animation does not fit:**
+- **No animation** — Use BlankAnimation and let the text carry the section
+- **Hold the previous animation** — Let a good visualization stay on screen longer rather than forcing a new one
+- **Seamless aesthetic transition** — Connect sections with beautiful but abstract animations (like the Stardust article's opening) that do not try to "explain" but create visual continuity
+
+**Aesthetic vs explanatory animations:**
+- **Aesthetic**: Abstract, beautiful, keeps the reader engaged while scrolling through text-heavy sections. Does not need to map to specific concepts.
+- **Explanatory**: Directly visualizes what the text describes. Should have clear correspondence between scroll progress and conceptual progression.
+
+Both are valid. Do not try to make every animation explanatory.
+
 ### Animation Design Principles
 
 1. **Reinforce, don't distract** — Animation should visualize what the text explains
@@ -541,6 +560,32 @@ When content-heavy sections need no animation, use BlankAnimation:
   startElementId: 'dense-math-section',
 }
 ```
+
+### Milestones for Multi-Phase Animations
+
+Use `milestones` to control when specific animation states are reached. This enables smoother, more complex animations that have distinct phases tied to content sections:
+
+```tsx
+{
+  render: (p) => <BrainAnimation progress={p} />,
+  startElementId: 'intro',
+  milestones: [
+    { elementId: 'brain-formed', progress: 0.5 },   // Brain fully formed at this section
+    { elementId: 'brain-active', progress: 0.8 },   // Neural activity begins
+  ]
+}
+```
+
+With milestones:
+- At `intro`: progress = 0 (animation starts)
+- At `brain-formed`: progress = 0.5 (brain is complete)
+- At `brain-active`: progress = 0.8 (activity visible)
+- At next animation's start: progress = 1.0
+
+Progress interpolates linearly between milestone points. This is useful for:
+- Seamless transitions where one visual transforms into another
+- Long animations that span multiple content sections
+- Ensuring specific visual states align with specific explanations
 
 ---
 
@@ -565,6 +610,8 @@ There are three distinct types of visual/interactive elements. Choose based on p
 - "What happens if I change X?" explorations
 - Comparing multiple configurations
 - Building intuition through direct manipulation
+
+**Heuristic: If a section has an interactive visualization, prefer inline over scroll animation.** When readers can play with something themselves, let them. A scroll animation alongside an interactive widget competes for attention and can feel redundant. Use BlankAnimation or hold the previous animation while the reader engages with the inline visualization.
 
 ```
 Example: Positional Encoding
@@ -671,6 +718,16 @@ A single section might use all three:
 ---
 
 ## 8. Visual Design
+
+### Color Philosophy
+
+**Use black and white.** Even when you think something "should" be colored, default to black, white, and grays. Minimalist designs are easier to read and feel more professional.
+
+**Only add color when absolutely necessary.** This means:
+- You need to distinguish two things and cannot do it with labels, position, or line style
+- The color has obvious semantic meaning (e.g., red/blue for hot/cold in a temperature visualization)
+
+When color is truly needed, use one or two colors maximum. Keep everything else grayscale.
 
 ### Prose Density
 
@@ -909,6 +966,7 @@ Default styles by level:
 - [ ] Animation IDs match actual element IDs in article
 - [ ] Animations reinforce (not distract from) content
 - [ ] Text in animations is readable (≥14px)
+- [ ] Black and white only, unless color is absolutely necessary
 
 ### Visual Polish
 
@@ -950,10 +1008,15 @@ Default styles by level:
   ]}
 />
 
-// Section with TOC entry
-<TOCHeading id="section-id" level={2} className="text-2xl font-bold mb-2">
-  Section Title
-</TOCHeading>
+// Animation with milestones (multi-phase)
+{
+  render: (p) => <ComplexAnim progress={p} />,
+  startElementId: 'start',
+  milestones: [{ elementId: 'phase-2', progress: 0.5 }]
+}
+
+// Section with TOC entry (defaults applied, no className needed)
+<TOCHeading id="section-id" level={2}>Section Title</TOCHeading>
 
 // Interactive Python
 <InteractiveCode code={`print("hello")`} packages={['numpy']} />

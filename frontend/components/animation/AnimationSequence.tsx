@@ -3,6 +3,16 @@
 import { ReactNode, useEffect, useState, useCallback } from 'react';
 
 /**
+ * A milestone within an animation that pins progress to a specific element
+ */
+export interface AnimationMilestone {
+  /** Element ID that triggers this milestone */
+  elementId: string;
+  /** Progress value (0-1) that the animation should be at when this element is in view */
+  progress: number;
+}
+
+/**
  * Configuration for a single animation in the sequence
  */
 export interface AnimationConfig {
@@ -17,6 +27,24 @@ export interface AnimationConfig {
    * This takes precedence over duration-based positioning.
    */
   startElementId?: string;
+
+  /**
+   * Milestones allow you to pin specific progress values to specific elements.
+   * Progress is interpolated linearly between milestones.
+   *
+   * @example
+   * ```tsx
+   * {
+   *   render: (p) => <BrainAnimation progress={p} />,
+   *   startElementId: 'intro',
+   *   milestones: [
+   *     { elementId: 'brain-formed', progress: 0.5 },  // At this element, animation is 50% done
+   *     { elementId: 'brain-active', progress: 0.8 },  // At this element, animation is 80% done
+   *   ]
+   * }
+   * ```
+   */
+  milestones?: AnimationMilestone[];
 
   /**
    * Duration can be:
@@ -72,7 +100,7 @@ export function AnimationSequence({
   scrollableHeight?: number;
   animations: AnimationConfig[];
 }) {
-  // Track element positions for element-based triggers
+  // Track element positions for element-based triggers (including milestones)
   const [elementPositions, setElementPositions] = useState<Map<string, number>>(new Map());
 
   // Calculate element positions on mount and scroll
@@ -89,18 +117,33 @@ export function AnimationSequence({
     const viewportHeight = window.innerHeight;
     const scrollableDistance = Math.max(1, articleHeight - viewportHeight);
 
+    // Helper to get normalized position for an element
+    const getElementPosition = (elementId: string): number | null => {
+      const element = document.getElementById(elementId);
+      if (!element) return null;
+      const elementRect = element.getBoundingClientRect();
+      const elementTop = window.scrollY + elementRect.top - articleTop;
+      const triggerPoint = elementTop - viewportHeight / 2;
+      return Math.max(0, Math.min(1, triggerPoint / scrollableDistance));
+    };
+
     animations.forEach((anim) => {
+      // Track startElementId
       if (anim.startElementId) {
-        const element = document.getElementById(anim.startElementId);
-        if (element) {
-          const elementRect = element.getBoundingClientRect();
-          // Calculate where this element is as a percentage of total scroll
-          // Element triggers when it reaches viewport center
-          const elementTop = window.scrollY + elementRect.top - articleTop;
-          const triggerPoint = elementTop - viewportHeight / 2;
-          const normalizedPosition = Math.max(0, Math.min(1, triggerPoint / scrollableDistance));
-          positions.set(anim.startElementId, normalizedPosition);
+        const pos = getElementPosition(anim.startElementId);
+        if (pos !== null) {
+          positions.set(anim.startElementId, pos);
         }
+      }
+
+      // Track milestone element IDs
+      if (anim.milestones) {
+        anim.milestones.forEach((milestone) => {
+          const pos = getElementPosition(milestone.elementId);
+          if (pos !== null) {
+            positions.set(milestone.elementId, pos);
+          }
+        });
       }
     });
 
@@ -148,10 +191,15 @@ export function AnimationSequence({
         if (opacity <= 0) return null;
 
         // Calculate normalized progress within this animation's range
-        const normalizedProgress = calculateNormalizedProgress(
-          scrollProgress,
-          range
-        );
+        // Use milestones if available for more precise control
+        const normalizedProgress = animation.milestones && animation.milestones.length > 0
+          ? calculateProgressWithMilestones(
+              scrollProgress,
+              range,
+              animation.milestones,
+              elementPositions
+            )
+          : calculateNormalizedProgress(scrollProgress, range);
 
         // Render with opacity wrapper
         return (
@@ -379,4 +427,61 @@ function calculateNormalizedProgress(
     Math.min(duration, progress - range.start)
   );
   return currentProgress / duration;
+}
+
+/**
+ * Calculate progress using milestones for more precise control.
+ * Interpolates linearly between milestone points.
+ *
+ * @example
+ * If animation starts at scroll 0.2 and ends at 0.6, with milestone at 0.4 = 50%:
+ * - At scroll 0.2: progress = 0
+ * - At scroll 0.4: progress = 0.5
+ * - At scroll 0.6: progress = 1.0
+ */
+function calculateProgressWithMilestones(
+  scrollProgress: number,
+  range: AnimationRange,
+  milestones: AnimationMilestone[],
+  elementPositions: Map<string, number>
+): number {
+  // Build sorted list of progress points: start (0), milestones, end (1)
+  const points: Array<{ scrollPos: number; animProgress: number }> = [
+    { scrollPos: range.start, animProgress: 0 },
+  ];
+
+  // Add milestone points
+  milestones.forEach((milestone) => {
+    const scrollPos = elementPositions.get(milestone.elementId);
+    if (scrollPos !== undefined) {
+      points.push({ scrollPos, animProgress: milestone.progress });
+    }
+  });
+
+  // Add end point
+  points.push({ scrollPos: range.end, animProgress: 1 });
+
+  // Sort by scroll position
+  points.sort((a, b) => a.scrollPos - b.scrollPos);
+
+  // Find which segment we're in and interpolate
+  for (let i = 0; i < points.length - 1; i++) {
+    const current = points[i];
+    const next = points[i + 1];
+
+    if (scrollProgress <= next.scrollPos) {
+      // We're in this segment - interpolate
+      const segmentScrollRange = next.scrollPos - current.scrollPos;
+      if (segmentScrollRange <= 0) return current.animProgress;
+
+      const scrollInSegment = scrollProgress - current.scrollPos;
+      const segmentProgress = scrollInSegment / segmentScrollRange;
+
+      const animProgressRange = next.animProgress - current.animProgress;
+      return current.animProgress + segmentProgress * animProgressRange;
+    }
+  }
+
+  // Past all points - return 1
+  return 1;
 }
