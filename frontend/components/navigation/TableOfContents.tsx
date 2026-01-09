@@ -101,6 +101,8 @@ interface TOCHeadingProps {
   children: ReactNode;
   className?: string;
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  /** Explicit text to show in TOC. Use when children contain React elements like Math. */
+  tocText?: string;
 }
 
 // Default styles for each heading level
@@ -125,10 +127,12 @@ export function TOCHeading({
   children,
   className,
   as,
+  tocText,
 }: TOCHeadingProps) {
   const { registerHeading, unregisterHeading } = useTOCContext();
   const Tag = as || (`h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6');
-  const text = typeof children === 'string' ? children : '';
+  // Use explicit tocText if provided, otherwise try to extract from string children
+  const text = tocText ?? (typeof children === 'string' ? children : '');
 
   // Use provided className or fall back to default for this level
   const headingClassName = className ?? defaultHeadingStyles[level] ?? '';
@@ -139,7 +143,11 @@ export function TOCHeading({
   }, [id, text, level, registerHeading, unregisterHeading]);
 
   return (
-    <Tag id={id} className={headingClassName}>
+    <Tag
+      id={id}
+      className={headingClassName}
+      style={{ scrollMarginTop: '72px' }}
+    >
       {children}
     </Tag>
   );
