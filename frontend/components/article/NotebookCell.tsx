@@ -85,6 +85,7 @@ export function NotebookCell({
       onCollapsedChange={onCollapsedChange}
       previewLines={previewLines}
       githubUrl={githubUrl ?? undefined}
+      visualization={cell.visualization}
     />
   );
 }

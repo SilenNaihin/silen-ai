@@ -97,7 +97,7 @@ export default function StardustArticle() {
 ## Directive Format
 
 ```python
-# | targetId [inline] [expanded]
+# | targetId [inline] [expanded] [visualization]
 ```
 
 - `#` - Python comment
@@ -105,6 +105,7 @@ export default function StardustArticle() {
 - `targetId` - Must match an `id` in your article
 - `inline` - (optional) Render in article body instead of right margin
 - `expanded` - (optional) Start expanded instead of collapsed
+- `visualization` - (optional) Show only output (no code), for graphs/plots
 
 **The directive line is automatically removed from displayed code.**
 
@@ -115,6 +116,7 @@ export default function StardustArticle() {
 # | formula inline            # In article body, collapsed
 # | implementation expanded   # Right margin, expanded
 # | demo inline expanded      # In article body, expanded
+# | parabola visualization    # Output only, no code shown
 ```
 
 **Placement Behavior:**
@@ -125,6 +127,23 @@ export default function StardustArticle() {
 | `# \| id inline` | Inline in article | Inline collapsed |
 | `# \| id expanded` | Right margin, expanded | Inline expanded |
 | `# \| id inline expanded` | Inline, expanded | Inline expanded |
+| `# \| id visualization` | Output only (graph/plot) | Output only |
+
+### Visualization Mode
+
+Use `visualization` when the cell produces a visual output (graph, plot, diagram) and the code is just implementation detail:
+
+```python
+# | attention-heatmap visualization
+import matplotlib.pyplot as plt
+plt.imshow(attention_matrix, cmap='Blues')
+plt.title("Attention Pattern")
+plt.show()
+```
+
+**Result:** Only the rendered plot appears in the article. No code is shown, no "Output:" label. GitHub link and copy button appear in the corner for readers who want to inspect the code.
+
+**Note:** Matplotlib artifacts like `<Figure size 600x500 with 2 Axes>` are automatically stripped from all cell outputs.
 
 ---
 
@@ -263,10 +282,11 @@ interface NotebookCell {
   code: string;            // Code without directive line
   language: string;        // e.g., "python", "javascript"
   output?: string;         // Execution output (if cell was run)
-  imageOutput?: string;    // Base64 image data (PNG/JPEG)
+  outputImage?: string;    // Base64 image data (PNG/JPEG)
   executionCount?: number; // Execution count from Jupyter
   inline?: boolean;        // Render in article body (not margin)
   expanded?: boolean;      // Start expanded (not collapsed)
+  visualization?: boolean; // Show only output (no code), for graphs/plots
 }
 ```
 

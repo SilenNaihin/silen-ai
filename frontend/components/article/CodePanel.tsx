@@ -23,6 +23,8 @@ interface CodePanelProps {
   collapsedLabel?: string;
   /** Show first N lines in collapsed preview mode */
   previewLines?: number;
+  /** Visualization mode: show only output (no code), for graphs/plots where code is implementation detail */
+  visualization?: boolean;
 }
 
 /**
@@ -138,6 +140,7 @@ export function CodePanel({
   onCollapsedChange,
   collapsedLabel = 'View Code',
   previewLines = 0,
+  visualization = false,
 }: CodePanelProps) {
   const [internalCollapsed, setInternalCollapsed] = useState(collapsible && defaultCollapsed);
 
@@ -171,6 +174,50 @@ export function CodePanel({
   const hasMoreLines = previewLines > 0 && codeLines.length > previewLines;
   const previewCode = previewLines > 0 ? codeLines.slice(0, previewLines).join('\n') : code;
   const highlightedPreview = language === 'python' ? highlightPython(previewCode) : previewCode;
+
+  // Visualization mode: show only output (no code), for graphs/plots
+  if (visualization) {
+    // Must have some output to show
+    if (!outputImage && !output) {
+      return null;
+    }
+
+    return (
+      <div className={`relative rounded-lg overflow-hidden ${className}`}>
+        {/* Action buttons in top right corner */}
+        <div className="absolute top-2 right-2 flex gap-1 z-10">
+          <button
+            onClick={handleCopy}
+            className="p-1.5 text-neutral-400 hover:text-neutral-600 bg-white/80 hover:bg-white border border-neutral-200 rounded shadow-sm transition-colors"
+            title="Copy code"
+          >
+            <FiCopy className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={handleGitHub}
+            className="p-1.5 text-neutral-400 hover:text-neutral-600 bg-white/80 hover:bg-white border border-neutral-200 rounded shadow-sm transition-colors"
+            title="View on GitHub"
+          >
+            <FiGithub className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Output only - no "Output:" label */}
+        <div className="bg-white">
+          {outputImage && (
+            <img
+              src={outputImage}
+              alt="Visualization"
+              className="max-w-full h-auto"
+            />
+          )}
+          {output && !outputImage && (
+            <pre className="font-mono text-sm text-neutral-900 whitespace-pre-wrap p-4">{output}</pre>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   // Collapsed view: show preview lines if specified, otherwise just a bar
   if (collapsible && isCollapsed) {

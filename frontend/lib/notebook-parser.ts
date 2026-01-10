@@ -14,6 +14,7 @@ export interface NotebookCell {
   executionCount?: number;
   inline?: boolean; // If true, render inline in article instead of side panel
   expanded?: boolean; // If true, start expanded instead of collapsed
+  visualization?: boolean; // If true, show only output (no code), for graphs/plots
 }
 
 export interface NotebookData {
@@ -28,6 +29,7 @@ export interface NotebookData {
  * - # | targetId                  - Standard cell, shown in side panel
  * - # | targetId inline           - Shown inline in article body (collapsed)
  * - # | targetId inline expanded  - Shown inline, expanded by default
+ * - # | targetId visualization    - Output only (graph/plot), no code shown
  */
 export function parseNotebook(notebookJson: any, notebookPath: string): NotebookData {
   const cells: Record<string, NotebookCell> = {};
@@ -44,14 +46,17 @@ export function parseNotebook(notebookJson: any, notebookPath: string): Notebook
       ? cell.source.join('')
       : cell.source;
 
-    // Look for directive: # | targetId [inline] [expanded] (with optional trailing >)
-    const directiveMatch = source.match(/^#\s*\|\s*([\w-]+)(?:\s+(inline))?(?:\s+(expanded))?\s*>?\s*$/m);
+    // Look for directive: # | targetId [inline] [expanded] [visualization] (with optional trailing >)
+    // Flags can appear in any order after targetId
+    const directiveMatch = source.match(/^#\s*\|\s*([\w-]+)((?:\s+(?:inline|expanded|visualization))*)\s*>?\s*$/m);
 
     if (!directiveMatch) return;
 
-    const [, targetId, inlineFlag, expandedFlag] = directiveMatch;
-    const isInline = inlineFlag === 'inline';
-    const isExpanded = expandedFlag === 'expanded';
+    const [, targetId, flagsStr] = directiveMatch;
+    const flags = flagsStr ? flagsStr.toLowerCase() : '';
+    const isInline = flags.includes('inline');
+    const isExpanded = flags.includes('expanded');
+    const isVisualization = flags.includes('visualization');
 
     // Extract code without the directive line
     const codeLines = source.split('\n');
@@ -81,10 +86,29 @@ export function parseNotebook(notebookJson: any, notebookPath: string): Notebook
       executionCount: cell.execution_count,
       inline: isInline,
       expanded: isExpanded,
+      visualization: isVisualization,
     };
   });
 
   return { cells, notebookPath };
+}
+
+/**
+ * Filter out matplotlib figure text representations
+ * These look like: <Figure size 600x500 with 2 Axes>
+ */
+function filterMatplotlibArtifacts(text: string | undefined): string | undefined {
+  if (!text) return text;
+
+  // Filter out matplotlib figure representations
+  // Matches patterns like: <Figure size 600x500 with 2 Axes>, <Figure size 640x480 with 1 Axes>, etc.
+  const filtered = text
+    .split('\n')
+    .filter(line => !line.match(/^<Figure size \d+x\d+ with \d+ Axes?>$/))
+    .join('\n')
+    .trim();
+
+  return filtered || undefined;
 }
 
 /**
@@ -127,6 +151,9 @@ function extractOutput(outputs: any[]): { text?: string; image?: string } {
       text = Array.isArray(traceback) ? traceback.join('\n') : traceback;
     }
   }
+
+  // Filter out matplotlib artifacts from text output
+  text = filterMatplotlibArtifacts(text);
 
   return { text, image };
 }

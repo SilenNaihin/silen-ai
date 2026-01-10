@@ -2,26 +2,239 @@
 
 A comprehensive guide for creating world-class interactive articles from Jupyter notebooks. This captures patterns learned through extensive iteration — follow it to avoid common pitfalls and achieve quality in one shot.
 
-**Important:** This guide is for a **planning dialogue**, not direct generation. The workflow is:
-
-1. Discuss the topic and visualization approach
-2. Plan the notebook structure together
-3. Review and iterate on the plan
-4. Only then implement the article
+**Important:** This guide is for a **planning dialogue**, not direct generation. The workflow depends on whether a notebook is provided.
 
 ---
 
 ## 0. Planning Phase: Before Any Implementation
 
-### Starting the Dialogue
+### Two Modes of Article Creation
 
-When given a topic, first establish:
+**Mode A: Notebook Provided (Source of Truth)**
+
+When a Jupyter notebook is provided, it is the authoritative source. The user has already vetted the content, code, and narrative. The article must be a **strict superset** of the notebook:
+
+- All markdown prose transfers faithfully
+- All code cells transfer faithfully
+- All structure and ordering preserved
+- Article **adds** presentation value (animations, styling, interactivity, accessibility)
+- Article **never removes or contradicts** notebook content
+
+**Mode B: Topic Only (Collaborative Planning)**
+
+When given just a topic, plan the article collaboratively from scratch using the dialogue approach below.
+
+### Mode A: Notebook-First Workflow
+
+When a notebook is provided:
+
+```
+1. Read the notebook thoroughly
+2. Identify the structure: sections, code cells, narrative flow
+3. Suggest improvements (content gaps, organizational issues) — clearly marked as suggestions
+4. Plan the presentation layer (animations, interactives, styling)
+5. User approves/rejects suggestions
+6. Implement faithfully, adding presentation value
+```
+
+**Content decisions vs. Presentation decisions:**
+
+| Decision Type | Examples | Authority |
+|---------------|----------|-----------|
+| **Content** | What concepts to cover, explanations, code logic, narrative flow | Notebook (defer unless suggesting improvement) |
+| **Presentation** | Which animations, where to add interactivity, styling choices, accessibility | Plan collaboratively |
+
+**When suggesting improvements:**
+
+Only suggest changes when genuinely valuable:
+- Missing context that would confuse readers
+- Organizational issues that hurt comprehension
+- Opportunities to strengthen the narrative
+
+Frame suggestions explicitly: "The notebook covers X well, but readers might benefit from Y" — never silently alter content.
+
+### What "Strict Superset" Means: Presentation Value Types
+
+The article adds value through presentation elements the notebook format cannot provide. Each type has specific use cases:
+
+**1. Scroll Animations (Sticky Panel)**
+
+*How it adds value:* Reinforces concepts visually as the reader progresses. Creates engagement through motion. Shows transformations, progressions, or spatial relationships that text alone cannot convey.
+
+*Two valid purposes for animation:*
+1. **Build intuition** — The concept has inherent time, steps, or transformation that becomes clearer when animated (e.g., a circle being traced, a matrix filling in)
+2. **Keep the reader captivated** — A beautiful, aesthetic animation that makes scrolling feel rewarding (e.g., particles condensing into a shape, smooth transitions between states)
+
+Both are valid. Do not try to make every animation explanatory.
+
+*Aesthetic vs explanatory animations:*
+- **Aesthetic**: Abstract, beautiful, keeps the reader engaged while scrolling through text-heavy sections. Does not need to map to specific concepts.
+- **Explanatory**: Directly visualizes what the text describes. Should have clear correspondence between scroll progress and conceptual progression.
+
+*When to use:*
+- Concepts with inherent time, steps, or transformation (circle being traced, matrix filling in)
+- Keeping readers engaged through text-heavy sections (aesthetic animations)
+- Showing evolution or progression tied to the narrative
+
+*When NOT to use:*
+- Concepts that become MORE confusing when animated — if you find yourself forcing an animation, it probably should not be animated
+- Sections with inline interactive visualizations (they compete for attention)
+- When a static image would be clearer
+
+*Alternatives when no animation fits:*
+- **BlankAnimation**: Empty sticky panel, let the text carry the section
+- **Static image in sticky panel**: A diagram or figure that persists while reading (see Static Images below)
+- **Hold previous animation**: Let a good visualization stay on screen longer
+- **Seamless aesthetic transition**: Connect sections with beautiful but abstract animations that create visual continuity without explaining
+
+*Implementation:* See Section 6 (Animation System)
+
+**2. Static Images (Inline or Sticky Panel)**
+
+*How it adds value:* Some concepts are best understood at a glance. A well-designed static diagram can be clearer than an animation. Images can appear inline with text or in the sticky panel. **When no obvious animation exists for a section, a static image in the sticky panel is a valid alternative to BlankAnimation.**
+
+*When to use:*
+- Architecture diagrams, system overviews
+- Comparisons that benefit from side-by-side viewing
+- Concepts where the reader needs to study details at their own pace
+- When animation would add motion without adding clarity
+- As a sticky panel alternative when no animation fits the section
+
+*When NOT to use:*
+- When the concept has inherent progression that benefits from animation
+- When interactivity would help exploration
+
+*Placement:*
+- **Inline:** When the image is directly referenced by adjacent text
+- **Sticky panel:** When it should persist while reading multiple paragraphs, or as an alternative to animation
+
+*How to include images:*
+
+Since images require sourcing, use one of these approaches:
+
+1. **Placeholder for human review** (preferred for custom diagrams):
+```
+<!-- INSERT IMAGE HERE
+Purpose: Show the transformer attention pattern as a heatmap
+Description: A 10x10 grid where cell (i,j) brightness indicates attention from position i to position j
+Should illustrate: The causal mask pattern (upper triangle dark) and local attention bias
+-->
+```
+
+2. **Claude web search** (for reference images, paper figures):
+When a well-known diagram exists (e.g., "the original transformer architecture diagram from Vaswani et al."), Claude can search for and suggest specific images with proper attribution.
+
+3. **Generated diagrams**: For simple diagrams, describe what to generate using tools like Mermaid, TikZ, or programmatic SVG.
+
+**3. Inline Interactive Visualizations**
+
+*How it adds value:* Lets readers explore "what if" scenarios through direct manipulation. Builds intuition through experimentation rather than passive viewing.
+
+*When to use:*
+- Parameter exploration ("what happens if I change X?")
+- Comparing multiple configurations
+- Building intuition through direct manipulation
+- When a single static view is insufficient
+
+*When NOT to use:*
+- Simple value display (just show the value)
+- When the concept doesn't benefit from exploration
+- Visualizations requiring complex setup/context
+
+*Implementation:* See Section 7 (Interactive Elements)
+
+**4. Pyodide Code Cells**
+
+*How it adds value:* Lets readers run and modify real Python code in the browser. Enables practice problems, verification of claims, and experimentation.
+
+*When to use:*
+- Practice problems with test assertions
+- Verifying claims the reader might be skeptical of
+- Experimenting with real computations
+- When readers benefit from modifying code themselves
+
+*When NOT to use:*
+- Simple value tweaking (use inline viz with slider instead)
+- Visualizations (Pyodide matplotlib is slow — use React)
+- Code that requires complex setup/context
+- Showing code without expectation of modification (use regular code cells)
+
+*Implementation:* See Section 7 (Interactive Elements)
+
+**5. Code Cell Placement**
+
+Notebook code cells can appear in the article in different ways. The placement signals importance and relevance:
+
+| Placement | Directive | When to Use |
+|-----------|-----------|-------------|
+| **Sidebar, collapsed** | `# \| cell-id` | Reference implementation. Reader may want to see it but doesn't need to. |
+| **Sidebar, expanded** | `# \| cell-id expanded` | Important reference that reader should notice. |
+| **Inline, collapsed** | `# \| cell-id inline` | Central to understanding but long. Reader should expand if curious. |
+| **Inline, expanded** | `# \| cell-id inline expanded` | Essential. Reader must see this code to follow the explanation. |
+| **Visualization only** | `# \| cell-id visualization` | Output is the content; code is implementation detail. Shows only the rendered output (graph, plot, diagram) with no code visible. GitHub link and copy button available in corner. |
+| **Not shown** | No directive | Supplementary code. The markdown prose explains the concept; code is just implementation detail. |
+
+**Decision tree for code placement:**
+
+```
+Does this cell produce a visual output (graph, plot, diagram)?
+├─ YES → Is the output the main content, with code as implementation detail?
+│   ├─ YES → visualization (shows only the output, code hidden but accessible)
+│   └─ NO (code matters too) → inline, with output shown below
+│
+└─ NO → Is there markdown prose that fully explains this concept?
+    ├─ YES → Is the code essential to understanding, or just implementation?
+    │   ├─ ESSENTIAL (reader needs to see the code) → inline
+    │   │   └─ Short (<10 lines)? → expanded, else collapsed
+    │   └─ IMPLEMENTATION DETAIL → no directive (don't show)
+    └─ NO → The code IS the explanation
+        └─ Is it central to the current point?
+            ├─ YES → inline (reader shouldn't have to look away)
+            │   └─ Short (<10 lines)? → expanded, else collapsed
+            └─ NO → sidebar
+                └─ Is this a "try it yourself" or reference implementation?
+                    ├─ YES → sidebar, collapsed
+                    └─ NO → consider if it's needed at all
+```
+
+**Examples:**
+
+```python
+# Concept explained in prose, code is supplementary — don't show
+def helper_function():
+    # Implementation detail the reader doesn't need to see
+    ...
+
+# | pe-formula inline expanded
+# Essential — the formula IS what we're explaining
+def positional_encoding(pos, d_model):
+    return np.sin(pos / 10000 ** (2 * np.arange(d_model//2) / d_model))
+
+# | parabola-plot visualization
+# Visual output is the content — only the graph is shown, no code
+x = np.linspace(-5, 5, 100)
+plt.plot(x, x**2)
+plt.title("A simple parabola")
+plt.show()
+
+# | full-implementation
+# Reference implementation — sidebar, collapsed
+class RotaryPositionalEmbedding(nn.Module):
+    # Full production code, reader can reference if needed
+    ...
+```
+
+### Mode B: Topic-First Workflow
+
+When given a topic without a notebook, establish:
 
 ```
 1. What should become intuitively obvious by the end?
 2. What's the reader's assumed starting knowledge?
 3. What type of visualization approach fits best?
 ```
+
+Then plan content and presentation together.
 
 ### Three Visualization Approaches
 
@@ -45,7 +258,17 @@ When given a topic, first establish:
 
 ### Plan Output Format
 
-Before implementation, produce a plan covering:
+**For Mode A (notebook provided):**
+
+- Notebook structure summary (sections, code cells identified)
+- Suggested improvements (clearly marked, with rationale)
+- Presentation plan:
+  - Visualization approach and why
+  - Animation ideas per section
+  - Where to add inline interactives
+  - Styling/accessibility considerations
+
+**For Mode B (topic only):**
 
 - Which visualization approach and why
 - Section-by-section breakdown with:
@@ -193,11 +416,15 @@ At major boundaries, briefly summarize and tease:
 
 ---
 
-## 3. Notebook Design Principles
+## 3. Evaluating Notebooks for Article Conversion
+
+When a notebook is provided (Mode A), evaluate it through the lens of article narrative. The notebook may be excellent for exploration or reference but need adjustments for a cohesive article. Use these criteria when suggesting improvements.
+
+**Important:** The notebook is still the source of truth. These criteria help identify opportunities to suggest — not mandates to change.
 
 ### Realistic Examples, Not Abstract Tensors
 
-Don't use meaningless numbers. Ground examples in something concrete:
+Check if examples are concrete and memorable. Abstract tensors work for exploration but often fail in articles:
 
 ```python
 # ❌ Bad: Abstract and forgettable
@@ -212,7 +439,7 @@ print(f"'{words[0]}' embedding: {embeddings[0]}")
 
 ### Single-Line Cells Are OK
 
-Don't feel obligated to bundle code. One line that demonstrates one thing is often clearer:
+One line demonstrating one thing is often clearer than bundled code. If the notebook bundles too much, consider suggesting it be split:
 
 ```python
 # Cell 1: Show the shape
@@ -227,7 +454,7 @@ embeddings.mean(dim=1)
 
 ### Build Up to Complete Functions
 
-Start with intuitions, not complete solutions:
+Check if the notebook jumps to complete solutions or builds up progressively. Articles benefit from progressive construction:
 
 ```python
 # Cell 1: What's a single sine encoding?
@@ -249,7 +476,7 @@ def positional_encoding(seq_len, d_model):
 
 ### Math Derivations to First Principles
 
-Break down math to the level of log rules and trig identities:
+Check if math derivations jump too many steps. Articles should break derivations down to fundamentals:
 
 ```
 For log_softmax, show:
@@ -263,7 +490,7 @@ log(softmax(x)) = log(exp(x_i) / Σexp(x_j))
 
 ### Intuitions From Unexpected Places
 
-Building intuition doesn't mean staying narrowly on-topic:
+Look for opportunities to suggest intuition-building detours. Sometimes the best way to explain concept X is through unrelated example Y:
 
 ```
 Example for understanding nonlinearity + UAT:
@@ -281,7 +508,7 @@ The parabola example isn't "about" neural networks, but builds the right intuiti
 
 ### Use PyTorch Over NumPy
 
-When relevant, prefer torch for consistency with ML codebases:
+For ML articles, PyTorch is preferred for consistency with production codebases:
 
 ```python
 # Prefer this
@@ -295,7 +522,7 @@ x = np.random.randn(3, 4)
 
 ### Include Practice Problems
 
-Add scaffolded exercises within Pyodide (a clear use case for Pyodide) with clear success criteria:
+If the notebook lacks exercises, suggest adding scaffolded practice problems. These are ideal Pyodide candidates:
 
 ```python
 # Exercise: Implement the frequency formula
@@ -419,6 +646,8 @@ Colons are fine for introducing code blocks or lists, but avoid them mid-sentenc
 
 ## 5. Code Cell Integration
 
+For the comprehensive decision tree on code placement (inline vs. sidebar vs. not shown), see **Section 0: Code Cell Placement**.
+
 ### Notebook Directive Syntax
 
 In your Jupyter notebook, mark cells with directives:
@@ -428,21 +657,14 @@ In your Jupyter notebook, mark cells with directives:
 # | cell-id inline             # In article body, collapsed
 # | cell-id expanded           # Sidebar, starts expanded
 # | cell-id inline expanded    # In body, starts expanded
+# | cell-id visualization      # Output only (graph/plot), no code shown
 ```
 
-### Placement Decision Tree
+Cells without directives are not shown in the article (supplementary code where prose explains the concept).
 
-```
-Is this code central to understanding the current point?
-├─ YES → inline (reader shouldn't have to look away)
-│   └─ Is it short (<10 lines)?
-│       ├─ YES → inline expanded
-│       └─ NO  → inline collapsed with preview
-└─ NO → sidebar
-    └─ Is this a "try it yourself" or reference implementation?
-        ├─ YES → sidebar, collapsed
-        └─ NO  → consider if it's needed at all
-```
+**Visualization cells:** Use `visualization` when the cell produces a visual output (graph, plot, diagram) and the code is just implementation detail. Only the rendered output appears in the article, with GitHub link and copy button in the corner for readers who want to inspect the code. No "Output:" label is shown.
+
+**Clean output rendering:** All cell outputs (not just visualization cells) should render cleanly without matplotlib artifacts like `<Figure size 600x500 with 2 Axes>`. The implementation should strip these text representations and show only the actual rendered figure.
 
 ### InlineCode for Precise Placement
 
@@ -524,26 +746,9 @@ animations={[
 ]}
 ```
 
-### When to Animate (and When Not To)
-
-An animation should serve one of two purposes:
-1. **Build intuition** — The concept has inherent time, steps, or transformation that becomes clearer when animated (e.g., a circle being traced, a matrix filling in)
-2. **Keep the reader captivated** — A beautiful, aesthetic animation that makes scrolling feel rewarding (e.g., particles condensing into a shape, smooth transitions between states)
-
-**Do not animate concepts that become MORE confusing through animation.** Many technical concepts are better explained with static diagrams or inline interactive visualizations. If you find yourself forcing an animation, it probably should not be animated.
-
-**Options when animation does not fit:**
-- **No animation** — Use BlankAnimation and let the text carry the section
-- **Hold the previous animation** — Let a good visualization stay on screen longer rather than forcing a new one
-- **Seamless aesthetic transition** — Connect sections with beautiful but abstract animations (like the Stardust article's opening) that do not try to "explain" but create visual continuity
-
-**Aesthetic vs explanatory animations:**
-- **Aesthetic**: Abstract, beautiful, keeps the reader engaged while scrolling through text-heavy sections. Does not need to map to specific concepts.
-- **Explanatory**: Directly visualizes what the text describes. Should have clear correspondence between scroll progress and conceptual progression.
-
-Both are valid. Do not try to make every animation explanatory.
-
 ### Animation Design Principles
+
+For when to animate, types of animations (aesthetic vs. explanatory), and alternatives when no animation fits, see **Section 0: Scroll Animations**.
 
 1. **Reinforce, don't distract** — Animation should visualize what the text explains
 2. **Progressive reveal** — Use progress (0→1) to build up complexity
@@ -590,6 +795,8 @@ Progress interpolates linearly between milestone points. This is useful for:
 ---
 
 ## 7. Interactive Elements
+
+For comprehensive guidance on when to use each type, see **Section 0: Presentation Value Types**. This section covers implementation details.
 
 There are three distinct types of visual/interactive elements. Choose based on purpose:
 
@@ -684,15 +891,7 @@ For "try it yourself" code blocks with editable Python:
 </ArticleSection>
 ```
 
-**Good uses for Pyodide:**
-- Practice problems with test assertions
-- Verifying claims the reader might be skeptical of
-- Experimenting with real computations
-
-**Overkill for Pyodide:**
-- Simple value tweaking (use inline viz with slider instead)
-- Visualizations (Pyodide matplotlib is slow — use React)
-- Code that requires complex setup/context
+For when to use Pyodide (and when not to), see **Section 0: Pyodide Code Cells**.
 
 ### Combining Multiple Types
 
@@ -945,6 +1144,13 @@ Default styles by level:
 
 ## 10. Checklist: Before Publishing
 
+### Mode A: Notebook Fidelity (if notebook provided)
+
+- [ ] All notebook markdown prose transferred faithfully
+- [ ] All notebook code cells accounted for (shown or intentionally omitted as supplementary)
+- [ ] Structure and ordering preserved
+- [ ] Any suggested changes were explicitly approved by user
+
 ### Content Flow
 
 - [ ] Hook poses problem viscerally in first 3 sentences
@@ -955,18 +1161,22 @@ Default styles by level:
 
 ### Code Cells
 
-- [ ] All notebook directives use correct syntax (`# | id [inline] [expanded]`)
-- [ ] Inline vs sidebar placement is intentional
+- [ ] All notebook directives use correct syntax (`# | id [inline] [expanded] [visualization]`)
+- [ ] Inline vs sidebar vs visualization placement is intentional
+- [ ] Visualization cells used for graphs/plots where code is implementation detail
 - [ ] githubUrl is set for the article
 - [ ] Interactive code blocks have appropriate packages
+- [ ] No matplotlib artifacts (`<Figure size...>`) visible in outputs
 
-### Animations
+### Animations & Images
 
 - [ ] All animations use `startElementId`, not duration
 - [ ] Animation IDs match actual element IDs in article
 - [ ] Animations reinforce (not distract from) content
 - [ ] Text in animations is readable (≥14px)
 - [ ] Black and white only, unless color is absolutely necessary
+- [ ] Sections without animation have appropriate alternative (BlankAnimation, static image, or hold previous)
+- [ ] Image placeholders have clear purpose/description for human review
 
 ### Visual Polish
 
