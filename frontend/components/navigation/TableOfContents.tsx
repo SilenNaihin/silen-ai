@@ -106,13 +106,14 @@ interface TOCHeadingProps {
 }
 
 // Default styles for each heading level
+// More space above (to separate from previous section) than below (to group with content)
 const defaultHeadingStyles: Record<number, string> = {
-  1: 'text-3xl font-bold mb-4 text-black',
-  2: 'text-2xl font-bold mb-2 text-black',
-  3: 'text-xl font-semibold mb-2 text-black',
-  4: 'text-lg font-semibold mb-1 text-black',
-  5: 'text-base font-medium mb-1 text-black',
-  6: 'text-sm font-medium mb-1 text-black',
+  1: 'text-3xl font-bold mt-8 mb-4 text-black',
+  2: 'text-2xl font-bold mt-6 mb-2 text-black',
+  3: 'text-xl font-semibold mt-5 mb-2 text-black',
+  4: 'text-lg font-semibold mt-4 mb-1 text-black',
+  5: 'text-base font-medium mt-3 mb-1 text-black',
+  6: 'text-sm font-medium mt-3 mb-1 text-black',
 };
 
 /**
@@ -206,7 +207,7 @@ export function TOCDropdown({ className = '' }: TOCDropdownProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full right-0 mt-2 w-64 bg-white border border-neutral-200 rounded-lg shadow-lg py-2 z-50"
+            className="absolute top-full right-0 mt-2 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto bg-white border border-neutral-200 rounded-lg shadow-lg py-2 z-50"
           >
             {items.map((item) => (
               <button

@@ -27,8 +27,8 @@ export function ArticleLayout({
         {/* Animation - centered vertically on viewport */}
         {leftContent && (
           <>
-            {/* Desktop: Left margin, full opacity */}
-            <div className="fixed left-[calc((100vw-1600px)/2+2rem)] top-1/2 -translate-y-1/2 w-[28rem] h-[28rem] hidden xl:flex items-center justify-center pr-8">
+            {/* Desktop: Centered in left column (space between viewport edge and content) */}
+            <div className="fixed left-0 top-1/2 -translate-y-1/2 w-[calc((100vw-768px)/2)] h-[28rem] hidden xl:flex items-center justify-center">
               {leftContent(scrollProgress)}
             </div>
 
@@ -39,8 +39,8 @@ export function ArticleLayout({
           </>
         )}
 
-        {/* Main content - centered with equal margins */}
-        <div className="xl:mx-[30rem] max-w-2xl mx-auto py-24 relative z-10">
+        {/* Main content - always centered, animation is fixed overlay */}
+        <div className="py-16 relative z-10 max-w-3xl mx-auto px-4">
           {children}
         </div>
       </div>
