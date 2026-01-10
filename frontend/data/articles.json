@@ -1,0 +1,32 @@
+{
+  "articles": [
+    {
+      "slug": "positional-encoding",
+      "title": "Positional Embeddings",
+      "description": "Building intuition from first principles: sine waves to RoPE",
+      "icon": "sin",
+      "status": "published"
+    },
+    {
+      "slug": "tied-embeddings",
+      "title": "Tied Embeddings",
+      "description": "Why sharing weights isn't always principled",
+      "icon": "W",
+      "status": "published"
+    },
+    {
+      "slug": "stardust",
+      "title": "How Do We Make Stardust Think?",
+      "description": "From neurons to neural networks",
+      "icon": "*",
+      "status": "published"
+    },
+    {
+      "slug": "claude-code",
+      "title": "Claude Code Guide",
+      "description": "Why I switched from Cursor to Claude Code",
+      "icon": ">_",
+      "status": "published"
+    }
+  ]
+}
