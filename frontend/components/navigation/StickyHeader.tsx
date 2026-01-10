@@ -39,8 +39,27 @@ export function StickyHeader({
       className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-neutral-200 ${className}`}
     >
       <div className="max-w-[1600px] mx-auto px-8 h-14 flex items-center justify-between">
-        {/* Left: Title (animates in after scroll) */}
-        <div className="w-[300px]">
+        {/* Left: Back button + Title (animates in after scroll) */}
+        <div className="w-[300px] flex items-center gap-3">
+          <a
+            href="https://silennai.com"
+            className="text-neutral-400 hover:text-black transition-colors"
+            aria-label="Back to silennai.com"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </a>
           <motion.div
             initial={false}
             animate={{
