@@ -42,9 +42,9 @@ export function StickyHeader({
         {/* Left: Back button + Title (animates in after scroll) */}
         <div className="w-[300px] flex items-center gap-3">
           <a
-            href="https://silennai.com"
+            href="https://silennai.com/blog"
             className="text-neutral-400 hover:text-black transition-colors"
-            aria-label="Back to silennai.com"
+            aria-label="Back to Silen"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
