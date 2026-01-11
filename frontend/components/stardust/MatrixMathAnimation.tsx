@@ -408,9 +408,9 @@ function drawMatrixMultiplication(
   height: number
 ) {
   const cellSize = 32;
-  const matrixW = { rows: 3, cols: 4, x: centerX - 140, y: centerY - 60 };
-  const vectorX = { rows: 4, x: centerX + 30, y: centerY - 60 };
-  const resultY = { rows: 3, x: centerX + 120, y: centerY - 60 };
+  const matrixW = { rows: 3, cols: 4, x: centerX - 140, y: centerY - 100 };
+  const vectorX = { rows: 4, x: centerX + 30, y: centerY - 100 };
+  const resultY = { rows: 3, x: centerX + 120, y: centerY - 100 };
 
   // Label
   ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
@@ -516,8 +516,8 @@ function drawMatrixMultiplication(
   // Operators
   ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
   ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-  ctx.fillText('×', vectorX.x - 15, centerY);
-  ctx.fillText('=', resultY.x - 18, centerY);
+  ctx.fillText('×', vectorX.x - 20, centerY - 50);
+  ctx.fillText('=', resultY.x - 30, centerY - 50);
 
   // "Each row is a dot product" label
   if (progress > 0.3) {
@@ -525,7 +525,7 @@ function drawMatrixMultiplication(
     ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
     ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
     ctx.textAlign = 'center';
-    ctx.fillText('Each output = row · x (dot product)', centerX, centerY + 75);
+    ctx.fillText('Each output = row · x (dot product)', centerX, centerY + 50);
   }
 }
 
