@@ -110,6 +110,21 @@ import { InlineCode } from '@/components/article/InlineCode';
 | Code at exact position in flow | `<InlineCode id="cell-id" />` |
 | Override notebook's inline/expanded | `<InlineCode id="cell-id" expanded />` |
 
+### Visualization Cells
+
+For cells where the output (graph, plot) is the content and code is just implementation detail:
+
+```python
+# In notebook:
+# | attention-plot visualization
+plt.imshow(attention_matrix)
+plt.show()
+```
+
+**Result:** Only the rendered plot appears. No code shown, no "Output:" label. GitHub link and copy button in corner for code access.
+
+See **[Notebook Integration Guide](../../lib/NOTEBOOK_CODE.md)** for complete directive documentation.
+
 ## Layout Structure
 
 The article system uses a three-column layout:

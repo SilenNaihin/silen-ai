@@ -1,4 +1,16 @@
 export { StardustAnimation } from './StardustAnimation';
 export { ParticlesAnimation } from './ParticlesAnimation';
 export { NetworkAnimation } from './NetworkAnimation';
+export { ShapeRecognitionAnimation } from './ShapeRecognitionAnimation';
+export { ParabolaAnimation } from './ParabolaAnimation';
+export { PerceptronAnimation } from './PerceptronAnimation';
+export { TokenizationAnimation } from './TokenizationAnimation';
+export { TrainingLoopAnimation } from './TrainingLoopAnimation';
+export { TrainingInteractive, TrainingInteractiveMini } from './TrainingInteractive';
+export { TokenizationInteractive } from './TokenizationInteractive';
+export { NumericalizationInteractive } from './NumericalizationInteractive';
+export { WorldModelAnimation } from './WorldModelAnimation';
+export { EmbeddingInteractive } from './EmbeddingInteractive';
+export { EmbeddingAnimation } from './EmbeddingAnimation';
+export { CrossEntropyAnimation } from './CrossEntropyAnimation';
 

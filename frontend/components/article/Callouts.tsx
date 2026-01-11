@@ -43,10 +43,10 @@ interface InsightBoxProps {
 export function InsightBox({ children, title, className = '' }: InsightBoxProps) {
   return (
     <div
-      className={`bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4 text-sm text-neutral-600 ${className}`}
+      className={`bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4 text-neutral-700 ${className}`}
     >
       {title && (
-        <p className="font-medium text-neutral-700 mb-2">{title}</p>
+        <p className="font-medium text-neutral-800 mb-2">{title}</p>
       )}
       {children}
     </div>
@@ -71,9 +71,9 @@ interface QuoteBoxProps {
 export function QuoteBox({ children, className = '' }: QuoteBoxProps) {
   return (
     <div
-      className={`bg-neutral-50 border-l-4 border-neutral-300 pl-4 py-2 my-4 ${className}`}
+      className={`bg-neutral-50 border-l-4 border-neutral-300 pl-4 py-3 my-4 ${className}`}
     >
-      <div className="text-sm text-neutral-700 space-y-1">{children}</div>
+      <div className="text-neutral-700 space-y-2">{children}</div>
     </div>
   );
 }
@@ -103,14 +103,14 @@ interface DataFlowStepProps {
 export function DataFlow({ children, title, note, className = '' }: DataFlowProps) {
   return (
     <div
-      className={`bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4 font-mono text-sm ${className}`}
+      className={`bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4 font-mono ${className}`}
     >
       {title && (
-        <p className="text-neutral-500 text-xs mb-2 font-sans">{title}</p>
+        <p className="text-neutral-500 text-sm mb-2 font-sans">{title}</p>
       )}
       <div className="space-y-2">{children}</div>
       {note && (
-        <p className="text-neutral-500 text-xs mt-3 font-sans">{note}</p>
+        <p className="text-neutral-500 text-sm mt-3 font-sans">{note}</p>
       )}
     </div>
   );
