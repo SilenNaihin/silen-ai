@@ -109,7 +109,7 @@ const DEFAULT_CONFIG: NetworkConfig = {
   inputDim: EMBED_DIM,
   hiddenDim: 3,
   outputDim: 2,
-  learningRate: 0.5,
+  learningRate: 0.1,
   activation: 'relu',
 };
 
@@ -969,7 +969,7 @@ function DetailPanel({
       <div className="space-y-1">
         <div className="text-xs text-neutral-500 uppercase font-medium">Step Complete</div>
         <div className="text-sm">
-          All weights updated. Click &quot;Step&quot; to train another example.
+          All weights updated. Click &quot;Step&quot; to train the next example, or &quot;Train Batch&quot; to train all {TRAINING_SET.length} examples.
         </div>
       </div>
     );
@@ -1127,9 +1127,12 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
 
   // State
   const [weights, setWeights] = useState<NetworkWeights>(() => initializeWeights(DEFAULT_CONFIG));
-  const [inputText, setInputText] = useState('I love this movie');
-  const [label, setLabel] = useState<0 | 1>(1);
+  const [guessText, setGuessText] = useState('I love this movie'); // For inference/guess mode
   const [mode, setMode] = useState<Mode>('train');
+
+  // Current training example being displayed (derived from exampleIndex)
+  const [currentTrainingText, setCurrentTrainingText] = useState(TRAINING_SET[0].text);
+  const [currentTrainingLabel, setCurrentTrainingLabel] = useState(TRAINING_SET[0].label);
 
   // Tokenization state
   const [tokens, setTokens] = useState<string[]>([]);
@@ -1145,10 +1148,11 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
   // Training state
   const [stage, setStage] = useState<TrainingStage>('idle');
   const [step, setStep] = useState(0);
+  const [exampleIndex, setExampleIndex] = useState(0); // Current example in training batch
   const [logs, setLogs] = useState<TrainingLogEntry[]>([]);
   const [lossHistory, setLossHistory] = useState<number[]>([]);
   const [accHistory, setAccHistory] = useState<number[]>([]);
-  const [predictions, setPredictions] = useState<{ predicted: number; actual: number }[]>([]);
+  const [correctCount, setCorrectCount] = useState(0); // Track correct predictions for accuracy
   const [embeddingHistory, setEmbeddingHistory] = useState<{ word: string; id: number; values: number[][] }>({ word: 'love', id: VOCAB['love'], values: [] });
 
   // Animation state
@@ -1169,10 +1173,16 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
   const stageRef = useRef<TrainingStage>('idle');
   const weightsRef = useRef(weights);
   const configRef = useRef(config);
+  const exampleIndexRef = useRef(exampleIndex);
+  const stepRef = useRef(step);
+  const correctCountRef = useRef(correctCount);
 
   useEffect(() => { stageRef.current = stage; }, [stage]);
   useEffect(() => { weightsRef.current = weights; }, [weights]);
   useEffect(() => { configRef.current = config; }, [config]);
+  useEffect(() => { exampleIndexRef.current = exampleIndex; }, [exampleIndex]);
+  useEffect(() => { stepRef.current = step; }, [step]);
+  useEffect(() => { correctCountRef.current = correctCount; }, [correctCount]);
 
   // Reset when config changes
   const handleConfigChange = useCallback((newConfig: NetworkConfig) => {
@@ -1184,10 +1194,13 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
     setLoss(null);
     setStage('idle');
     setStep(0);
+    setExampleIndex(0);
+    setCurrentTrainingText(TRAINING_SET[0].text);
+    setCurrentTrainingLabel(TRAINING_SET[0].label);
     setLogs([]);
     setLossHistory([]);
     setAccHistory([]);
-    setPredictions([]);
+    setCorrectCount(0);
     setEmbeddingHistory({ word: 'love', id: VOCAB['love'], values: [[...newWeights.embeddings[VOCAB['love']]]] });
     setHighlightWeight(null);
     setUpdatingWeight(null);
@@ -1197,15 +1210,24 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
     setFeatures([0, 0]);
   }, []);
 
-  // Step function - advances one stage at a time
+  // Step function - advances one stage at a time through training examples
   const doStep = useCallback(() => {
     const currentStage = stageRef.current;
     const currentWeights = weightsRef.current;
     const currentConfig = configRef.current;
+    const currentExampleIndex = exampleIndexRef.current;
+
+    // Get current training example
+    const example = TRAINING_SET[currentExampleIndex];
+    const exampleText = example.text;
+    const exampleLabel = example.label;
 
     // Start: tokenize
     if (currentStage === 'idle' || currentStage === 'complete') {
-      const toks = tokenize(inputText);
+      // Update display to show current training example (don't touch guessText)
+      setCurrentTrainingText(exampleText);
+      setCurrentTrainingLabel(exampleLabel);
+      const toks = tokenize(exampleText);
       setTokens(toks);
       setStage('tokenizing');
       return;
@@ -1253,7 +1275,7 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
     // Loss
     if (currentStage === 'forward-output') {
       if (forward) {
-        setLoss(computeLoss(forward.probs, label));
+        setLoss(computeLoss(forward.probs, exampleLabel));
       }
       setStage('loss');
       return;
@@ -1262,7 +1284,7 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
     // Backward output
     if (currentStage === 'loss') {
       if (forward) {
-        const grads = backwardPass(forward, label, currentWeights, currentConfig, tokenIds);
+        const grads = backwardPass(forward, exampleLabel, currentWeights, currentConfig, tokenIds);
         setGradients(grads);
         setHighlightWeight({ layer: 'output', from: 0, to: 0 });
       }
@@ -1329,15 +1351,15 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
         }));
 
         const predicted = forward!.probs[1] > forward!.probs[0] ? 1 : 0;
-        const correct = predicted === label;
-        const newStep = step + 1;
-        setStep(newStep);
+        const correct = predicted === exampleLabel;
+        const newStep = stepRef.current + 1;
+        const newCorrectCount = correctCountRef.current + (correct ? 1 : 0);
 
-        setPredictions(p => [...p, { predicted, actual: label }]);
+        setStep(newStep);
+        setCorrectCount(newCorrectCount);
         setLossHistory(h => [...h, loss!]);
 
-        const totalCorrect = predictions.filter(p => p.predicted === p.actual).length + (correct ? 1 : 0);
-        const accuracy = totalCorrect / (predictions.length + 1);
+        const accuracy = newCorrectCount / newStep;
         setAccHistory(h => [...h, accuracy]);
 
         setLogs(logs => [...logs, {
@@ -1345,130 +1367,157 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
           loss: loss!,
           accuracy,
           predicted: predicted === 1 ? 'Pos' : 'Neg',
-          actual: label === 1 ? 'Pos' : 'Neg',
+          actual: exampleLabel === 1 ? 'Pos' : 'Neg',
           correct,
         }]);
+
+        // Advance to next example in training set
+        setExampleIndex((currentExampleIndex + 1) % TRAINING_SET.length);
       }
       setUpdatingWeight(null);
       setOldWeightValue(null);
       setNewWeightValue(null);
       setStage('complete');
     }
-  }, [inputText, label, forward, gradients, highlightWeight, tokens, step, predictions, loss]);
+  }, [forward, gradients, highlightWeight, tokens, tokenIds, loss]);
 
-  // Train full step (fast)
-  const trainFullStep = useCallback(() => {
-    const toks = tokenize(inputText);
-    const ids = tokensToIds(toks);
-    const embs = getEmbeddings(ids, weights);
-    const feats = poolEmbeddings(embs);
-    const fwd = forwardPass(feats, weights, config);
-    const l = computeLoss(fwd.probs, label);
-    const grads = backwardPass(fwd, label, weights, config, ids);
-    const newWeights = applyGradients(weights, grads, config.learningRate);
-    setWeights(newWeights);
-
-    // Track embedding history
-    setEmbeddingHistory(h => ({
-      ...h,
-      values: [...h.values, [...newWeights.embeddings[h.id]]],
-    }));
-
-    const predicted = fwd.probs[1] > fwd.probs[0] ? 1 : 0;
-    const correct = predicted === label;
-    const newStep = step + 1;
-    setStep(newStep);
-
-    setPredictions(p => [...p, { predicted, actual: label }]);
-    setLossHistory(h => [...h, l]);
-
-    const totalCorrect = predictions.filter(p => p.predicted === p.actual).length + (correct ? 1 : 0);
-    const accuracy = totalCorrect / (predictions.length + 1);
-    setAccHistory(h => [...h, accuracy]);
-
-    setLogs(logs => [...logs, {
-      step: newStep,
-      loss: l,
-      accuracy,
-      predicted: predicted === 1 ? 'Pos' : 'Neg',
-      actual: label === 1 ? 'Pos' : 'Neg',
-      correct,
-    }]);
-
-    setForward(fwd);
-    setGradients(grads);
-    setLoss(l);
-    setTokens(toks);
-    setTokenIds(ids);
-    setEmbeddings(getEmbeddings(ids, newWeights));
-    setFeatures(feats);
-    setStage('complete');
-  }, [inputText, label, weights, config, step, predictions]);
-
-  // Train 10x
-  const train10Steps = useCallback(() => {
+  // Train full batch (one epoch through all training examples) with fast visual cycling
+  const trainFullBatch = useCallback(async () => {
     let currentWeights = weights;
+    let currentStep = step;
+    let currentCorrectCount = correctCount;
 
-    for (let i = 0; i < 10; i++) {
-      const example = TRAINING_SET[i % TRAINING_SET.length];
-      const exToks = tokenize(example.text);
-      const exIds = tokensToIds(exToks);
-      const exEmbs = getEmbeddings(exIds, currentWeights);
-      const feats = poolEmbeddings(exEmbs);
+    // Cycle through examples with visual feedback
+    for (let i = 0; i < TRAINING_SET.length; i++) {
+      const example = TRAINING_SET[i];
+
+      // Update UI to show current example
+      setExampleIndex(i);
+      setCurrentTrainingText(example.text);
+      setCurrentTrainingLabel(example.label);
+
+      const toks = tokenize(example.text);
+      const ids = tokensToIds(toks);
+      const embs = getEmbeddings(ids, currentWeights);
+      const feats = poolEmbeddings(embs);
       const fwd = forwardPass(feats, currentWeights, config);
       const l = computeLoss(fwd.probs, example.label);
-      const grads = backwardPass(fwd, example.label, currentWeights, config, exIds);
+      const grads = backwardPass(fwd, example.label, currentWeights, config, ids);
       currentWeights = applyGradients(currentWeights, grads, config.learningRate);
-
-      // Track embedding history
-      setEmbeddingHistory(h => ({
-        ...h,
-        values: [...h.values, [...currentWeights.embeddings[h.id]]],
-      }));
 
       const predicted = fwd.probs[1] > fwd.probs[0] ? 1 : 0;
       const correct = predicted === example.label;
-      const newStep = step + i + 1;
+      currentStep++;
+      if (correct) currentCorrectCount++;
 
-      setPredictions(p => [...p, { predicted, actual: example.label }]);
+      const accuracy = currentCorrectCount / currentStep;
+
+      // Update state for each example
+      setWeights(currentWeights);
+      setStep(currentStep);
+      setCorrectCount(currentCorrectCount);
       setLossHistory(h => [...h, l]);
-
-      const totalCorrect = predictions.filter(p => p.predicted === p.actual).length + (correct ? 1 : 0);
-      const accuracy = totalCorrect / (predictions.length + i + 1);
       setAccHistory(h => [...h, accuracy]);
+      setLoss(l);
+      setForward(fwd);
+      setTokens(toks);
+      setTokenIds(ids);
+      setEmbeddings(embs);
+      setFeatures(feats);
 
       setLogs(logs => [...logs, {
-        step: newStep,
+        step: currentStep,
         loss: l,
         accuracy,
         predicted: predicted === 1 ? 'Pos' : 'Neg',
         actual: example.label === 1 ? 'Pos' : 'Neg',
         correct,
       }]);
+
+      // Small delay for visual effect
+      await new Promise(resolve => setTimeout(resolve, 60));
+    }
+
+    setExampleIndex(0); // Reset to start of batch for next round
+    setStage('complete');
+  }, [weights, config, step, correctCount]);
+
+  // Train N epochs (N passes through all training data)
+  const trainNEpochs = useCallback((numEpochs: number) => {
+    let currentWeights = weights;
+    let currentStep = step;
+    let currentCorrectCount = correctCount;
+    const newLogs: TrainingLogEntry[] = [];
+    const newLossHistory: number[] = [];
+    const newAccHistory: number[] = [];
+    let lastLoss = 0;
+
+    for (let epoch = 0; epoch < numEpochs; epoch++) {
+      for (let i = 0; i < TRAINING_SET.length; i++) {
+        const example = TRAINING_SET[i];
+        const toks = tokenize(example.text);
+        const ids = tokensToIds(toks);
+        const embs = getEmbeddings(ids, currentWeights);
+        const feats = poolEmbeddings(embs);
+        const fwd = forwardPass(feats, currentWeights, config);
+        const l = computeLoss(fwd.probs, example.label);
+        const grads = backwardPass(fwd, example.label, currentWeights, config, ids);
+        currentWeights = applyGradients(currentWeights, grads, config.learningRate);
+
+        const predicted = fwd.probs[1] > fwd.probs[0] ? 1 : 0;
+        const correct = predicted === example.label;
+        currentStep++;
+        if (correct) currentCorrectCount++;
+
+        const accuracy = currentCorrectCount / currentStep;
+        newLossHistory.push(l);
+        newAccHistory.push(accuracy);
+        lastLoss = l;
+
+        newLogs.push({
+          step: currentStep,
+          loss: l,
+          accuracy,
+          predicted: predicted === 1 ? 'Pos' : 'Neg',
+          actual: example.label === 1 ? 'Pos' : 'Neg',
+          correct,
+        });
+      }
     }
 
     setWeights(currentWeights);
-    setStep(s => s + 10);
+    setStep(currentStep);
+    setCorrectCount(currentCorrectCount);
+    setLogs(logs => [...logs, ...newLogs]);
+    setLossHistory(h => [...h, ...newLossHistory]);
+    setAccHistory(h => [...h, ...newAccHistory]);
+    setLoss(lastLoss); // Sync loss with last training step
 
-    // Update display with current input
-    const toks = tokenize(inputText);
+    // Update display with first example
+    const firstExample = TRAINING_SET[0];
+    const toks = tokenize(firstExample.text);
     const ids = tokensToIds(toks);
     const embs = getEmbeddings(ids, currentWeights);
     const feats = poolEmbeddings(embs);
     const fwd = forwardPass(feats, currentWeights, config);
     setForward(fwd);
-    setLoss(computeLoss(fwd.probs, label));
+    setCurrentTrainingText(firstExample.text);
+    setCurrentTrainingLabel(firstExample.label);
     setTokens(toks);
     setTokenIds(ids);
     setEmbeddings(embs);
     setFeatures(feats);
+    setExampleIndex(0);
     setStage('complete');
-  }, [weights, config, step, predictions, inputText, label]);
+  }, [weights, config, step, correctCount]);
+
+  const train10x = useCallback(() => trainNEpochs(10), [trainNEpochs]);
+  const train100x = useCallback(() => trainNEpochs(100), [trainNEpochs]);
 
   // Guess (inference only)
   const runGuess = useCallback(() => {
     setMode('guess');
-    const toks = tokenize(inputText);
+    const toks = tokenize(guessText);
     const ids = tokensToIds(toks);
     const embs = getEmbeddings(ids, weights);
     const feats = poolEmbeddings(embs);
@@ -1480,7 +1529,7 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
     setFeatures(feats);
     setForward(fwd);
     setStage('complete');
-  }, [inputText, weights, config]);
+  }, [guessText, weights, config]);
 
   // Reset
   const reset = useCallback(() => {
@@ -1491,10 +1540,13 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
     setLoss(null);
     setStage('idle');
     setStep(0);
+    setExampleIndex(0);
+    setCurrentTrainingText(TRAINING_SET[0].text);
+    setCurrentTrainingLabel(TRAINING_SET[0].label);
     setLogs([]);
     setLossHistory([]);
     setAccHistory([]);
-    setPredictions([]);
+    setCorrectCount(0);
     setEmbeddingHistory({ word: 'love', id: VOCAB['love'], values: [[...newWeights.embeddings[VOCAB['love']]]] });
     setHighlightWeight(null);
     setUpdatingWeight(null);
@@ -1517,6 +1569,7 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
         </div>
         <div className="flex items-center gap-3 text-xs font-mono">
           <span className="text-neutral-500">Step: <span className="font-bold text-black">{step}</span></span>
+          <span className="text-neutral-500">Example: <span className="font-bold text-black">{exampleIndex + 1}/{TRAINING_SET.length}</span></span>
           {loss !== null && (
             <span className="text-neutral-500">Loss: <span className="font-bold text-black">{loss.toFixed(3)}</span></span>
           )}
@@ -1524,59 +1577,40 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
       </div>
 
       <div className="p-4 space-y-3">
-        {/* Input Row */}
-        <div className="flex gap-2 items-center">
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value.slice(0, 50))}
-            disabled={isRunning}
-            className="flex-1 px-3 py-2 border border-neutral-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-black disabled:bg-neutral-100"
-            placeholder="Enter text..."
-          />
-          <div className="flex gap-1">
-            <button
-              onClick={() => setLabel(0)}
-              disabled={isRunning}
-              className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                label === 0
-                  ? 'bg-red-100 border-2 border-red-400 text-red-700'
-                  : 'border border-neutral-300 hover:bg-neutral-50'
-              } disabled:opacity-50`}
-            >
-              Neg
-            </button>
-            <button
-              onClick={() => setLabel(1)}
-              disabled={isRunning}
-              className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                label === 1
-                  ? 'bg-green-100 border-2 border-green-400 text-green-700'
-                  : 'border border-neutral-300 hover:bg-neutral-50'
-              } disabled:opacity-50`}
-            >
-              Pos
-            </button>
+        {/* Training Data Section - Compact overlapping pills */}
+        <div className="bg-neutral-50 rounded-lg p-2">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[10px] font-medium text-neutral-500">Training Data:</span>
+            <div className="flex flex-wrap gap-1">
+              {TRAINING_SET.map((ex, i) => {
+                const isCurrent = i === exampleIndex;
+                return (
+                  <div
+                    key={i}
+                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono transition-all ${
+                      isCurrent
+                        ? 'bg-blue-500 text-white ring-2 ring-blue-300 z-10'
+                        : 'bg-white border border-neutral-200 text-neutral-600'
+                    }`}
+                  >
+                    <span className="truncate max-w-[80px]">{ex.text}</span>
+                    <span className={`px-1 rounded text-[8px] font-bold ${
+                      isCurrent
+                        ? ex.label === 1 ? 'bg-green-400 text-green-900' : 'bg-red-400 text-red-900'
+                        : ex.label === 1 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                      {ex.label === 1 ? '+' : '−'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-
-        {/* Examples */}
-        <div className="flex gap-1 flex-wrap">
-          {TRAINING_SET.slice(0, 4).map((ex, i) => (
-            <button
-              key={i}
-              onClick={() => { setInputText(ex.text); setLabel(ex.label as 0 | 1); }}
-              disabled={isRunning}
-              className="text-xs px-2 py-1 bg-neutral-100 rounded hover:bg-neutral-200 transition-colors disabled:opacity-50"
-            >
-              {ex.text}
-            </button>
-          ))}
         </div>
 
         {/* Tokenization Flow */}
         <TokenFlow
-          text={inputText}
+          text={mode === 'guess' ? guessText : currentTrainingText}
           tokens={tokens}
           tokenIds={tokenIds}
           embeddings={embeddings}
@@ -1604,7 +1638,7 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
             forward={forward}
             gradients={gradients}
             loss={loss}
-            label={label}
+            label={currentTrainingLabel}
             highlightWeight={highlightWeight}
             updatingWeight={updatingWeight}
             weights={weights}
@@ -1650,8 +1684,9 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
           })}
         </div>
 
-        {/* Controls */}
+        {/* Training Controls */}
         <div className="flex gap-2 items-center flex-wrap pt-2 border-t border-neutral-200">
+          <span className="text-xs font-medium text-neutral-500">Train:</span>
           <button
             onClick={() => { setMode('train'); doStep(); }}
             className="px-4 py-2 bg-black text-white rounded-lg text-sm font-semibold hover:bg-neutral-800 transition-colors"
@@ -1659,32 +1694,31 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
             Step
           </button>
           <button
-            onClick={() => { setMode('train'); trainFullStep(); }}
+            onClick={() => { setMode('train'); trainFullBatch(); }}
             disabled={isRunning}
             className="px-4 py-2 bg-neutral-200 text-neutral-800 rounded-lg text-sm font-semibold hover:bg-neutral-300 transition-colors disabled:opacity-50"
           >
-            Train Full Step
+            Batch
           </button>
           <button
-            onClick={train10Steps}
+            onClick={train10x}
             disabled={isRunning}
             className="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm font-semibold hover:bg-blue-200 transition-colors disabled:opacity-50"
           >
             10x
           </button>
           <button
+            onClick={train100x}
+            disabled={isRunning}
+            className="px-3 py-2 bg-purple-100 text-purple-800 rounded-lg text-sm font-semibold hover:bg-purple-200 transition-colors disabled:opacity-50"
+          >
+            100x
+          </button>
+          <button
             onClick={reset}
-            className="px-4 py-2 border border-neutral-300 rounded-lg text-sm font-semibold hover:bg-neutral-50 transition-colors"
+            className="px-3 py-2 border border-neutral-300 rounded-lg text-sm font-medium hover:bg-neutral-50 transition-colors"
           >
             Reset
-          </button>
-          <div className="w-px h-6 bg-neutral-300" />
-          <button
-            onClick={runGuess}
-            disabled={isRunning}
-            className="px-4 py-2 bg-black text-white rounded-lg text-sm font-semibold hover:bg-neutral-800 transition-colors disabled:opacity-50"
-          >
-            Guess
           </button>
 
           {/* Config */}
@@ -1693,26 +1727,16 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
             <label className="text-neutral-500">LR:</label>
             <input
               type="range"
-              min="0.1"
+              min="0.01"
               max="1"
-              step="0.1"
+              step="0.01"
               value={config.learningRate}
               onChange={(e) => handleConfigChange({ ...config, learningRate: parseFloat(e.target.value) })}
               disabled={isRunning}
               className="w-16"
             />
-            <span className="font-mono w-6">{config.learningRate.toFixed(1)}</span>
+            <span className="font-mono w-8">{config.learningRate.toFixed(2)}</span>
           </div>
-          <select
-            value={config.activation}
-            onChange={(e) => handleConfigChange({ ...config, activation: e.target.value as NetworkConfig['activation'] })}
-            disabled={isRunning}
-            className="text-xs px-2 py-1 border border-neutral-300 rounded bg-white"
-          >
-            <option value="relu">ReLU</option>
-            <option value="sigmoid">Sigmoid</option>
-            <option value="tanh">Tanh</option>
-          </select>
           <select
             value={config.hiddenDim}
             onChange={(e) => handleConfigChange({ ...config, hiddenDim: parseInt(e.target.value) })}
@@ -1723,6 +1747,30 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
               <option key={n} value={n}>{n}h</option>
             ))}
           </select>
+        </div>
+
+        {/* Inference Section */}
+        <div className="pt-3 border-t border-neutral-200">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-medium text-neutral-500">Test your model:</span>
+          </div>
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={guessText}
+              onChange={(e) => setGuessText(e.target.value.slice(0, 50))}
+              disabled={isRunning}
+              className="flex-1 px-3 py-2 border border-neutral-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-black disabled:bg-neutral-100"
+              placeholder="Enter text to classify..."
+            />
+            <button
+              onClick={runGuess}
+              disabled={isRunning}
+              className="px-4 py-2 bg-black text-white rounded-lg text-sm font-semibold hover:bg-neutral-800 transition-colors disabled:opacity-50"
+            >
+              Guess
+            </button>
+          </div>
         </div>
 
         {/* Guess result */}
@@ -1737,7 +1785,7 @@ export function TrainingInteractive({ className = '' }: { className?: string }) 
             }`}
           >
             <div className="text-sm">
-              <span className="font-mono">&quot;{inputText.slice(0, 20)}{inputText.length > 20 ? '...' : ''}&quot;</span>
+              <span className="font-mono">&quot;{guessText.slice(0, 20)}{guessText.length > 20 ? '...' : ''}&quot;</span>
               {' '}guessed{' '}
               <span className={`font-bold ${forward.probs[1] > forward.probs[0] ? 'text-green-600' : 'text-red-600'}`}>
                 {forward.probs[1] > forward.probs[0] ? 'positive' : 'negative'}

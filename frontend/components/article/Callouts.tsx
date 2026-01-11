@@ -244,3 +244,55 @@ export function MutedText({ children, className = '' }: MutedTextProps) {
     <p className={`text-neutral-600 italic ${className}`}>{children}</p>
   );
 }
+
+/**
+ * Aside box for tangential thoughts, references, or philosophical notes.
+ * On desktop (xl+): Appears in the right margin alongside the content.
+ * On mobile (<xl): Appears inline as a styled callout.
+ *
+ * Must be used within an ArticleSection with `position: relative`.
+ *
+ * @example
+ * <Aside title="The Chinese Room">
+ *   Understanding language seems to require a robust world model,
+ *   but consider Searle's Chinese Room experiment...
+ * </Aside>
+ */
+interface AsideProps {
+  children: ReactNode;
+  title?: string;
+  className?: string;
+}
+
+export function Aside({ children, title, className = '' }: AsideProps) {
+  return (
+    <>
+      {/* Desktop: Right margin positioning */}
+      <div
+        className={`hidden xl:block absolute left-full ml-8 w-[22rem] ${className}`}
+        style={{ top: 'auto' }}
+      >
+        <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 text-sm text-neutral-600">
+          {title && (
+            <p className="font-medium text-neutral-700 mb-2 text-xs uppercase tracking-wide">
+              {title}
+            </p>
+          )}
+          <div className="space-y-2">{children}</div>
+        </div>
+      </div>
+
+      {/* Mobile: Inline callout */}
+      <div
+        className={`xl:hidden bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4 text-sm text-neutral-600 ${className}`}
+      >
+        {title && (
+          <p className="font-medium text-neutral-700 mb-2 text-xs uppercase tracking-wide">
+            {title}
+          </p>
+        )}
+        <div className="space-y-2">{children}</div>
+      </div>
+    </>
+  );
+}

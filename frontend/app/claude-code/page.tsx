@@ -1406,6 +1406,33 @@ until it's complete, then write the spec to the file.`}
               </li>
             </UnorderedList>
 
+            <TOCHeading id="mental-models" level={3}>
+              Mental Models
+            </TOCHeading>
+            <Prose>
+              <p>
+                <strong>Outcome, not sequence.</strong> You describe an outcome.
+                The agent operates in a loop until it&apos;s achieved. This is
+                different from executing a choreographed sequence of commands.
+                The agent can encounter unexpected cases, adjust its approach,
+                or ask clarifying questions.
+              </p>
+              <p>
+                <strong>Files are the universal interface.</strong> Agents are
+                naturally good at files. They already know cat, grep, mv, mkdir.
+                Files are inspectable (you can see what the agent created),
+                portable (export is trivial), and self-documenting
+                (/projects/acme/notes/ explains itself). Design for what agents
+                can reason about.
+              </p>
+              <p>
+                <strong>Discover latent demand.</strong> Pay attention to what
+                you ask the agent to do. When patterns emerge, formalize them
+                into commands or docs. You&apos;re discovering what you need,
+                not guessing upfront.
+              </p>
+            </Prose>
+
             <InsightBox title="Your Foundation">
               <p>
                 Understand interfaces. Debug on the spot. Manage agents like

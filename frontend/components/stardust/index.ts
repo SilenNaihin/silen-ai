@@ -13,4 +13,9 @@ export { WorldModelAnimation } from './WorldModelAnimation';
 export { EmbeddingInteractive } from './EmbeddingInteractive';
 export { EmbeddingAnimation } from './EmbeddingAnimation';
 export { CrossEntropyAnimation } from './CrossEntropyAnimation';
+export { CrossEntropyInteractive } from './CrossEntropyInteractive';
+export { MatrixMathAnimation } from './MatrixMathAnimation';
+export { OverfittingAnimation } from './OverfittingAnimation';
+export { HyperparametersAnimation } from './HyperparametersAnimation';
+export { ConvergenceAnimation } from './ConvergenceAnimation';
 

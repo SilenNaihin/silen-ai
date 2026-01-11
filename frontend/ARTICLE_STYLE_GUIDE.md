@@ -1070,7 +1070,7 @@ import { OrderedList, UnorderedList, MutedText } from '@/components/article/Call
 </UnorderedList>
 ```
 
-**MutedText** for secondary information, asides, or closing thoughts:
+**MutedText** for secondary information or closing thoughts:
 
 ```tsx
 <MutedText>
@@ -1078,6 +1078,19 @@ import { OrderedList, UnorderedList, MutedText } from '@/components/article/Call
   how careful reasoning leads to robust designs.
 </MutedText>
 ```
+
+**Aside** for tangential thoughts, philosophical notes, or references that complement but don't interrupt the main narrative:
+
+```tsx
+<Aside title="The Chinese Room">
+  <p>
+    Understanding language seems to require a robust world model.
+    But consider Searle's Chinese Room experiment...
+  </p>
+</Aside>
+```
+
+On desktop (xl+), asides appear in the right margin alongside the content. On mobile, they render inline as styled callouts. Use asides for content that enriches the article but isn't essential to the main argument.
 
 ### TOCHeading Default Styles
 
@@ -1240,7 +1253,7 @@ Default styles by level:
   <p>Content with consistent spacing and styling.</p>
 </Prose>
 
-// Callout components
+// Callout components (import from @/components/article/Callouts)
 <InsightBox title="Optional Title">Content here</InsightBox>
 <QuoteBox>Comparison or quote content</QuoteBox>
 <DataFlow title="Pipeline" note={<>Optional note</>}>
@@ -1251,6 +1264,11 @@ Default styles by level:
 <OrderedList><li>Numbered item</li></OrderedList>
 <UnorderedList><li>Bullet item</li></UnorderedList>
 <MutedText>Secondary, italic text</MutedText>
+
+// Aside (right margin on desktop, inline on mobile)
+<Aside title="Optional Title">
+  <p>Tangential content that enriches but doesn't interrupt.</p>
+</Aside>
 
 // TOCHeading (no className needed, defaults applied)
 <TOCHeading id="section" level={2}>Title</TOCHeading>

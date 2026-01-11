@@ -125,6 +125,35 @@ plt.show()
 
 See **[Notebook Integration Guide](../../lib/NOTEBOOK_CODE.md)** for complete directive documentation.
 
+### `Aside`
+
+Aside boxes for tangential thoughts, philosophical notes, or references. On desktop, they appear in the right margin. On mobile, they render inline.
+
+**Usage:**
+
+```tsx
+import { Aside } from '@/components/article/Callouts';
+
+<ArticleSection>
+  <Aside title="The Chinese Room">
+    <p>Understanding language seems to require a robust world model...</p>
+  </Aside>
+  <Prose>
+    <p>Your main article content...</p>
+  </Prose>
+</ArticleSection>
+```
+
+**Props:**
+
+- `children`: ReactNode - The aside content
+- `title`: string (optional) - Small uppercase title for the aside
+- `className`: string - Optional additional classes
+
+**Behavior:**
+- Desktop (xl+): Floats in the right margin at the same vertical position
+- Mobile (<xl): Renders inline as a styled callout box
+
 ## Layout Structure
 
 The article system uses a three-column layout:
@@ -137,7 +166,7 @@ The article system uses a three-column layout:
 │                                                                   │
 │   - Scroll-synced    - Article text      - Code panels           │
 │   - Animations       - Headings          - Diagrams              │
-│   - Visualizations   - Paragraphs        - Side notes            │
+│   - Visualizations   - Paragraphs        - Asides                │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
