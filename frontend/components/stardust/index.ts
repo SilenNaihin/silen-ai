@@ -17,5 +17,4 @@ export { CrossEntropyInteractive } from './CrossEntropyInteractive';
 export { MatrixMathAnimation } from './MatrixMathAnimation';
 export { OverfittingAnimation } from './OverfittingAnimation';
 export { HyperparametersAnimation } from './HyperparametersAnimation';
-export { ConvergenceAnimation } from './ConvergenceAnimation';
 

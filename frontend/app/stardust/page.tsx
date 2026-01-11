@@ -29,6 +29,7 @@ import {
   UnorderedList,
   Aside,
 } from '@/components/article/Callouts';
+import { InlineCode } from '@/components/article/InlineCode';
 import { Math, FormulaBox } from '@/components/article/Math';
 
 import { ShapeRecognitionAnimation } from '@/components/stardust/ShapeRecognitionAnimation';
@@ -42,7 +43,6 @@ import { CrossEntropyInteractive } from '@/components/stardust/CrossEntropyInter
 import { MatrixMathAnimation } from '@/components/stardust/MatrixMathAnimation';
 import { OverfittingAnimation } from '@/components/stardust/OverfittingAnimation';
 import { HyperparametersAnimation } from '@/components/stardust/HyperparametersAnimation';
-import { ConvergenceAnimation } from '@/components/stardust/ConvergenceAnimation';
 
 const TABS = [
   { id: 'foundations', label: 'Foundations' },
@@ -163,9 +163,11 @@ export default function StardustArticle() {
                         render: (p) => <OverfittingAnimation progress={p} />,
                         startElementId: 'overfitting',
                         milestones: [
-                          { elementId: 'overfitting-curves', progress: 0.2 },
-                          { elementId: 'dropout-demo', progress: 0.5 },
-                          { elementId: 'regularization-list', progress: 0.8 },
+                          { elementId: 'overfitting-curves', progress: 0.15 },
+                          { elementId: 'dropout', progress: 0.4 },
+                          { elementId: 'dropout-demo', progress: 0.55 },
+                          { elementId: 'regularization-techniques', progress: 0.75 },
+                          { elementId: 'regularization-list', progress: 0.9 },
                         ],
                         overlap: 0.1,
                       },
@@ -174,20 +176,9 @@ export default function StardustArticle() {
                         render: (p) => <HyperparametersAnimation progress={p} />,
                         startElementId: 'hyperparameters',
                         milestones: [
-                          { elementId: 'learning-rate', progress: 0.25 },
-                          { elementId: 'batch-size', progress: 0.55 },
-                          { elementId: 'architecture-capacity', progress: 0.85 },
-                        ],
-                        overlap: 0.1,
-                      },
-                      // Convergence with grokking
-                      {
-                        render: (p) => <ConvergenceAnimation progress={p} />,
-                        startElementId: 'convergence',
-                        milestones: [
-                          { elementId: 'convergence-normal', progress: 0.25 },
-                          { elementId: 'convergence-landscape', progress: 0.55 },
-                          { elementId: 'grokking', progress: 0.85 },
+                          { elementId: 'learning-rate', progress: 0.15 },
+                          { elementId: 'batch-size', progress: 0.45 },
+                          { elementId: 'architecture-capacity', progress: 0.75 },
                         ],
                         overlap: 0.1,
                       },
@@ -1266,34 +1257,95 @@ function TrainingContent() {
             training data instead of learning general patterns. It performs
             great on training examples but fails on new data.
           </p>
-          <p id="overfitting-curves">
-            Signs of overfitting: training loss keeps decreasing while
-            validation loss starts increasing. The network is getting better at
-            the training set while getting worse at everything else.
+          <p>
+            Think of it like a student who memorizes every answer in a practice
+            test without understanding the underlying concepts. They ace the
+            practice test but fail the real exam because the questions are
+            slightly different.
           </p>
+          <p id="overfitting-curves">
+            The clearest sign of overfitting: training loss keeps decreasing
+            while validation loss starts increasing. The network is getting
+            better at the training set while getting worse at everything else.
+            Watch the animation to see this divergence in action.
+          </p>
+        </Prose>
+        <InlineCode id="overfitting-demo" expanded={true} />
+        <Prose>
+          <p>
+            The code above simulates this phenomenon. Notice how the gap between
+            training and validation loss grows over time. The network is
+            &quot;cheating&quot; by memorizing rather than learning.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <TOCHeading id="dropout" level={4}>
+          Dropout: Random Resilience
+        </TOCHeading>
+        <Prose>
           <p id="dropout-demo">
-            <strong>Regularization</strong> techniques help prevent this:
+            The most elegant solution to overfitting is surprisingly simple:
+            during training, randomly &quot;turn off&quot; neurons by setting
+            their outputs to zero. This is called <strong>dropout</strong>.
+          </p>
+          <p>
+            Why does randomly breaking your network make it better? Because it
+            prevents <em>co-adaptation</em>. Without dropout, neurons can become
+            overly dependent on specific other neurons. With dropout, each
+            neuron must learn to be useful on its own, because it never knows
+            which other neurons will be present.
+          </p>
+        </Prose>
+        <InlineCode id="dropout-demo" expanded={true} />
+        <Prose>
+          <p>
+            A typical dropout rate is 0.5 for hidden layers, meaning half the
+            neurons are randomly disabled on each training step. At test time,
+            all neurons are active but their outputs are scaled down to
+            compensate.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <TOCHeading id="regularization-techniques" level={4}>
+          Other Regularization Techniques
+        </TOCHeading>
+        <Prose>
+          <p>
+            Dropout is powerful, but it&apos;s not the only tool. Here are other
+            techniques that help prevent overfitting:
           </p>
           <div id="regularization-list">
             <UnorderedList>
               <li>
-                <strong>Dropout</strong>: Randomly &quot;turn off&quot; neurons
-                during training, forcing the network to be robust.
+                <strong>Weight decay (L2 regularization)</strong>: Add a penalty
+                term to the loss that grows with the square of the weights. This
+                encourages smaller weights and simpler models.
               </li>
               <li>
-                <strong>Weight decay</strong>: Penalize large weights, encouraging
-                simpler solutions.
+                <strong>Early stopping</strong>: Monitor validation loss during
+                training and stop when it stops improving. Simple but effective.
               </li>
               <li>
-                <strong>Early stopping</strong>: Stop training when validation
-                loss stops improving.
+                <strong>Data augmentation</strong>: Create variations of your
+                training examples (rotate images, add noise, paraphrase text) to
+                increase effective dataset size.
               </li>
               <li>
-                <strong>Data augmentation</strong>: Create variations of training
-                examples to increase effective dataset size.
+                <strong>Batch normalization</strong>: Normalize activations
+                within each layer. Originally designed for training stability,
+                but also has regularization effects.
               </li>
             </UnorderedList>
           </div>
+          <p>
+            In practice, modern networks use multiple techniques together.
+            Large language models typically combine dropout, weight decay, and
+            careful learning rate scheduling.
+          </p>
         </Prose>
       </ArticleSection>
 
@@ -1306,33 +1358,125 @@ function TrainingContent() {
           <p>
             Some numbers in our system are <em>learned</em> (weights, biases,
             embeddings). Others are <em>chosen</em> by us before training
-            begins. These are <strong>hyperparameters</strong>:
-          </p>
-          <UnorderedList>
-            <li id="learning-rate">
-              <strong>Learning rate</strong>: How big a step we take during
-              gradient descent. Too high and we overshoot. Too low and
-              we&apos;re slow.
-            </li>
-            <li id="batch-size">
-              <strong>Batch size</strong>: How many examples we process at once.
-              Affects both speed and gradient stability.
-            </li>
-            <li id="architecture-capacity">
-              <strong>Number of layers/neurons</strong>: The architecture
-              itself. More capacity means more potential, but also more data
-              needed.
-            </li>
-            <li>
-              <strong>Number of epochs</strong>: How long we train. Stop too
-              early and we underfit. Too late and we overfit.
-            </li>
-          </UnorderedList>
-          <p>
-            Finding good hyperparameters is part science, part art. We often try
-            many combinations and see what works best on the validation set.
+            begins. These are <strong>hyperparameters</strong>. They control
+            <em>how</em> learning happens, not <em>what</em> is learned.
           </p>
         </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <TOCHeading id="learning-rate" level={4}>
+          Learning Rate: The Most Important Hyperparameter
+        </TOCHeading>
+        <Prose>
+          <p>
+            The learning rate controls how big a step we take during gradient
+            descent. Get it wrong and nothing works.
+          </p>
+          <p>
+            <strong>Too high:</strong> The network overshoots the minimum,
+            bouncing chaotically or even diverging to infinity. Loss increases
+            instead of decreasing.
+          </p>
+          <p>
+            <strong>Too low:</strong> The network inches toward the minimum so
+            slowly that training takes forever, or it gets stuck in local
+            minima before reaching a good solution.
+          </p>
+          <p>
+            <strong>Just right:</strong> The network descends smoothly into a
+            good minimum. Watch the animation to see how different learning
+            rates affect convergence.
+          </p>
+        </Prose>
+        <InlineCode id="learning-rate-demo" expanded={true} />
+        <Prose>
+          <p>
+            In practice, we often use <strong>learning rate schedules</strong>
+            that change the rate during training. Start high to make fast
+            progress, then decay to fine-tune. Common schedules include cosine
+            annealing, step decay, and warmup-then-decay.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <TOCHeading id="batch-size" level={4}>
+          Batch Size: Speed vs Stability
+        </TOCHeading>
+        <Prose>
+          <p>
+            Batch size controls how many examples we process before updating
+            weights. It affects both computation and learning dynamics.
+          </p>
+          <p>
+            <strong>Small batches (8-32):</strong> Noisy gradients act as
+            regularization, potentially finding better minima. But
+            computationally inefficient since GPUs are underutilized.
+          </p>
+          <p>
+            <strong>Large batches (256-8192):</strong> Stable gradients and
+            efficient GPU usage. But can converge to sharp, poorly-generalizing
+            minima without careful tuning.
+          </p>
+          <p>
+            The sweet spot depends on your dataset, model, and hardware. Most
+            practitioners start with 32 or 64 and adjust based on GPU memory
+            and convergence behavior.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <TOCHeading id="architecture-capacity" level={4}>
+          Architecture Capacity
+        </TOCHeading>
+        <Prose>
+          <p>
+            The number of layers and neurons determines your network&apos;s
+            <strong> capacity</strong>, its ability to represent complex
+            functions.
+          </p>
+          <p>
+            <strong>Too small:</strong> The network can&apos;t capture the
+            patterns in your data. This is <em>underfitting</em>.
+          </p>
+          <p>
+            <strong>Too large:</strong> The network has enough capacity to
+            memorize every training example. Without proper regularization, it
+            will overfit.
+          </p>
+          <p>
+            Modern wisdom: err on the side of larger networks with strong
+            regularization (dropout, weight decay). It&apos;s easier to
+            regularize a powerful model than to add capacity to a weak one.
+          </p>
+          <p>
+            The number of epochs determines how long we train. Too few and we
+            underfit. Too many and we overfit. Use validation loss to know when
+            to stop.
+          </p>
+        </Prose>
+        <InsightBox title="Hyperparameter Search">
+          <p>
+            Finding good hyperparameters is part science, part art. Common
+            approaches:
+          </p>
+          <UnorderedList className="mt-2">
+            <li>
+              <strong>Grid search:</strong> Try all combinations of a predefined
+              set of values
+            </li>
+            <li>
+              <strong>Random search:</strong> Sample randomly from ranges, often
+              more efficient than grid search
+            </li>
+            <li>
+              <strong>Bayesian optimization:</strong> Use past results to
+              intelligently choose what to try next
+            </li>
+          </UnorderedList>
+        </InsightBox>
       </ArticleSection>
 
       {/* ========== CONVERGENCE ========== */}
@@ -1344,30 +1488,94 @@ function TrainingContent() {
           <p id="convergence-normal">
             Training is done when the network <strong>converges</strong>: when
             the loss stops decreasing meaningfully. This doesn&apos;t mean we
-            found the global minimum. We&apos;ve just found a point where the
-            gradient is small enough that we stop moving.
-          </p>
-          <p id="convergence-landscape">
-            In practice, we often stop when validation loss hasn&apos;t improved
-            for several epochs, or when we hit a computational budget. Perfect
-            convergence is rarely the goal. Good enough, fast enough, is.
-          </p>
-          <p id="grokking">
-            But here&apos;s something strange: sometimes a network appears to
-            converge after 50 epochs, loss goes flat for 2000 more, and then{' '}
-            <em>suddenly</em> performance jumps. This phenomenon is called{' '}
-            <strong>grokking</strong>. The network seems stuck, but internally
-            it&apos;s slowly restructuring its representations until something
-            clicks.
+            found the global minimum, just a point where the gradient is small
+            enough that we stop moving.
           </p>
           <p>
-            Grokking suggests that &quot;converged&quot; isn&apos;t always
-            final. Given enough time and the right conditions, networks can
-            break through apparent plateaus. It&apos;s a reminder that we
-            don&apos;t fully understand what happens inside these systems during
-            training.
+            Watch the animation to see normal convergence: loss drops rapidly at
+            first, then gradually levels off as the network settles into a
+            minimum. The curve looks like an exponential decay, steep then flat.
           </p>
         </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <TOCHeading id="loss-landscape" level={4}>
+          The Loss Landscape
+        </TOCHeading>
+        <Prose>
+          <p id="convergence-landscape">
+            Real loss landscapes are not smooth bowls. They&apos;re rugged
+            terrain with hills, valleys, saddle points, and plateaus. The
+            animation shows this complexity: your starting point matters, and
+            different paths lead to different solutions.
+          </p>
+          <p>
+            <strong>Local minima:</strong> Low points that aren&apos;t the
+            lowest. Early stopping or bad initialization can trap you here.
+          </p>
+          <p>
+            <strong>Saddle points:</strong> Points that look like minima in some
+            directions but are actually maxima in others. In high dimensions,
+            these are more common than true local minima.
+          </p>
+          <p>
+            <strong>Plateaus:</strong> Flat regions where gradients are tiny.
+            Progress slows to a crawl, though you haven&apos;t converged.
+          </p>
+          <p>
+            Modern optimizers like Adam help navigate this landscape by adapting
+            learning rates per-parameter and using momentum to escape saddle
+            points.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <TOCHeading id="grokking" level={4}>
+          Grokking: Sudden Understanding
+        </TOCHeading>
+        <Prose>
+          <p>
+            Here&apos;s something strange: sometimes a network appears to
+            converge after 50 epochs, loss goes flat for thousands more, and
+            then <em>suddenly</em> validation accuracy jumps from random chance
+            to near-perfect.
+          </p>
+          <p>
+            This phenomenon is called <strong>grokking</strong>. The network
+            seems stuck on the training set, memorizing without generalizing.
+            But internally, it&apos;s slowly restructuring its representations.
+            Then something clicks.
+          </p>
+        </Prose>
+        <InlineCode id="grokking-demo" expanded={true} />
+        <Prose>
+          <p>
+            The code above demonstrates grokking on modular arithmetic. The
+            network memorizes the training examples quickly, but true
+            understanding, the ability to generalize, emerges much later.
+          </p>
+          <p>
+            Grokking is still not fully understood. It seems related to the
+            network finding simpler, more generalizable representations. Weight
+            decay appears to help trigger it by penalizing the complex
+            memorization solution.
+          </p>
+        </Prose>
+        <InsightBox title="What Does Grokking Tell Us?">
+          <p>
+            Grokking suggests that &quot;converged&quot; isn&apos;t always
+            final. Given enough time and the right regularization, networks can
+            break through apparent plateaus.
+          </p>
+          <p className="mt-2">
+            It&apos;s a reminder that we don&apos;t fully understand what
+            happens inside these systems during training. The transition from
+            memorization to generalization might be more sudden and dramatic
+            than we thought.
+          </p>
+        </InsightBox>
       </ArticleSection>
 
       {/* ========== THE THREE PILLARS ========== */}
