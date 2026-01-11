@@ -27,6 +27,6 @@ export { ActivationFunctionsAnimation } from './ActivationFunctionsAnimation';
 export { SimpleRNNInteractive } from './SimpleRNNInteractive';
 export { GradientFlowInteractive } from './GradientFlowInteractive';
 export { ContextLossAnimation } from './ContextLossAnimation';
-export { ChainRuleInteractive, BackpropVisualization } from './ChainRuleInteractive';
+export { ChainRuleInteractive } from './ChainRuleInteractive';
 export { StardustToSiliconAnimation } from './StardustToSiliconAnimation';
 

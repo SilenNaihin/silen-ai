@@ -673,7 +673,7 @@ function drawLossComputation(
   }
 }
 
-// Phase 6: Backpropagation - Wheel/Gear Chain Rule Visualization
+// Phase 6: Backpropagation - Gradient Values Flowing Through Network
 function drawBackpropFlow(
   ctx: CanvasRenderingContext2D,
   centerX: number,
@@ -682,123 +682,138 @@ function drawBackpropFlow(
   width: number,
   height: number
 ) {
-  // Three connected wheels showing chain rule
-  // x-wheel drives u-wheel drives y-wheel
-  // du/dx and dy/du are the "gear ratios"
+  // Show gradient values flowing backwards through computation nodes
+  // Different from wheel interactive - this shows actual numerical gradients
 
-  const wheelSpacing = 100;
-  const wheels = [
-    { label: 'x', radius: 40, x: centerX - wheelSpacing, color: '#3b82f6', derivative: 'dx' },
-    { label: 'u', radius: 30, x: centerX, color: '#22c55e', derivative: 'du' },
-    { label: 'y', radius: 25, x: centerX + wheelSpacing * 0.85, color: '#f59e0b', derivative: 'dy' },
+  const nodeY = centerY - 20;
+  const nodeSpacing = 85;
+  const nodeRadius = 22;
+
+  // Computation nodes: Loss -> z -> h -> W
+  const nodes = [
+    { label: 'W', x: centerX - nodeSpacing * 1.5 },
+    { label: 'h', x: centerX - nodeSpacing * 0.5 },
+    { label: 'z', x: centerX + nodeSpacing * 0.5 },
+    { label: 'L', x: centerX + nodeSpacing * 1.5 },
   ];
 
-  const wheelY = centerY - 10;
-  const baseRotation = progress * Math.PI * 4; // Rotate with progress
+  // Gradient values (flowing backwards: L -> z -> h -> W)
+  const gradients = [1.0, 0.7, 0.35, 0.12]; // Shrinking as they flow back
 
-  // Gear ratios (derivatives)
-  const du_dx = 2; // u changes 2x as fast as x
-  const dy_du = 0.5; // y changes 0.5x as fast as u
-
-  // Draw connecting "belts" between wheels
-  if (progress > 0.2) {
-    const beltAlpha = Math.min(1, (progress - 0.2) * 3);
-
-    // Belt from x to u
-    ctx.strokeStyle = `rgba(0, 0, 0, ${beltAlpha * 0.3})`;
-    ctx.lineWidth = 3;
-    ctx.setLineDash([5, 3]);
+  // Draw forward pass arrows (dim)
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < nodes.length - 1; i++) {
     ctx.beginPath();
-    ctx.moveTo(wheels[0].x + wheels[0].radius, wheelY);
-    ctx.lineTo(wheels[1].x - wheels[1].radius, wheelY);
+    ctx.moveTo(nodes[i].x + nodeRadius + 5, nodeY);
+    ctx.lineTo(nodes[i + 1].x - nodeRadius - 5, nodeY);
     ctx.stroke();
-
-    // Belt from u to y
+    // Arrow head
     ctx.beginPath();
-    ctx.moveTo(wheels[1].x + wheels[1].radius, wheelY);
-    ctx.lineTo(wheels[2].x - wheels[2].radius, wheelY);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.moveTo(nodes[i + 1].x - nodeRadius - 5, nodeY);
+    ctx.lineTo(nodes[i + 1].x - nodeRadius - 12, nodeY - 4);
+    ctx.lineTo(nodes[i + 1].x - nodeRadius - 12, nodeY + 4);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+    ctx.fill();
   }
 
-  // Draw wheels
-  wheels.forEach((wheel, i) => {
-    const rotation = i === 0
-      ? baseRotation
-      : i === 1
-        ? baseRotation * du_dx
-        : baseRotation * du_dx * dy_du;
+  // Draw backward gradient arrows (animated)
+  const backwardProgress = Math.min(1, progress * 1.5);
 
-    // Wheel circle
+  for (let i = nodes.length - 1; i > 0; i--) {
+    const arrowProgress = Math.max(0, Math.min(1, (backwardProgress - (nodes.length - 1 - i) * 0.25) * 4));
+
+    if (arrowProgress > 0) {
+      const startX = nodes[i].x - nodeRadius - 5;
+      const endX = nodes[i - 1].x + nodeRadius + 5;
+      const currentX = startX - (startX - endX) * arrowProgress;
+
+      // Gradient arrow (red, flowing backwards)
+      ctx.strokeStyle = `rgba(180, 50, 50, ${arrowProgress * 0.8})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(startX, nodeY + 30);
+      ctx.lineTo(currentX, nodeY + 30);
+      ctx.stroke();
+
+      // Arrow head when complete
+      if (arrowProgress > 0.9) {
+        ctx.beginPath();
+        ctx.moveTo(endX, nodeY + 30);
+        ctx.lineTo(endX + 8, nodeY + 26);
+        ctx.lineTo(endX + 8, nodeY + 34);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(180, 50, 50, 0.8)';
+        ctx.fill();
+      }
+
+      // Gradient value label
+      if (arrowProgress > 0.5) {
+        const grad = gradients[nodes.length - i];
+        const labelX = (nodes[i].x + nodes[i - 1].x) / 2;
+        ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = `rgba(180, 50, 50, ${(arrowProgress - 0.5) * 2})`;
+        ctx.fillText(`∂L = ${grad.toFixed(2)}`, labelX, nodeY + 50);
+      }
+    }
+  }
+
+  // Draw nodes
+  nodes.forEach((node, i) => {
+    const isLoss = i === nodes.length - 1;
+    const gradientReached = backwardProgress > (nodes.length - 1 - i) * 0.25;
+
+    // Node circle
     ctx.beginPath();
-    ctx.arc(wheel.x, wheelY, wheel.radius, 0, Math.PI * 2);
-    ctx.strokeStyle = wheel.color;
-    ctx.lineWidth = 3;
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.arc(node.x, nodeY, nodeRadius, 0, Math.PI * 2);
+
+    if (isLoss) {
+      ctx.fillStyle = 'rgba(180, 50, 50, 0.2)';
+      ctx.strokeStyle = 'rgba(180, 50, 50, 1)';
+    } else if (gradientReached) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+    } else {
+      ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    }
+
+    ctx.lineWidth = 2;
     ctx.fill();
-
-    // Spoke showing rotation
-    ctx.beginPath();
-    ctx.moveTo(wheel.x, wheelY);
-    ctx.lineTo(
-      wheel.x + Math.cos(rotation) * wheel.radius * 0.85,
-      wheelY + Math.sin(rotation) * wheel.radius * 0.85
-    );
-    ctx.strokeStyle = wheel.color;
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
     ctx.stroke();
 
-    // Center dot
-    ctx.beginPath();
-    ctx.arc(wheel.x, wheelY, 4, 0, Math.PI * 2);
-    ctx.fillStyle = wheel.color;
-    ctx.fill();
-
-    // Wheel label
+    // Node label
     ctx.font = 'bold 16px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.fillText(`${wheel.label}-wheel`, wheel.x, wheelY + wheel.radius + 20);
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = isLoss ? 'rgba(180, 50, 50, 1)' : 'rgba(0, 0, 0, 0.8)';
+    ctx.fillText(node.label, node.x, nodeY);
+
+    // Gradient magnitude bar below node
+    if (gradientReached && !isLoss) {
+      const grad = gradients[nodes.length - 1 - i];
+      const barWidth = grad * 40;
+      const barHeight = 6;
+      const barY = nodeY - nodeRadius - 15;
+
+      ctx.fillStyle = 'rgba(180, 50, 50, 0.6)';
+      ctx.fillRect(node.x - barWidth / 2, barY, barWidth, barHeight);
+      ctx.strokeStyle = 'rgba(180, 50, 50, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(node.x - barWidth / 2, barY, barWidth, barHeight);
+    }
   });
 
-  // Draw derivative labels between wheels
-  if (progress > 0.4) {
-    const labelAlpha = Math.min(1, (progress - 0.4) * 2);
-    ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-
-    // du/dx
-    const midX1 = (wheels[0].x + wheels[1].x) / 2;
-    ctx.fillStyle = `rgba(34, 197, 94, ${labelAlpha})`;
-    ctx.fillText('du/dx = 2', midX1, wheelY - 55);
-    ctx.font = '11px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(0, 0, 0, ${labelAlpha * 0.6})`;
-    ctx.fillText('u spins 2× faster', midX1, wheelY - 40);
-
-    // dy/du
-    const midX2 = (wheels[1].x + wheels[2].x) / 2;
-    ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(245, 158, 11, ${labelAlpha})`;
-    ctx.fillText('dy/du = 0.5', midX2, wheelY - 55);
-    ctx.font = '11px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(0, 0, 0, ${labelAlpha * 0.6})`;
-    ctx.fillText('y spins 0.5× as fast', midX2, wheelY - 40);
-  }
-
-  // Chain rule result
-  if (progress > 0.7) {
-    const resultAlpha = Math.min(1, (progress - 0.7) * 3);
-
-    ctx.font = 'bold 16px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = `rgba(180, 50, 50, ${resultAlpha})`;
-    ctx.fillText('dy/dx = du/dx × dy/du = 2 × 0.5 = 1', centerX, wheelY + 70);
-
+  // "Gradients shrink as they flow back" label
+  if (progress > 0.6) {
+    const alpha = Math.min(1, (progress - 0.6) * 2.5);
     ctx.font = '12px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(0, 0, 0, ${resultAlpha * 0.7})`;
-    ctx.fillText('Chain rule: multiply the gear ratios!', centerX, wheelY + 90);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.7})`;
+    ctx.fillText('Gradients shrink as they propagate backward', centerX, nodeY + 75);
+    ctx.fillText('(this is why deep networks are hard to train)', centerX, nodeY + 90);
   }
 }
 

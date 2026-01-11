@@ -112,18 +112,12 @@ export function AnimationsProvider({
   children: ReactNode;
 }) {
   // Track mobile viewport (matches xl breakpoint where sticky panel shows)
-  // Initialize with correct value to avoid flash of wrong content
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 1280;
-    }
-    return false;
-  });
+  // Always start false to avoid hydration mismatch
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1280);
-    // Re-check in case SSR value differs from client
-    checkMobile();
+    checkMobile(); // Check immediately after mount
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
@@ -240,18 +234,12 @@ export function AnimationSequence({
   const animations = animationsProp ?? context?.animations ?? [];
 
   // Track mobile viewport (use context if available, otherwise detect locally)
-  // Initialize with correct value to avoid flash of wrong content on first render
-  const [localIsMobile, setLocalIsMobile] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 1280;
-    }
-    return false;
-  });
+  // Always start false to avoid hydration mismatch, then update in effect
+  const [localIsMobile, setLocalIsMobile] = useState(false);
   useEffect(() => {
     if (context) return; // Use context value instead
     const checkMobile = () => setLocalIsMobile(window.innerWidth < 1280);
-    // Re-check in case SSR value differs from client
-    checkMobile();
+    checkMobile(); // Check immediately after mount
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, [context]);
@@ -259,6 +247,10 @@ export function AnimationSequence({
 
   // Track element positions for element-based triggers (including milestones)
   const [elementPositions, setElementPositions] = useState<Map<string, number>>(new Map());
+
+  // Store animations in a ref to avoid dependency issues
+  const animationsRef = useRef(animations);
+  animationsRef.current = animations;
 
   // Calculate element positions on mount and scroll
   const updateElementPositions = useCallback(() => {
@@ -284,7 +276,8 @@ export function AnimationSequence({
       return Math.max(0, Math.min(1, triggerPoint / scrollableDistance));
     };
 
-    animations.forEach((anim) => {
+    // Use ref to avoid dependency on animations array
+    animationsRef.current.forEach((anim) => {
       // Track startElementId
       if (anim.startElementId) {
         const pos = getElementPosition(anim.startElementId);
@@ -305,7 +298,7 @@ export function AnimationSequence({
     });
 
     setElementPositions(positions);
-  }, [animations]);
+  }, []); // No dependencies - uses ref
 
   useEffect(() => {
     updateElementPositions();
@@ -329,77 +322,69 @@ export function AnimationSequence({
     elementPositions
   );
 
-  // Track containers for mobile inline animations
+  // Track if we've set up mobile containers
+  // Use ref for flag (no re-render on change) and state counter to force re-render after setup
+  const mobileSetupDone = useRef(false);
   const containerRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const [mobileContainersReady, setMobileContainersReady] = useState(false);
+  const [, forceUpdate] = useState(0);
 
-  // Create/update containers for mobile inline animations
+  // Create containers for mobile inline animations - only once on mount when mobile
   useEffect(() => {
-    if (!isMobile) {
-      // Clean up containers when not on mobile
-      containerRefs.current.forEach((container) => {
-        container.remove();
-      });
-      containerRefs.current.clear();
-      setMobileContainersReady(false);
-      return;
-    }
+    // Only run setup once when mobile is detected
+    if (!isMobile || mobileSetupDone.current) return;
 
-    // Create containers for animations that should render inline on mobile
-    // Default: animations with startElementId render inline unless mobileInline is explicitly false
-    animations.forEach((animation) => {
-      if (!animation.startElementId) return;
-      // Skip if explicitly set to false
-      if (animation.mobileInline === false) return;
+    // Get all startElementIds that should render inline
+    const inlineElementIds = animations
+      .filter((a) => a.startElementId && a.mobileInline !== false)
+      .map((a) => a.startElementId!);
 
-      const elementId = animation.startElementId;
+    // Create containers
+    inlineElementIds.forEach((elementId) => {
+      if (containerRefs.current.has(elementId)) return;
+
       const targetElement = document.getElementById(elementId);
       if (!targetElement) return;
 
-      // Check if container already exists
-      let container = containerRefs.current.get(elementId);
-      if (!container) {
-        // Create new container - block element that flows with content
-        container = document.createElement('div');
-        container.className = 'mobile-inline-animation';
-        // Use inline styles to ensure the container takes up space
-        // These styles make it flow naturally in the document
-        container.style.display = 'block';
-        container.style.width = '100%';
-        container.style.marginTop = '1.5rem';
-        container.style.marginBottom = '1.5rem';
-        container.setAttribute('data-animation-id', elementId);
-        targetElement.parentNode?.insertBefore(container, targetElement.nextSibling);
-        containerRefs.current.set(elementId, container);
-      }
+      // Create container
+      const container = document.createElement('div');
+      container.className = 'mobile-inline-animation';
+      container.style.cssText = 'display:block;width:100%;margin:1rem 0;';
+      container.setAttribute('data-animation-id', elementId);
+
+      // Insert after the target element's parent (usually the heading wrapper)
+      // This ensures we don't break the heading structure
+      const insertTarget = targetElement.parentElement?.tagName === 'DIV'
+        ? targetElement.parentElement
+        : targetElement;
+      insertTarget.parentNode?.insertBefore(container, insertTarget.nextSibling);
+      containerRefs.current.set(elementId, container);
     });
 
-    setMobileContainersReady(true);
+    mobileSetupDone.current = true;
+    forceUpdate(n => n + 1); // Force re-render to show portals
 
-    // Cleanup on unmount
+    // Cleanup only on unmount
     return () => {
-      containerRefs.current.forEach((container) => {
-        container.remove();
-      });
+      containerRefs.current.forEach((c) => c.remove());
       containerRefs.current.clear();
+      mobileSetupDone.current = false;
     };
-  }, [isMobile, animations]);
+  }, [isMobile]); // Only depend on isMobile
 
-  // Render mobile inline animations via portals
-  // Default: animations with startElementId render inline unless mobileInline is explicitly false
-  const mobileInlinePortals = mobileContainersReady && isMobile
+  // Render mobile inline animations via portals (smaller size than sidebar)
+  const mobileInlinePortals = isMobile && mobileSetupDone.current
     ? animations
-        .filter((animation) => animation.startElementId && animation.mobileInline !== false)
+        .filter((a) => a.startElementId && a.mobileInline !== false && containerRefs.current.has(a.startElementId))
         .map((animation) => {
           const container = containerRefs.current.get(animation.startElementId!);
           if (!container) return null;
 
           return createPortal(
             <div
-              key={`mobile-inline-${animation.startElementId}`}
-              className="w-full aspect-[4/3]"
+              key={`mobile-${animation.startElementId}`}
+              className="w-full max-w-md mx-auto aspect-video"
             >
-              {animation.render(1)} {/* Always render at 100% progress */}
+              {animation.render(1)}
             </div>,
             container
           );
@@ -414,9 +399,10 @@ export function AnimationSequence({
       {mobileInlinePortals}
 
       {animations.map((animation, index) => {
-        // On mobile, skip animations that render inline (those with startElementId, unless mobileInline is false)
-        // They render via portals instead
-        if (isMobile && animation.startElementId && animation.mobileInline !== false) return null;
+        // On mobile, skip animations that have containers created for them
+        // They render via portals instead. If no container exists, render normally.
+        const hasContainer = animation.startElementId && containerRefs.current.has(animation.startElementId);
+        if (isMobile && hasContainer && animation.mobileInline !== false) return null;
 
         const range = animationRanges[index];
         const isFirst = index === 0;
@@ -664,14 +650,17 @@ function calculateOpacity(
 
 /**
  * Calculate normalized progress (0-1) within animation's active range.
- * Progress reaches 100% at fadeOut point, ensuring animation completes before fading.
+ * Progress reaches 100% at 80% of the way to fadeOut, giving buffer before fading.
  */
 function calculateNormalizedProgress(
   progress: number,
   range: AnimationRange
 ): number {
-  // Use fadeOut as the effective end - animation completes before fading starts
-  const effectiveDuration = range.fadeOut - range.start;
+  // Calculate effective end at 80% of the way to fadeOut
+  // This ensures animation completes before fading starts (20% buffer)
+  const durationToFadeOut = range.fadeOut - range.start;
+  const effectiveEnd = range.start + durationToFadeOut * 0.8;
+  const effectiveDuration = effectiveEnd - range.start;
   if (effectiveDuration <= 0) return 1;
 
   const currentProgress = Math.max(0, progress - range.start);
@@ -681,7 +670,10 @@ function calculateNormalizedProgress(
 /**
  * Calculate progress using milestones for more precise control.
  * Interpolates linearly between milestone points.
- * Progress reaches 100% at fadeOut point, ensuring animation completes before fading.
+ *
+ * NOTE: Milestone-based animations do NOT use early finish because the author
+ * explicitly defined when progress should reach certain values. The animation
+ * completes at fadeOut, not before.
  *
  * @example
  * If animation starts at scroll 0.2 and fadeOut at 0.55:
@@ -695,7 +687,8 @@ function calculateProgressWithMilestones(
   milestones: AnimationMilestone[],
   elementPositions: Map<string, number>
 ): number {
-  // Use fadeOut as the effective end - animation completes before fading starts
+  // For milestone animations, use fadeOut as the endpoint (no early finish)
+  // Authors have explicitly defined milestone timing, so we respect that
   const effectiveEnd = range.fadeOut;
 
   // Build sorted list of progress points: start (0), milestones, effectiveEnd (1)
@@ -703,11 +696,10 @@ function calculateProgressWithMilestones(
     { scrollPos: range.start, animProgress: 0 },
   ];
 
-  // Add milestone points that are within the effective range
-  // Skip milestones beyond effectiveEnd to avoid conflicts with the endpoint
+  // Add all milestone points
   milestones.forEach((milestone) => {
     const scrollPos = elementPositions.get(milestone.elementId);
-    if (scrollPos !== undefined && scrollPos < effectiveEnd) {
+    if (scrollPos !== undefined) {
       points.push({ scrollPos, animProgress: milestone.progress });
     }
   });

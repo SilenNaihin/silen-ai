@@ -53,7 +53,7 @@ import { ContextLossAnimation } from '@/components/stardust/ContextLossAnimation
 import { SimpleRNNInteractive } from '@/components/stardust/SimpleRNNInteractive';
 import { LSTMBuildupInteractive } from '@/components/stardust/LSTMBuildupInteractive';
 import { GradientFlowInteractive } from '@/components/stardust/GradientFlowInteractive';
-import { ChainRuleInteractive, BackpropVisualization } from '@/components/stardust/ChainRuleInteractive';
+import { ChainRuleInteractive } from '@/components/stardust/ChainRuleInteractive';
 import { StardustToSiliconAnimation } from '@/components/stardust/StardustToSiliconAnimation';
 
 const TABS = [
@@ -2581,22 +2581,6 @@ function TrainingContent() {
         </div>
       </ArticleSection>
 
-      {/* Gradient flow visualization */}
-      <ArticleSection>
-        <Prose>
-          <p>
-            <strong>Visualizing Gradient Flow</strong>
-          </p>
-          <p>
-            Here&apos;s a 2-layer network where you can see gradients flowing
-            backward through actual neurons. Toggle between forward and backward
-            passes. Notice how ReLU blocks gradients when neurons are inactive.
-          </p>
-        </Prose>
-        <div className="my-6">
-          <BackpropVisualization />
-        </div>
-      </ArticleSection>
 
       {/* The Update */}
       <ArticleSection>
