@@ -326,6 +326,7 @@ export function AnimationSequence({
   // Use ref for flag (no re-render on change) and state counter to force re-render after setup
   const mobileSetupDone = useRef(false);
   const containerRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const ownedContainers = useRef<Set<string>>(new Set()); // Containers we created (not reused)
   const [, forceUpdate] = useState(0);
 
   // Create containers for mobile inline animations - only once on mount when mobile
@@ -338,9 +339,16 @@ export function AnimationSequence({
       .filter((a) => a.startElementId && a.mobileInline !== false)
       .map((a) => a.startElementId!);
 
-    // Create containers
+    // Create containers (skip if already exists from another AnimationSequence instance)
     inlineElementIds.forEach((elementId) => {
       if (containerRefs.current.has(elementId)) return;
+
+      // Check if container already exists in DOM (from another instance)
+      const existingContainer = document.querySelector(`[data-animation-id="${elementId}"]`);
+      if (existingContainer) {
+        // Another instance owns this container, skip
+        return;
+      }
 
       const targetElement = document.getElementById(elementId);
       if (!targetElement) return;
@@ -358,23 +366,29 @@ export function AnimationSequence({
         : targetElement;
       insertTarget.parentNode?.insertBefore(container, insertTarget.nextSibling);
       containerRefs.current.set(elementId, container);
+      ownedContainers.current.add(elementId); // Mark as owned by this instance
     });
 
     mobileSetupDone.current = true;
     forceUpdate(n => n + 1); // Force re-render to show portals
 
-    // Cleanup only on unmount
+    // Cleanup only on unmount - only remove containers we created
     return () => {
-      containerRefs.current.forEach((c) => c.remove());
+      ownedContainers.current.forEach((elementId) => {
+        const container = containerRefs.current.get(elementId);
+        if (container) container.remove();
+      });
       containerRefs.current.clear();
+      ownedContainers.current.clear();
       mobileSetupDone.current = false;
     };
   }, [isMobile]); // Only depend on isMobile
 
   // Render mobile inline animations via portals (smaller size than sidebar)
+  // Only render for containers this instance owns (created, not reused)
   const mobileInlinePortals = isMobile && mobileSetupDone.current
     ? animations
-        .filter((a) => a.startElementId && a.mobileInline !== false && containerRefs.current.has(a.startElementId))
+        .filter((a) => a.startElementId && a.mobileInline !== false && ownedContainers.current.has(a.startElementId))
         .map((animation) => {
           const container = containerRefs.current.get(animation.startElementId!);
           if (!container) return null;
@@ -399,10 +413,10 @@ export function AnimationSequence({
       {mobileInlinePortals}
 
       {animations.map((animation, index) => {
-        // On mobile, skip animations that have containers created for them
-        // They render via portals instead. If no container exists, render normally.
-        const hasContainer = animation.startElementId && containerRefs.current.has(animation.startElementId);
-        if (isMobile && hasContainer && animation.mobileInline !== false) return null;
+        // On mobile, skip animations that should render inline (via portals)
+        // Don't depend on container existence - just skip if it should be inline
+        const shouldBeInline = animation.startElementId && animation.mobileInline !== false;
+        if (isMobile && shouldBeInline) return null;
 
         const range = animationRanges[index];
         const isFirst = index === 0;

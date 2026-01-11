@@ -49,8 +49,15 @@ export function MatrixMathAnimation({
     }
     // Phase 3: Matrix Multiplication
     else if (progress < 0.48) {
-      const phaseProgress = (progress - 0.30) / 0.15;
-      drawMatrixMultiplication(ctx, centerX, centerY, phaseProgress, width, height);
+      const phaseProgress = (progress - 0.3) / 0.15;
+      drawMatrixMultiplication(
+        ctx,
+        centerX,
+        centerY,
+        phaseProgress,
+        width,
+        height
+      );
     }
     // Phase 4: Forward Pass
     else if (progress < 0.73) {
@@ -59,7 +66,7 @@ export function MatrixMathAnimation({
     }
     // Phase 5: Loss
     else if (progress < 0.88) {
-      const phaseProgress = (progress - 0.70) / 0.15;
+      const phaseProgress = (progress - 0.7) / 0.15;
       drawLossComputation(ctx, centerX, centerY, phaseProgress, width, height);
     }
     // Phase 6: Backprop
@@ -69,22 +76,25 @@ export function MatrixMathAnimation({
     }
 
     // Draw phase indicator
-    drawPhaseIndicator(ctx, width * 0.9, height * 0.12, phase);
+    drawPhaseIndicator(ctx, width * 0.9, height * 0.14, phase);
   };
 
   return (
-    <AnimationCanvas progress={progress} className={`w-full h-full ${className}`}>
+    <AnimationCanvas
+      progress={progress}
+      className={`w-full h-full ${className}`}
+    >
       {renderAnimation}
     </AnimationCanvas>
   );
 }
 
 function getPhase(progress: number): number {
-  if (progress < 0.15) return 1;
-  if (progress < 0.30) return 2;
-  if (progress < 0.45) return 3;
-  if (progress < 0.70) return 4;
-  if (progress < 0.85) return 5;
+  if (progress < 0.18) return 1;
+  if (progress < 0.33) return 2;
+  if (progress < 0.48) return 3;
+  if (progress < 0.73) return 4;
+  if (progress < 0.88) return 5;
   return 6;
 }
 
@@ -137,7 +147,7 @@ function drawPhaseIndicator(
   });
 }
 
-// Phase 1: Embedding Lookup
+// Phase 1: Embedding Lookup - Vertical Layout
 function drawEmbeddingLookup(
   ctx: CanvasRenderingContext2D,
   centerX: number,
@@ -146,19 +156,22 @@ function drawEmbeddingLookup(
   width: number,
   height: number
 ) {
-  const matrixX = centerX - 100;
-  const matrixY = centerY - 80;
   const cellSize = 36;
   const rows = 5;
   const cols = 4;
 
-  // Draw embedding matrix E
+  // Center the matrix horizontally
+  const matrixWidth = cols * cellSize;
+  const matrixX = centerX - matrixWidth / 2;
+  const matrixY = centerY - 90;
+
+  // Draw embedding matrix E label
   ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-  ctx.fillText('Embedding Matrix E', matrixX + (cols * cellSize) / 2, matrixY - 20);
+  ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+  ctx.fillText('Embedding Matrix E', centerX, matrixY - 12);
 
-  // Draw vocabulary labels
+  // Draw vocabulary labels on the left
   const vocabLabels = ['the', 'cat', 'sat', 'on', 'mat'];
   ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
   ctx.textAlign = 'right';
@@ -167,9 +180,22 @@ function drawEmbeddingLookup(
     const isSelected = i === 1; // "cat" is selected
     ctx.fillStyle = isSelected
       ? `rgba(40, 120, 60, ${Math.min(1, progress * 2)})`
-      : 'rgba(0, 0, 0, 0.5)';
-    ctx.fillText(label, matrixX - 10, matrixY + i * cellSize + cellSize / 2 + 4);
+      : 'rgba(0, 0, 0, 0.7)';
+    ctx.fillText(label, matrixX - 8, matrixY + i * cellSize + cellSize / 2 + 4);
   });
+
+  // Draw token_id indicator next to selected row
+  if (progress > 0.1) {
+    const selectorAlpha = Math.min(1, (progress - 0.1) * 5);
+    ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = `rgba(40, 120, 60, ${selectorAlpha})`;
+    ctx.fillText(
+      '← token[1]',
+      matrixX + matrixWidth + 10,
+      matrixY + cellSize * 1.5 + 4
+    );
+  }
 
   // Draw matrix cells
   for (let r = 0; r < rows; r++) {
@@ -181,14 +207,15 @@ function drawEmbeddingLookup(
       // Cell highlight for selected row
       if (isSelectedRow && progress > 0.3) {
         const highlightAlpha = Math.min(1, (progress - 0.3) * 3);
-        ctx.fillStyle = `rgba(40, 120, 60, ${highlightAlpha * 0.3})`;
+        ctx.fillStyle = `rgba(40, 120, 60, ${highlightAlpha * 0.4})`;
         ctx.fillRect(x, y, cellSize, cellSize);
       }
 
       // Cell border
-      ctx.strokeStyle = isSelectedRow && progress > 0.3
-        ? `rgba(40, 120, 60, ${Math.min(1, (progress - 0.3) * 3)})`
-        : 'rgba(0, 0, 0, 0.3)';
+      ctx.strokeStyle =
+        isSelectedRow && progress > 0.3
+          ? `rgba(40, 120, 60, 1)`
+          : 'rgba(0, 0, 0, 0.4)';
       ctx.lineWidth = isSelectedRow && progress > 0.3 ? 3 : 1;
       ctx.strokeRect(x, y, cellSize, cellSize);
 
@@ -197,59 +224,51 @@ function drawEmbeddingLookup(
       ctx.font = '12px system-ui, -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = isSelectedRow && progress > 0.3
-        ? 'rgba(40, 120, 60, 1)'
-        : 'rgba(0, 0, 0, 0.7)';
+      ctx.fillStyle =
+        isSelectedRow && progress > 0.3
+          ? 'rgba(40, 120, 60, 1)'
+          : 'rgba(0, 0, 0, 0.8)';
       ctx.fillText(value, x + cellSize / 2, y + cellSize / 2);
     }
   }
 
-  // Draw token ID selector
-  if (progress > 0.1) {
-    const selectorAlpha = Math.min(1, (progress - 0.1) * 5);
-    const tokenX = matrixX - 70;
-    const tokenY = centerY - 10;
+  // Draw arrow and output vector below
+  if (progress > 0.5) {
+    const arrowAlpha = Math.min(1, (progress - 0.5) * 3);
+    const arrowY = matrixY + rows * cellSize + 8;
 
-    ctx.font = '12px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = `rgba(0, 0, 0, ${selectorAlpha * 0.7})`;
-    ctx.fillText('token_id', tokenX, tokenY - 25);
-
-    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(40, 120, 60, ${selectorAlpha})`;
-    ctx.fillText('1', tokenX, tokenY + 5);
-
-    // Arrow to row
-    if (progress > 0.4) {
-      const arrowAlpha = Math.min(1, (progress - 0.4) * 3);
-      ctx.strokeStyle = `rgba(40, 120, 60, ${arrowAlpha * 0.8})`;
-      ctx.lineWidth = 2;
-      ctx.setLineDash([6, 3]);
-      ctx.beginPath();
-      ctx.moveTo(tokenX + 20, tokenY);
-      ctx.lineTo(matrixX - 15, matrixY + cellSize * 1.5);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
+    // Down arrow
+    ctx.strokeStyle = `rgba(40, 120, 60, ${arrowAlpha})`;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(centerX, arrowY);
+    ctx.lineTo(centerX, arrowY + 18);
+    ctx.stroke();
+    // Arrow head
+    ctx.beginPath();
+    ctx.moveTo(centerX - 6, arrowY + 12);
+    ctx.lineTo(centerX, arrowY + 22);
+    ctx.lineTo(centerX + 6, arrowY + 12);
+    ctx.stroke();
   }
 
-  // Draw output vector
+  // Draw output vector below
   if (progress > 0.6) {
     const outputAlpha = Math.min(1, (progress - 0.6) * 2.5);
-    const outputX = matrixX + cols * cellSize + 50;
-    const outputY = matrixY + cellSize;
+    const outputY = matrixY + rows * cellSize + 35;
 
+    // Output label
     ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillStyle = `rgba(0, 0, 0, ${outputAlpha * 0.7})`;
-    ctx.fillText('E[1] = "cat"', outputX + 40, outputY - 20);
+    ctx.fillStyle = `rgba(0, 0, 0, ${outputAlpha})`;
+    ctx.fillText('E[1] = "cat" embedding', centerX, outputY + 52);
 
-    // Output vector
+    // Output vector (horizontal, same width as matrix)
     for (let c = 0; c < cols; c++) {
-      const x = outputX + c * cellSize;
+      const x = matrixX + c * cellSize;
       const value = (Math.sin(1 * 3 + c * 7) * 0.5 + 0.5).toFixed(1);
 
-      ctx.fillStyle = `rgba(40, 120, 60, ${outputAlpha * 0.25})`;
+      ctx.fillStyle = `rgba(40, 120, 60, ${outputAlpha * 0.35})`;
       ctx.fillRect(x, outputY, cellSize, cellSize);
 
       ctx.strokeStyle = `rgba(40, 120, 60, ${outputAlpha})`;
@@ -257,14 +276,11 @@ function drawEmbeddingLookup(
       ctx.strokeRect(x, outputY, cellSize, cellSize);
 
       ctx.font = '12px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
       ctx.fillStyle = `rgba(40, 120, 60, ${outputAlpha})`;
       ctx.fillText(value, x + cellSize / 2, outputY + cellSize / 2);
     }
-
-    // Equals sign
-    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(0, 0, 0, ${outputAlpha * 0.8})`;
-    ctx.fillText('=', matrixX + cols * cellSize + 25, outputY + cellSize / 2);
   }
 }
 
@@ -291,7 +307,8 @@ function drawDotProduct(
   // Vector b (rotates based on progress to show alignment)
   const bAngleStart = Math.PI / 3;
   const bAngleEnd = aAngle + 0.1; // Nearly aligned
-  const bAngle = bAngleStart + (bAngleEnd - bAngleStart) * Math.min(1, progress * 1.5);
+  const bAngle =
+    bAngleStart + (bAngleEnd - bAngleStart) * Math.min(1, progress * 1.5);
   const bEnd = {
     x: origin.x + Math.cos(bAngle) * scale * 0.9,
     y: origin.y + Math.sin(bAngle) * scale * 0.9,
@@ -299,7 +316,15 @@ function drawDotProduct(
 
   // Draw vectors
   drawArrow(ctx, origin.x, origin.y, aEnd.x, aEnd.y, 'rgba(40, 120, 60, 1)', 4);
-  drawArrow(ctx, origin.x, origin.y, bEnd.x, bEnd.y, 'rgba(60, 100, 180, 1)', 4);
+  drawArrow(
+    ctx,
+    origin.x,
+    origin.y,
+    bEnd.x,
+    bEnd.y,
+    'rgba(60, 100, 180, 1)',
+    4
+  );
 
   // Labels
   ctx.font = 'bold 18px system-ui, -apple-system, sans-serif';
@@ -314,7 +339,13 @@ function drawDotProduct(
   ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(origin.x, origin.y, angleSize, Math.min(aAngle, bAngle), Math.max(aAngle, bAngle));
+  ctx.arc(
+    origin.x,
+    origin.y,
+    angleSize,
+    Math.min(aAngle, bAngle),
+    Math.max(aAngle, bAngle)
+  );
   ctx.stroke();
 
   // Angle label
@@ -339,14 +370,17 @@ function drawDotProduct(
 
   // Result box
   const resultY = centerY - 45;
-  ctx.fillStyle = normalizedDot > 0.5 ? 'rgba(40, 120, 60, 0.15)' : 'rgba(180, 80, 60, 0.15)';
+  ctx.fillStyle =
+    normalizedDot > 0.5 ? 'rgba(40, 120, 60, 0.15)' : 'rgba(180, 80, 60, 0.15)';
   ctx.fillRect(centerX - 60, resultY - 16, 120, 32);
-  ctx.strokeStyle = normalizedDot > 0.5 ? 'rgba(40, 120, 60, 0.8)' : 'rgba(180, 80, 60, 0.8)';
+  ctx.strokeStyle =
+    normalizedDot > 0.5 ? 'rgba(40, 120, 60, 0.8)' : 'rgba(180, 80, 60, 0.8)';
   ctx.lineWidth = 2;
   ctx.strokeRect(centerX - 60, resultY - 16, 120, 32);
 
   ctx.font = 'bold 18px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = normalizedDot > 0.5 ? 'rgba(40, 120, 60, 1)' : 'rgba(180, 80, 60, 1)';
+  ctx.fillStyle =
+    normalizedDot > 0.5 ? 'rgba(40, 120, 60, 1)' : 'rgba(180, 80, 60, 1)';
   ctx.fillText(`= ${normalizedDot.toFixed(2)}`, centerX, resultY + 2);
 
   // Similarity interpretation
@@ -354,7 +388,12 @@ function drawDotProduct(
     const alpha = Math.min(1, (progress - 0.6) * 2.5);
     ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
     ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
-    const interpretation = normalizedDot > 0.7 ? 'Similar!' : normalizedDot > 0.3 ? 'Somewhat similar' : 'Different';
+    const interpretation =
+      normalizedDot > 0.7
+        ? 'Similar!'
+        : normalizedDot > 0.3
+        ? 'Somewhat similar'
+        : 'Different';
     ctx.fillText(interpretation, centerX, resultY + 35);
   }
 }
@@ -391,10 +430,14 @@ function drawMatrixMultiplication(
       const highlightRow = Math.floor(progress * 4);
       const isActive = r === highlightRow && progress < 0.9;
 
-      ctx.fillStyle = isActive ? 'rgba(40, 120, 60, 0.25)' : 'rgba(0, 0, 0, 0.03)';
+      ctx.fillStyle = isActive
+        ? 'rgba(40, 120, 60, 0.25)'
+        : 'rgba(0, 0, 0, 0.03)';
       ctx.fillRect(x, y, cellSize, cellSize);
 
-      ctx.strokeStyle = isActive ? 'rgba(40, 120, 60, 0.9)' : 'rgba(0, 0, 0, 0.3)';
+      ctx.strokeStyle = isActive
+        ? 'rgba(40, 120, 60, 0.9)'
+        : 'rgba(0, 0, 0, 0.3)';
       ctx.lineWidth = isActive ? 2.5 : 1;
       ctx.strokeRect(x, y, cellSize, cellSize);
 
@@ -415,10 +458,14 @@ function drawMatrixMultiplication(
     const highlightRow = Math.floor(progress * 4);
     const isActive = highlightRow < 3 && progress < 0.9;
 
-    ctx.fillStyle = isActive ? 'rgba(60, 100, 180, 0.25)' : 'rgba(0, 0, 0, 0.03)';
+    ctx.fillStyle = isActive
+      ? 'rgba(60, 100, 180, 0.25)'
+      : 'rgba(0, 0, 0, 0.03)';
     ctx.fillRect(x, y, cellSize, cellSize);
 
-    ctx.strokeStyle = isActive ? 'rgba(60, 100, 180, 0.9)' : 'rgba(0, 0, 0, 0.3)';
+    ctx.strokeStyle = isActive
+      ? 'rgba(60, 100, 180, 0.9)'
+      : 'rgba(0, 0, 0, 0.3)';
     ctx.lineWidth = isActive ? 2.5 : 1;
     ctx.strokeRect(x, y, cellSize, cellSize);
 
@@ -438,7 +485,7 @@ function drawMatrixMultiplication(
     const isComputing = r >= rowProgress - 1 && r < rowProgress;
 
     if (isComputed || isComputing) {
-      const alpha = isComputing ? (rowProgress - r) : 1;
+      const alpha = isComputing ? rowProgress - r : 1;
 
       ctx.fillStyle = `rgba(40, 120, 60, ${alpha * 0.3})`;
       ctx.fillRect(x, y, cellSize, cellSize);
@@ -509,10 +556,12 @@ function drawForwardPassMath(
     // Draw connections to next layer
     if (layerIdx < layers.length - 1) {
       const nextLayer = layers[layerIdx + 1];
-      const nextStartY = centerY - ((nextLayer.neurons - 1) * neuronSpacing) / 2;
+      const nextStartY =
+        centerY - ((nextLayer.neurons - 1) * neuronSpacing) / 2;
 
       const layerProgress = progress * 4;
-      const isActive = layerIdx < layerProgress && layerIdx + 1 <= layerProgress;
+      const isActive =
+        layerIdx < layerProgress && layerIdx + 1 <= layerProgress;
 
       for (let i = 0; i < layer.neurons; i++) {
         for (let j = 0; j < nextLayer.neurons; j++) {
@@ -558,7 +607,11 @@ function drawForwardPassMath(
     ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.fillText(layer.label, layer.x, startY + layer.neurons * neuronSpacing + 28);
+    ctx.fillText(
+      layer.label,
+      layer.x,
+      startY + layer.neurons * neuronSpacing + 28
+    );
   });
 
   // Operation labels
@@ -620,14 +673,23 @@ function drawLossComputation(
   ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-  ctx.fillText('Prediction', predX + predGroupWidth / 2, barY - barMaxHeight - 20);
-  ctx.fillText('Target', targetX + targetGroupWidth / 2, barY - barMaxHeight - 20);
+  ctx.fillText(
+    'Prediction',
+    predX + predGroupWidth / 2,
+    barY - barMaxHeight - 20
+  );
+  ctx.fillText(
+    'Target',
+    targetX + targetGroupWidth / 2,
+    barY - barMaxHeight - 20
+  );
 
   classes.forEach((cls, i) => {
     const pX = predX + i * (barWidth + barGap);
     const tX = targetX + i * (barWidth + barGap);
     const predHeight = predValues[i] * barMaxHeight * Math.min(1, progress * 2);
-    const targetHeight = targetValues[i] * barMaxHeight * Math.min(1, progress * 2);
+    const targetHeight =
+      targetValues[i] * barMaxHeight * Math.min(1, progress * 2);
 
     // Prediction bar
     ctx.fillStyle = 'rgba(60, 100, 180, 0.4)';
@@ -652,9 +714,17 @@ function drawLossComputation(
     if (progress > 0.3) {
       ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(60, 100, 180, 1)';
-      ctx.fillText(predValues[i].toFixed(1), pX + barWidth / 2, barY - predHeight - 6);
+      ctx.fillText(
+        predValues[i].toFixed(1),
+        pX + barWidth / 2,
+        barY - predHeight - 6
+      );
       ctx.fillStyle = 'rgba(40, 120, 60, 1)';
-      ctx.fillText(targetValues[i].toFixed(1), tX + barWidth / 2, barY - targetHeight - 6);
+      ctx.fillText(
+        targetValues[i].toFixed(1),
+        tX + barWidth / 2,
+        barY - targetHeight - 6
+      );
     }
   });
 
@@ -722,7 +792,10 @@ function drawBackpropFlow(
   const backwardProgress = Math.min(1, progress * 1.5);
 
   for (let i = nodes.length - 1; i > 0; i--) {
-    const arrowProgress = Math.max(0, Math.min(1, (backwardProgress - (nodes.length - 1 - i) * 0.25) * 4));
+    const arrowProgress = Math.max(
+      0,
+      Math.min(1, (backwardProgress - (nodes.length - 1 - i) * 0.25) * 4)
+    );
 
     if (arrowProgress > 0) {
       const startX = nodes[i].x - nodeRadius - 5;
@@ -812,8 +885,16 @@ function drawBackpropFlow(
     ctx.font = '12px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.7})`;
-    ctx.fillText('Gradients shrink as they propagate backward', centerX, nodeY + 75);
-    ctx.fillText('(this is why deep networks are hard to train)', centerX, nodeY + 90);
+    ctx.fillText(
+      'Gradients shrink as they propagate backward',
+      centerX,
+      nodeY + 75
+    );
+    ctx.fillText(
+      '(this is why deep networks are hard to train)',
+      centerX,
+      nodeY + 90
+    );
   }
 }
 

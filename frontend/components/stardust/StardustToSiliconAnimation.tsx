@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useMemo } from 'react';
 import { AnimationCanvas } from '@/components/animation/AnimationCanvas';
 
 interface StardustToSiliconAnimationProps {
@@ -16,6 +16,12 @@ interface Star {
   targetY: number;
 }
 
+// Deterministic "random" for render-safe star initialization
+function pseudoRandom01(seed: number): number {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
 /**
  * "From Stardust to Silicon" - Simple closing animation
  *
@@ -26,10 +32,13 @@ export function StardustToSiliconAnimation({
   progress,
   className = '',
 }: StardustToSiliconAnimationProps) {
-  const starsRef = useRef<Star[]>([]);
+  // Make this animation reach its final state slightly before progress=1
+  const finishBy = 0.9;
+  const t = Math.min(1, Math.max(0, progress / finishBy));
 
-  // Initialize stars once - positioned to form silicon grid when coalesced
-  if (starsRef.current.length === 0) {
+  // Initialize stars once (render-safe & deterministic)
+  const stars = useMemo<Star[]>(() => {
+    const next: Star[] = [];
     const gridSize = 5;
     const gridSpacing = 0.12;
     const gridOffset = 0.5 - ((gridSize - 1) * gridSpacing) / 2;
@@ -37,17 +46,18 @@ export function StardustToSiliconAnimation({
     for (let i = 0; i < gridSize; i++) {
       for (let j = 0; j < gridSize; j++) {
         // Random starting position (scattered)
-        const startX = Math.random();
-        const startY = Math.random();
+        const base = 1 + i * gridSize + j;
+        const startX = pseudoRandom01(base * 11.1);
+        const startY = pseudoRandom01(base * 17.7);
 
         // Target position in grid
         const targetX = gridOffset + j * gridSpacing;
         const targetY = gridOffset + i * gridSpacing;
 
-        starsRef.current.push({
+        next.push({
           x: startX,
           y: startY,
-          size: 2 + Math.random() * 2,
+          size: 2 + pseudoRandom01(base * 29.3) * 2,
           targetX,
           targetY,
         });
@@ -56,15 +66,17 @@ export function StardustToSiliconAnimation({
 
     // Add some extra background stars that fade out
     for (let i = 0; i < 50; i++) {
-      starsRef.current.push({
-        x: Math.random(),
-        y: Math.random(),
-        size: 1 + Math.random() * 1.5,
+      const base = 1000 + i;
+      next.push({
+        x: pseudoRandom01(base * 13.13),
+        y: pseudoRandom01(base * 19.19),
+        size: 1 + pseudoRandom01(base * 23.23) * 1.5,
         targetX: -1, // Off-screen target = fade out
         targetY: -1,
       });
     }
-  }
+    return next;
+  }, []);
 
   const renderAnimation = (
     ctx: CanvasRenderingContext2D,
@@ -77,12 +89,11 @@ export function StardustToSiliconAnimation({
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
-    const stars = starsRef.current;
     const gridStarCount = 25; // First 25 stars form the grid
 
     // Draw grid connections (appear as stars coalesce)
-    if (progress > 0.5) {
-      const connectionAlpha = Math.min(1, (progress - 0.5) * 2);
+    if (t > 0.5) {
+      const connectionAlpha = Math.min(1, (t - 0.5) * 2);
       ctx.strokeStyle = `rgba(0, 0, 0, ${connectionAlpha * 0.3})`;
       ctx.lineWidth = 1;
 
@@ -91,15 +102,17 @@ export function StardustToSiliconAnimation({
         for (let j = 0; j < gridSize; j++) {
           const idx = i * gridSize + j;
           const star = stars[idx];
-          const x = lerp(star.x, star.targetX, easeInOut(progress)) * width;
-          const y = lerp(star.y, star.targetY, easeInOut(progress)) * height;
+          const x = lerp(star.x, star.targetX, easeInOut(t)) * width;
+          const y = lerp(star.y, star.targetY, easeInOut(t)) * height;
 
           // Connect to right neighbor
           if (j < gridSize - 1) {
             const rightIdx = i * gridSize + (j + 1);
             const rightStar = stars[rightIdx];
-            const rx = lerp(rightStar.x, rightStar.targetX, easeInOut(progress)) * width;
-            const ry = lerp(rightStar.y, rightStar.targetY, easeInOut(progress)) * height;
+            const rx =
+              lerp(rightStar.x, rightStar.targetX, easeInOut(t)) * width;
+            const ry =
+              lerp(rightStar.y, rightStar.targetY, easeInOut(t)) * height;
             ctx.beginPath();
             ctx.moveTo(x, y);
             ctx.lineTo(rx, ry);
@@ -110,8 +123,10 @@ export function StardustToSiliconAnimation({
           if (i < gridSize - 1) {
             const bottomIdx = (i + 1) * gridSize + j;
             const bottomStar = stars[bottomIdx];
-            const bx = lerp(bottomStar.x, bottomStar.targetX, easeInOut(progress)) * width;
-            const by = lerp(bottomStar.y, bottomStar.targetY, easeInOut(progress)) * height;
+            const bx =
+              lerp(bottomStar.x, bottomStar.targetX, easeInOut(t)) * width;
+            const by =
+              lerp(bottomStar.y, bottomStar.targetY, easeInOut(t)) * height;
             ctx.beginPath();
             ctx.moveTo(x, y);
             ctx.lineTo(bx, by);
@@ -127,11 +142,11 @@ export function StardustToSiliconAnimation({
 
       if (isGridStar) {
         // Grid stars: move toward target position
-        const x = lerp(star.x, star.targetX, easeInOut(progress)) * width;
-        const y = lerp(star.y, star.targetY, easeInOut(progress)) * height;
+        const x = lerp(star.x, star.targetX, easeInOut(t)) * width;
+        const y = lerp(star.y, star.targetY, easeInOut(t)) * height;
 
         // Size grows slightly as they settle
-        const size = star.size * (1 + progress * 0.3);
+        const size = star.size * (1 + t * 0.3);
 
         ctx.beginPath();
         ctx.arc(x, y, size, 0, Math.PI * 2);
@@ -139,7 +154,7 @@ export function StardustToSiliconAnimation({
         ctx.fill();
       } else {
         // Background stars: fade out as grid forms
-        const alpha = Math.max(0, 1 - progress * 1.5);
+        const alpha = Math.max(0, 1 - t * 1.5);
         if (alpha > 0) {
           ctx.beginPath();
           ctx.arc(star.x * width, star.y * height, star.size, 0, Math.PI * 2);
@@ -148,15 +163,6 @@ export function StardustToSiliconAnimation({
         }
       }
     });
-
-    // "Si" label appears at end
-    if (progress > 0.8) {
-      const labelAlpha = (progress - 0.8) / 0.2;
-      ctx.font = 'bold 16px system-ui, -apple-system, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = `rgba(0, 0, 0, ${labelAlpha * 0.6})`;
-      ctx.fillText('Si', width / 2, height / 2 + height * 0.25);
-    }
   };
 
   return (
