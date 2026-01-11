@@ -1,6 +1,7 @@
 'use client';
 
-import { ReactNode, useEffect, useState, useCallback } from 'react';
+import { ReactNode, useEffect, useState, useCallback, createContext, useContext, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 /**
  * A milestone within an animation that pins progress to a specific element
@@ -62,6 +63,136 @@ export interface AnimationConfig {
    * Default: 0 (no overlap)
    */
   overlap?: number;
+
+  /**
+   * When true, renders the animation at 100% progress inline (below the startElementId)
+   * on mobile viewports instead of in the sticky panel.
+   * This is useful for animations that should be visible as static content on mobile.
+   * Default: false
+   */
+  mobileInline?: boolean;
+}
+
+/** Default early finish ratio - animations reach 100% at this point of their scroll range */
+const EARLY_FINISH_RATIO = 0.9;
+
+/**
+ * Context to share animation configurations for mobile inline rendering
+ */
+interface AnimationContextValue {
+  animations: AnimationConfig[];
+  isMobile: boolean;
+}
+
+const AnimationContext = createContext<AnimationContextValue | null>(null);
+
+/**
+ * Provider to share animation configurations between AnimationSequence and MobileInlineAnimation.
+ * Wrap your ArticleLayout with this provider when using mobileInline animations.
+ *
+ * @example
+ * ```tsx
+ * <AnimationsProvider animations={myAnimations}>
+ *   <ArticleLayout
+ *     leftContent={(scrollProgress) => (
+ *       <AnimationSequence scrollProgress={scrollProgress} />
+ *     )}
+ *   >
+ *     <h2 id="intro">Intro</h2>
+ *     <MobileInlineAnimation startElementId="intro" />
+ *   </ArticleLayout>
+ * </AnimationsProvider>
+ * ```
+ */
+export function AnimationsProvider({
+  animations,
+  children,
+}: {
+  animations: AnimationConfig[];
+  children: ReactNode;
+}) {
+  // Track mobile viewport (matches xl breakpoint where sticky panel shows)
+  // Initialize with correct value to avoid flash of wrong content
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 1280;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1280);
+    // Re-check in case SSR value differs from client
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return (
+    <AnimationContext.Provider value={{ animations, isMobile }}>
+      {children}
+    </AnimationContext.Provider>
+  );
+}
+
+/**
+ * Hook to access animation context
+ */
+export function useAnimations() {
+  return useContext(AnimationContext);
+}
+
+/**
+ * Component to render a specific animation inline at 100% progress.
+ * Use this in your article content to show animations inline on mobile.
+ * Place it right after the element you want the animation to appear below.
+ * Must be used within an AnimationsProvider.
+ *
+ * @example
+ * ```tsx
+ * <h2 id="my-section">Section Title</h2>
+ * <MobileInlineAnimation startElementId="my-section" />
+ * <p>Content continues here...</p>
+ * ```
+ */
+export function MobileInlineAnimation({
+  startElementId,
+  className = '',
+}: {
+  /** The startElementId of the animation to render */
+  startElementId: string;
+  className?: string;
+}) {
+  const context = useContext(AnimationContext);
+
+  if (!context) {
+    // Not within AnimationsProvider - render nothing
+    return null;
+  }
+
+  const { animations, isMobile } = context;
+
+  // Only render on mobile
+  if (!isMobile) {
+    return null;
+  }
+
+  // Find the animation with matching startElementId and mobileInline: true
+  const animation = animations.find(
+    (a) => a.startElementId === startElementId && a.mobileInline
+  );
+
+  if (!animation) {
+    return null;
+  }
+
+  return (
+    <div className={`my-6 w-full ${className}`}>
+      <div className="aspect-[4/3] relative">
+        {animation.render(1)} {/* Render at 100% progress */}
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -73,6 +204,8 @@ export interface AnimationConfig {
  * - Pixel-based or percentage-based duration control
  * - Smooth transitions with configurable overlap
  * - Each animation receives normalized progress (0-1)
+ * - Animations finish slightly early (at 90% of scroll range) for smoother transitions
+ * - Mobile inline mode: render animations at 100% below their start element on mobile
  *
  * @example
  * ```tsx
@@ -86,6 +219,7 @@ export interface AnimationConfig {
  *     {
  *       render: (p) => <SummaryAnimation progress={p} />,
  *       startElementId: 'summary-section', // Starts when #summary-section is in view
+ *       mobileInline: true, // Shows at 100% inline on mobile
  *     }
  *   ]}
  * />
@@ -94,12 +228,38 @@ export interface AnimationConfig {
 export function AnimationSequence({
   scrollProgress,
   scrollableHeight,
-  animations,
+  animations: animationsProp,
+  earlyFinishRatio = EARLY_FINISH_RATIO,
 }: {
   scrollProgress: number;
   scrollableHeight?: number;
-  animations: AnimationConfig[];
+  /** Animations config - can also be provided via AnimationsProvider context */
+  animations?: AnimationConfig[];
+  /** Ratio at which animations reach 100% progress (default: 0.9 = 90%) */
+  earlyFinishRatio?: number;
 }) {
+  // Get animations from context or props
+  const context = useContext(AnimationContext);
+  const animations = animationsProp ?? context?.animations ?? [];
+
+  // Track mobile viewport (use context if available, otherwise detect locally)
+  // Initialize with correct value to avoid flash of wrong content on first render
+  const [localIsMobile, setLocalIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 1280;
+    }
+    return false;
+  });
+  useEffect(() => {
+    if (context) return; // Use context value instead
+    const checkMobile = () => setLocalIsMobile(window.innerWidth < 1280);
+    // Re-check in case SSR value differs from client
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [context]);
+  const isMobile = context?.isMobile ?? localIsMobile;
+
   // Track element positions for element-based triggers (including milestones)
   const [elementPositions, setElementPositions] = useState<Map<string, number>>(new Map());
 
@@ -172,10 +332,90 @@ export function AnimationSequence({
     elementPositions
   );
 
+  // Track containers for mobile inline animations
+  const containerRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const [mobileContainersReady, setMobileContainersReady] = useState(false);
+
+  // Create/update containers for mobile inline animations
+  useEffect(() => {
+    if (!isMobile) {
+      // Clean up containers when not on mobile
+      containerRefs.current.forEach((container) => {
+        container.remove();
+      });
+      containerRefs.current.clear();
+      setMobileContainersReady(false);
+      return;
+    }
+
+    // Create containers for each mobileInline animation
+    animations.forEach((animation) => {
+      if (!animation.mobileInline || !animation.startElementId) return;
+
+      const elementId = animation.startElementId;
+      const targetElement = document.getElementById(elementId);
+      if (!targetElement) return;
+
+      // Check if container already exists
+      let container = containerRefs.current.get(elementId);
+      if (!container) {
+        // Create new container - block element that flows with content
+        container = document.createElement('div');
+        container.className = 'mobile-inline-animation';
+        // Use inline styles to ensure the container takes up space
+        // These styles make it flow naturally in the document
+        container.style.display = 'block';
+        container.style.width = '100%';
+        container.style.marginTop = '1.5rem';
+        container.style.marginBottom = '1.5rem';
+        container.setAttribute('data-animation-id', elementId);
+        targetElement.parentNode?.insertBefore(container, targetElement.nextSibling);
+        containerRefs.current.set(elementId, container);
+      }
+    });
+
+    setMobileContainersReady(true);
+
+    // Cleanup on unmount
+    return () => {
+      containerRefs.current.forEach((container) => {
+        container.remove();
+      });
+      containerRefs.current.clear();
+    };
+  }, [isMobile, animations]);
+
+  // Render mobile inline animations via portals
+  const mobileInlinePortals = mobileContainersReady && isMobile
+    ? animations
+        .filter((animation) => animation.mobileInline && animation.startElementId)
+        .map((animation) => {
+          const container = containerRefs.current.get(animation.startElementId!);
+          if (!container) return null;
+
+          return createPortal(
+            <div
+              key={`mobile-inline-${animation.startElementId}`}
+              className="w-full aspect-[4/3]"
+            >
+              {animation.render(1)} {/* Always render at 100% progress */}
+            </div>,
+            container
+          );
+        })
+        .filter(Boolean)
+    : [];
+
   // Find which animation(s) should be rendered based on current progress
   return (
     <>
+      {/* Mobile inline animations rendered via portals */}
+      {mobileInlinePortals}
+
       {animations.map((animation, index) => {
+        // Skip mobile inline animations in sticky panel on mobile
+        if (isMobile && animation.mobileInline) return null;
+
         const range = animationRanges[index];
         const isFirst = index === 0;
         const isLast = index === animations.length - 1;
@@ -192,14 +432,23 @@ export function AnimationSequence({
 
         // Calculate normalized progress within this animation's range
         // Use milestones if available for more precise control
-        const normalizedProgress = animation.milestones && animation.milestones.length > 0
-          ? calculateProgressWithMilestones(
-              scrollProgress,
-              range,
-              animation.milestones,
-              elementPositions
-            )
-          : calculateNormalizedProgress(scrollProgress, range);
+        let normalizedProgress: number;
+
+        if (animation.milestones && animation.milestones.length > 0) {
+          // For milestone animations, pass earlyFinishRatio to adjust endpoint
+          // This preserves milestone progress values while completing at 90% of range
+          normalizedProgress = calculateProgressWithMilestones(
+            scrollProgress,
+            range,
+            animation.milestones,
+            elementPositions,
+            earlyFinishRatio
+          );
+        } else {
+          // For non-milestone animations, scale output to reach 100% at 90% of range
+          normalizedProgress = calculateNormalizedProgress(scrollProgress, range);
+          normalizedProgress = Math.min(1, normalizedProgress / earlyFinishRatio);
+        }
 
         // Render with opacity wrapper
         return (
@@ -415,7 +664,8 @@ function calculateOpacity(
 }
 
 /**
- * Calculate normalized progress (0-1) within animation's active range
+ * Calculate normalized progress (0-1) within animation's active range.
+ * Returns raw progress - early finish scaling is applied externally.
  */
 function calculateNormalizedProgress(
   progress: number,
@@ -432,34 +682,41 @@ function calculateNormalizedProgress(
 /**
  * Calculate progress using milestones for more precise control.
  * Interpolates linearly between milestone points.
+ * Uses earlyFinishRatio to set the endpoint so animation completes early.
  *
  * @example
  * If animation starts at scroll 0.2 and ends at 0.6, with milestone at 0.4 = 50%:
  * - At scroll 0.2: progress = 0
- * - At scroll 0.4: progress = 0.5
- * - At scroll 0.6: progress = 1.0
+ * - At scroll 0.4: progress = 0.5 (milestone preserved)
+ * - At scroll 0.56 (90% of range): progress = 1.0 (early finish)
  */
 function calculateProgressWithMilestones(
   scrollProgress: number,
   range: AnimationRange,
   milestones: AnimationMilestone[],
-  elementPositions: Map<string, number>
+  elementPositions: Map<string, number>,
+  earlyFinishRatio: number = EARLY_FINISH_RATIO
 ): number {
-  // Build sorted list of progress points: start (0), milestones, end (1)
+  // Calculate effective end point for early finish
+  const duration = range.end - range.start;
+  const effectiveEnd = range.start + duration * earlyFinishRatio;
+
+  // Build sorted list of progress points: start (0), milestones, effectiveEnd (1)
   const points: Array<{ scrollPos: number; animProgress: number }> = [
     { scrollPos: range.start, animProgress: 0 },
   ];
 
-  // Add milestone points
+  // Add milestone points that are within the effective range
+  // Skip milestones beyond effectiveEnd to avoid conflicts with the endpoint
   milestones.forEach((milestone) => {
     const scrollPos = elementPositions.get(milestone.elementId);
-    if (scrollPos !== undefined) {
+    if (scrollPos !== undefined && scrollPos < effectiveEnd) {
       points.push({ scrollPos, animProgress: milestone.progress });
     }
   });
 
-  // Add end point
-  points.push({ scrollPos: range.end, animProgress: 1 });
+  // Add end point at effective end (early finish)
+  points.push({ scrollPos: effectiveEnd, animProgress: 1 });
 
   // Sort by scroll position
   points.sort((a, b) => a.scrollPos - b.scrollPos);

@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 interface TabsContextValue {
@@ -29,26 +30,99 @@ interface TabsProviderProps {
   tabs: TabConfig[];
   defaultTab?: string;
   onTabChange?: (tabId: string) => void;
+  /** Query parameter name for URL sync. Set to false to disable URL sync. Default: 'tab' */
+  queryParam?: string | false;
 }
 
 /**
  * Provider for tab state management.
  * Wrap your article content with this to enable tabbed navigation.
+ *
+ * By default, syncs active tab to URL query params (e.g., ?tab=training).
+ * This ensures refreshing the page maintains the current tab.
  */
-export function TabsProvider({
+export function TabsProvider(props: TabsProviderProps) {
+  return (
+    <Suspense fallback={<TabsProviderFallback {...props} />}>
+      <TabsProviderInner {...props} />
+    </Suspense>
+  );
+}
+
+/**
+ * Fallback component that renders without URL sync during SSR/loading
+ */
+function TabsProviderFallback({
   children,
   tabs,
   defaultTab,
-  onTabChange,
 }: TabsProviderProps) {
   const [activeTab, setActiveTabState] = useState(defaultTab || tabs[0]?.id || '');
 
   const setActiveTab = useCallback(
     (id: string) => {
       setActiveTabState(id);
-      onTabChange?.(id);
     },
-    [onTabChange]
+    []
+  );
+
+  return (
+    <TabsContext.Provider value={{ activeTab, setActiveTab, tabs }}>
+      {children}
+    </TabsContext.Provider>
+  );
+}
+
+/**
+ * Inner provider that uses searchParams (requires Suspense boundary)
+ */
+function TabsProviderInner({
+  children,
+  tabs,
+  defaultTab,
+  onTabChange,
+  queryParam = 'tab',
+}: TabsProviderProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Get initial tab from URL or default
+  const getInitialTab = useCallback(() => {
+    if (queryParam) {
+      const urlTab = searchParams.get(queryParam);
+      if (urlTab && tabs.some(t => t.id === urlTab)) {
+        return urlTab;
+      }
+    }
+    return defaultTab || tabs[0]?.id || '';
+  }, [searchParams, queryParam, defaultTab, tabs]);
+
+  const [activeTab, setActiveTabState] = useState(getInitialTab);
+
+  // Sync with URL on mount and when URL changes
+  useEffect(() => {
+    if (queryParam) {
+      const urlTab = searchParams.get(queryParam);
+      if (urlTab && tabs.some(t => t.id === urlTab) && urlTab !== activeTab) {
+        setActiveTabState(urlTab);
+      }
+    }
+  }, [searchParams, queryParam, tabs, activeTab]);
+
+  const setActiveTab = useCallback(
+    (id: string) => {
+      setActiveTabState(id);
+      onTabChange?.(id);
+
+      // Update URL query param
+      if (queryParam) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set(queryParam, id);
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+      }
+    },
+    [onTabChange, queryParam, searchParams, router, pathname]
   );
 
   return (

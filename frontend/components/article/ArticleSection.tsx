@@ -144,10 +144,11 @@ export function ArticleSection({
       )}
 
       {/* Desktop: Right panel - absolutely positioned in right margin */}
+      {/* hover:z-50 brings panel to front when hovered, preventing overlap issues */}
       {hasRightContent && (
         <div
           ref={rightPanelRef}
-          className="hidden xl:block absolute left-full ml-8 top-0 w-[26rem]"
+          className="hidden xl:block absolute left-full ml-8 top-0 w-[26rem] z-10 hover:z-50 transition-[z-index] duration-0"
         >
           {renderRightContent(false)}
         </div>

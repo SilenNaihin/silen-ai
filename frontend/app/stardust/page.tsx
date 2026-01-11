@@ -43,6 +43,18 @@ import { CrossEntropyInteractive } from '@/components/stardust/CrossEntropyInter
 import { MatrixMathAnimation } from '@/components/stardust/MatrixMathAnimation';
 import { OverfittingAnimation } from '@/components/stardust/OverfittingAnimation';
 import { HyperparametersAnimation } from '@/components/stardust/HyperparametersAnimation';
+import { SimpleRecurrenceAnimation } from '@/components/stardust/SimpleRecurrenceAnimation';
+import { UnrolledRNNAnimation } from '@/components/stardust/UnrolledRNNAnimation';
+import { BPTTAnimation } from '@/components/stardust/BPTTAnimation';
+import { VanishingGradientAnimation } from '@/components/stardust/VanishingGradientAnimation';
+import { LSTMProgressiveAnimation } from '@/components/stardust/LSTMProgressiveAnimation';
+import { ActivationFunctionsAnimation } from '@/components/stardust/ActivationFunctionsAnimation';
+import { ContextLossAnimation } from '@/components/stardust/ContextLossAnimation';
+import { SimpleRNNInteractive } from '@/components/stardust/SimpleRNNInteractive';
+import { LSTMBuildupInteractive } from '@/components/stardust/LSTMBuildupInteractive';
+import { GradientFlowInteractive } from '@/components/stardust/GradientFlowInteractive';
+import { ChainRuleInteractive, BackpropVisualization } from '@/components/stardust/ChainRuleInteractive';
+import { StardustToSiliconAnimation } from '@/components/stardust/StardustToSiliconAnimation';
 
 const TABS = [
   { id: 'foundations', label: 'Foundations' },
@@ -214,19 +226,85 @@ export default function StardustArticle() {
                           { elementId: 'loss-computation', progress: 0.7 },
                           { elementId: 'backprop-math', progress: 0.85 },
                         ],
+                        overlap: 0.1,
+                      },
+                      // Closing animation - From Stardust to Silicon
+                      {
+                        render: (p) => <StardustToSiliconAnimation progress={p} />,
+                        startElementId: 'stardust-conclusion',
                       },
                     ]}
                   />
                 </TabContent>
 
-                {/* Tab 3: Architectures - placeholder */}
+                {/* Tab 3: Architectures animations */}
                 <TabContent tabId="architectures">
-                  <div className="h-full flex items-center justify-center">
-                    <div className="text-neutral-400 text-center">
-                      <div className="text-6xl mb-4">🏗️</div>
-                      <div className="text-lg font-medium">Coming Soon</div>
-                    </div>
-                  </div>
+                  <AnimationSequence
+                    scrollProgress={scrollProgress}
+                    animations={[
+                      // Simple recurrence
+                      {
+                        render: (p) => <SimpleRecurrenceAnimation progress={p} />,
+                        startElementId: 'the-sequence-problem',
+                        milestones: [
+                          { elementId: 'simplest-rnn', progress: 0.3 },
+                          { elementId: 'weight-sharing', progress: 0.7 },
+                        ],
+                        overlap: 0.1,
+                      },
+                      // Unrolled view
+                      {
+                        render: (p) => <UnrolledRNNAnimation progress={p} />,
+                        startElementId: 'unrolling',
+                        overlap: 0.1,
+                      },
+                      // BPTT
+                      {
+                        render: (p) => <BPTTAnimation progress={p} />,
+                        startElementId: 'bptt',
+                        milestones: [
+                          { elementId: 'full-bptt', progress: 0.35 },
+                          { elementId: 'tbptt', progress: 0.7 },
+                        ],
+                        overlap: 0.1,
+                      },
+                      // Vanishing gradients
+                      {
+                        render: (p) => <VanishingGradientAnimation progress={p} />,
+                        startElementId: 'rnn-problems',
+                        milestones: [
+                          { elementId: 'vanishing-gradients', progress: 0.4 },
+                          { elementId: 'exploding-gradients', progress: 0.7 },
+                        ],
+                        overlap: 0.1,
+                      },
+                      // Context loss demo
+                      {
+                        render: (p) => <ContextLossAnimation progress={p} />,
+                        startElementId: 'long-term-context-demo',
+                        overlap: 0.1,
+                      },
+                      // LSTM build-up
+                      {
+                        render: (p) => <LSTMProgressiveAnimation progress={p} />,
+                        startElementId: 'building-lstm',
+                        milestones: [
+                          { elementId: 'the-cell-state', progress: 0.15 },
+                          { elementId: 'forget-gate', progress: 0.3 },
+                          { elementId: 'input-gate', progress: 0.45 },
+                          { elementId: 'output-gate', progress: 0.6 },
+                          { elementId: 'lstm-complete', progress: 0.8 },
+                        ],
+                        overlap: 0.1,
+                      },
+                      // Activation functions
+                      {
+                        render: (p) => <ActivationFunctionsAnimation progress={p} />,
+                        startElementId: 'activation-functions',
+                        overlap: 0.1,
+                      },
+                    ]}
+                  />
                 </TabContent>
               </>
             )}
@@ -2195,88 +2273,165 @@ function TrainingContent() {
             This is exactly what parallel dot products do.
           </p>
         </Prose>
+        <InsightBox title="Broadcasting">
+          <p>
+            When shapes don&apos;t quite match, NumPy and PyTorch use{' '}
+            <strong>broadcasting</strong>: they automatically expand dimensions
+            to make operations work. For example, adding a bias vector{' '}
+            <code>[b₁, b₂, b₃]</code> to every row of a matrix &quot;broadcasts&quot;
+            the vector across rows. This is how we add a single bias to every example
+            in a batch.
+          </p>
+          <p className="mt-2">
+            Broadcasting is powerful but can cause subtle bugs. When you get
+            unexpected shapes, check if broadcasting silently changed your
+            tensors.
+          </p>
+        </InsightBox>
       </ArticleSection>
 
       {/* The Forward Pass */}
       <ArticleSection>
         <TOCHeading id="forward-pass-math" level={3}>
-          The Forward Pass: Step by Step
+          The Forward Pass: A Concrete Example
         </TOCHeading>
         <Prose>
           <p>
-            Now we can trace through our sentiment classifier mathematically.
-            The animation shows data flowing through: embedding layer → hidden
-            layer → output layer → softmax. Watch the neurons light up as
-            activations propagate forward.
+            Let&apos;s trace through a complete forward pass with real numbers.
+            We&apos;ll classify the word &quot;cat&quot; as positive or
+            negative sentiment. To keep things visible, we&apos;ll use tiny
+            dimensions: 4D embeddings and 3 hidden neurons.
           </p>
           <p id="forward-pass-full">
+            Watch the animation as data flows through: embedding → hidden →
+            output → softmax.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      {/* Step 1: Embedding */}
+      <ArticleSection>
+        <Prose>
+          <p>
             <strong>Step 1: Embedding Lookup</strong>
           </p>
-        </Prose>
-        <FormulaBox>
-          {
-            'x = E[\\text{token\\_ids}] \\quad \\text{shape: (seq\\_len, embed\\_dim)}'
-          }
-        </FormulaBox>
-        <Prose>
           <p>
-            We look up each token&apos;s embedding and stack them. For
-            &quot;great movie&quot; with 2D embeddings, we get a 2x2 matrix.
-          </p>
-          <p id="forward-step-2">
-            <strong>Step 2: Pool to Single Vector</strong>
+            The word &quot;cat&quot; has token ID 1. We grab row 1 from our
+            embedding matrix:
           </p>
         </Prose>
-        <FormulaBox>
-          {
-            '\\bar{x} = \\frac{1}{n}\\sum_i x_i \\quad \\text{shape: (embed\\_dim,)}'
-          }
-        </FormulaBox>
+        <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 font-mono text-sm my-4">
+          <div className="text-neutral-500 mb-2"># E is our 5×4 embedding matrix</div>
+          <div>x = E[1]</div>
+          <div className="text-neutral-600 mt-2">
+            x = [<span className="text-green-700">0.8</span>,{' '}
+            <span className="text-green-700">-0.2</span>,{' '}
+            <span className="text-green-700">0.5</span>,{' '}
+            <span className="text-green-700">0.1</span>]
+          </div>
+          <div className="text-neutral-400 mt-1"># shape: (4,) — one 4D vector</div>
+        </div>
         <Prose>
           <p>
-            We average across tokens to get one vector representing the whole
-            sentence. This is crude but simple.
+            That&apos;s it. The embedding for &quot;cat&quot; is now a 4-dimensional
+            vector. These numbers were learned during training to capture
+            something meaningful about &quot;cat-ness.&quot;
           </p>
-          <p id="forward-step-3">
-            <strong>Step 3: Hidden Layer</strong>
+        </Prose>
+      </ArticleSection>
+
+      {/* Step 2: Hidden Layer */}
+      <ArticleSection>
+        <Prose>
+          <p>
+            <strong>Step 2: Hidden Layer</strong>
+          </p>
+          <p>
+            Now we transform this embedding through our hidden layer. This is
+            where matrix multiplication happens:
+          </p>
+        </Prose>
+        <FormulaBox>{'h = \\text{ReLU}(W_1 x + b_1)'}</FormulaBox>
+        <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 font-mono text-sm my-4">
+          <div className="text-neutral-500 mb-2"># W₁ is 3×4, transforms 4D → 3D</div>
+          <div className="mb-3">
+            <div>W₁ @ x = [0.5, -0.3, 0.2, 0.1] · [0.8, -0.2, 0.5, 0.1]  → <span className="text-blue-700">0.57</span></div>
+            <div className="text-neutral-400 text-xs ml-8">= 0.5×0.8 + (-0.3)×(-0.2) + 0.2×0.5 + 0.1×0.1</div>
+            <div>{'        '}[0.1, 0.4, -0.2, 0.3] · [0.8, -0.2, 0.5, 0.1]  → <span className="text-blue-700">-0.07</span></div>
+            <div>{'        '}[-0.2, 0.1, 0.6, -0.1] · [0.8, -0.2, 0.5, 0.1]  → <span className="text-blue-700">0.11</span></div>
+          </div>
+          <div className="text-neutral-500 mb-2"># Add bias b₁ = [0.1, 0.1, 0.1]</div>
+          <div>pre_relu = [0.67, 0.03, 0.21]</div>
+          <div className="text-neutral-500 mt-3 mb-2"># ReLU: keep positives, zero negatives</div>
+          <div>h = [<span className="text-green-700">0.67</span>, <span className="text-green-700">0.03</span>, <span className="text-green-700">0.21</span>]</div>
+          <div className="text-neutral-400 mt-1"># shape: (3,) — three &quot;features&quot;</div>
+        </div>
+        <Prose>
+          <p>
+            Each hidden neuron computes a dot product with the input, asking
+            &quot;how much does this embedding match my learned pattern?&quot;
+            The ReLU zeros out negative responses.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      {/* Step 3: Output Layer */}
+      <ArticleSection>
+        <Prose>
+          <p>
+            <strong>Step 3: Output Layer (Logits)</strong>
+          </p>
+          <p>
+            Another matrix multiply produces raw scores for each class:
+          </p>
+        </Prose>
+        <FormulaBox>{'z = W_2 h + b_2'}</FormulaBox>
+        <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 font-mono text-sm my-4">
+          <div className="text-neutral-500 mb-2"># W₂ is 2×3, transforms 3D → 2D (pos/neg)</div>
+          <div className="mb-2">
+            <div>W₂ @ h = [0.8, -0.5, 0.3] · [0.67, 0.03, 0.21]  → <span className="text-blue-700">0.58</span></div>
+            <div>{'        '}[-0.6, 0.7, -0.2] · [0.67, 0.03, 0.21]  → <span className="text-blue-700">-0.42</span></div>
+          </div>
+          <div className="text-neutral-500 mb-2"># Add bias b₂ = [0.0, 0.0]</div>
+          <div>z = [<span className="text-green-700">0.58</span>, <span className="text-red-700">-0.42</span>]</div>
+          <div className="text-neutral-400 mt-1"># &quot;logits&quot; — raw scores, not yet probabilities</div>
+        </div>
+        <Prose>
+          <p>
+            The positive class got score 0.58, negative got -0.42. Higher is
+            better, so the network is leaning positive. But these aren&apos;t
+            probabilities yet.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      {/* Step 4: Softmax */}
+      <ArticleSection>
+        <Prose>
+          <p>
+            <strong>Step 4: Softmax → Probabilities</strong>
+          </p>
+          <p>
+            Softmax converts logits to probabilities that sum to 1:
           </p>
         </Prose>
         <FormulaBox>
-          {
-            'h = \\text{ReLU}(W_1 \\bar{x} + b_1) \\quad \\text{shape: (hidden\\_dim,)}'
-          }
+          {'p_i = \\frac{e^{z_i}}{\\sum_j e^{z_j}}'}
         </FormulaBox>
+        <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 font-mono text-sm my-4">
+          <div className="text-neutral-500 mb-2"># Exponentiate</div>
+          <div>exp(z) = [exp(0.58), exp(-0.42)] = [1.79, 0.66]</div>
+          <div className="text-neutral-500 mt-3 mb-2"># Normalize to sum to 1</div>
+          <div>sum = 1.79 + 0.66 = 2.45</div>
+          <div className="mt-2">p = [1.79/2.45, 0.66/2.45]</div>
+          <div className="mt-1">p = [<span className="text-green-700 font-bold">0.73</span>, <span className="text-red-700">0.27</span>]</div>
+          <div className="text-neutral-400 mt-2"># 73% positive, 27% negative</div>
+        </div>
         <Prose>
           <p>
-            Matrix multiply, add bias, apply nonlinearity. Each hidden neuron
-            computes a dot product with <Math>{'\\bar{x}'}</Math>, asking
-            &quot;how much does this sentence match my pattern?&quot;
-          </p>
-          <p id="forward-step-4">
-            <strong>Step 4: Output Layer</strong>
-          </p>
-        </Prose>
-        <FormulaBox>
-          {'z = W_2 h + b_2 \\quad \\text{shape: (num\\_classes,)}'}
-        </FormulaBox>
-        <Prose>
-          <p>
-            Another matrix multiply produces &quot;logits&quot; (raw scores) for
-            each class.
-          </p>
-          <p id="forward-step-5">
-            <strong>Step 5: Softmax</strong>
-          </p>
-        </Prose>
-        <FormulaBox>
-          {
-            'p_i = \\frac{e^{z_i}}{\\sum_j e^{z_j}} \\quad \\text{shape: (num\\_classes,)}'
-          }
-        </FormulaBox>
-        <Prose>
-          <p>
-            Softmax converts logits to probabilities that sum to 1. Now we have
-            our prediction: &quot;70% positive, 30% negative.&quot;
+            Our network predicts &quot;cat&quot; has 73% positive sentiment.
+            That&apos;s the complete forward pass: token ID → embedding →
+            hidden features → logits → probabilities.
           </p>
         </Prose>
       </ArticleSection>
@@ -2315,49 +2470,132 @@ function TrainingContent() {
         </TOCHeading>
         <Prose>
           <p>
-            Watch the animation: gradients now flow from right to left, from the
-            loss back to the weights. This is backpropagation. We need to figure
-            out how to adjust each weight to reduce the loss.
+            Now comes the crucial question: how do we update the weights to reduce
+            the loss? We need to know how much each weight contributed to the error.
+            This requires the <strong>chain rule</strong> from calculus.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      {/* Chain Rule Explanation */}
+      <ArticleSection>
+        <Prose>
+          <p>
+            <strong>The Chain Rule</strong>
           </p>
           <p>
-            The <strong>chain rule</strong> lets us compute how much each weight
-            contributed to the final error. Starting from the loss, we work
-            backward through each layer:
+            Imagine a chain of operations: <Math>{'x \\to h \\to y \\to L'}</Math>.
+            If we want to know how <Math>{'x'}</Math> affects <Math>{'L'}</Math>,
+            we multiply the effects along the chain:
           </p>
         </Prose>
         <FormulaBox label="Chain Rule">
           {
-            '\\frac{\\partial \\mathcal{L}}{\\partial W_1} = \\frac{\\partial \\mathcal{L}}{\\partial z} \\cdot \\frac{\\partial z}{\\partial h} \\cdot \\frac{\\partial h}{\\partial W_1}'
+            '\\frac{\\partial L}{\\partial x} = \\frac{\\partial L}{\\partial y} \\cdot \\frac{\\partial y}{\\partial h} \\cdot \\frac{\\partial h}{\\partial x}'
           }
         </FormulaBox>
         <Prose>
-          <p id="backprop-steps">
-            Each term is a local gradient that we can compute independently.
-            Then we multiply them together to get the total effect.
+          <p>
+            Each term is a <strong>local gradient</strong> that we compute at that
+            step. The beauty is we only need to know how each operation affects
+            its immediate output. Then we multiply them all together.
           </p>
         </Prose>
-        <InsightBox title="The Gradient Flow">
-          <p className="font-mono text-sm space-y-1">
-            <span className="text-neutral-500">Loss:</span>{' '}
-            <Math>{'\\mathcal{L}'}</Math>
+      </ArticleSection>
+
+      {/* Concrete backprop example */}
+      <ArticleSection>
+        <Prose>
+          <p>
+            <strong>Following a Gradient Backward</strong>
           </p>
-          <p className="font-mono text-sm">
-            <span className="text-neutral-500">{'  ↓'}</span> gradient w.r.t.
-            logits: <Math>{'p - y'}</Math> (predicted minus true)
+          <p>
+            Let&apos;s trace through our &quot;cat&quot; example. The network predicted
+            73% positive but the true label was 100% positive (class 0). The loss was:
           </p>
-          <p className="font-mono text-sm">
-            <span className="text-neutral-500">{'  ↓'}</span> gradient w.r.t.
-            hidden: <Math>{'W_2^T (p - y)'}</Math>
+        </Prose>
+        <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 font-mono text-sm my-4">
+          <div className="text-neutral-500 mb-2"># Loss: how wrong were we?</div>
+          <div>L = -log(0.73) = <span className="text-red-600 font-bold">0.31</span></div>
+          <div className="text-neutral-500 mt-4 mb-2"># Step 1: Gradient at output (softmax + cross-entropy)</div>
+          <div>∂L/∂z = p - y = [0.73, 0.27] - [1, 0] = [<span className="text-red-600">-0.27</span>, <span className="text-red-600">0.27</span>]</div>
+          <div className="text-neutral-400 text-xs mt-1">
+            # Remarkably simple! The gradient is just (predicted - actual)
+          </div>
+        </div>
+        <Prose>
+          <p>
+            Now we propagate this gradient backward through each layer:
           </p>
-          <p className="font-mono text-sm">
-            <span className="text-neutral-500">{'  ↓'}</span> gradient w.r.t.
-            W₁: outer product with input
+        </Prose>
+        <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 font-mono text-sm my-4">
+          <div className="text-neutral-500 mb-2"># Step 2: Through output layer (W₂)</div>
+          <div>∂L/∂h = W₂ᵀ @ (∂L/∂z)</div>
+          <div className="mt-1">{'       '} = W₂ᵀ @ [-0.27, 0.27]</div>
+          <div className="text-neutral-400 text-xs mt-1 mb-3">
+            # Each hidden neuron gets credit proportional to its weight
+          </div>
+
+          <div className="text-neutral-500 mb-2"># Step 3: Through ReLU</div>
+          <div>∂L/∂pre_h = ∂L/∂h × (h &gt; 0 ? 1 : 0)</div>
+          <div className="text-neutral-400 text-xs mt-1 mb-3">
+            # ReLU gradient: 1 if active, 0 if not (gradient dies!)
+          </div>
+
+          <div className="text-neutral-500 mb-2"># Step 4: Through hidden layer (W₁)</div>
+          <div>∂L/∂W₁ = ∂L/∂pre_h ⊗ x</div>
+          <div className="text-neutral-400 text-xs mt-1">
+            # Outer product: each weight&apos;s gradient = input × error signal
+          </div>
+        </div>
+        <InsightBox title="Why Gradients Get Multiplied">
+          <p>
+            Notice the pattern: at each step, we <strong>multiply</strong> by the
+            local gradient. If any gradient is very small (like a saturated
+            sigmoid: ~0.01), the product shrinks rapidly. After 10 layers:
           </p>
-          <p className="mt-3 text-neutral-600">
-            Notice how the gradient &quot;flows backward&quot; through the same
-            path the data flowed forward, but in reverse.
+          <p className="font-mono text-sm mt-2 text-center">
+            0.01 × 0.01 × ... × 0.01 = 0.01¹⁰ = <span className="text-red-600">0.0000000001</span>
+          </p>
+          <p className="mt-2">
+            This is the <strong>vanishing gradient problem</strong>. It&apos;s why
+            deep networks were hard to train before modern techniques like ReLU,
+            skip connections, and careful initialization.
           </p>
         </InsightBox>
+      </ArticleSection>
+
+      {/* Interactive Chain Rule */}
+      <ArticleSection>
+        <Prose>
+          <p>
+            <strong>Try It: Interactive Chain Rule</strong>
+          </p>
+          <p>
+            Adjust the input and weight below to see how gradients flow backward.
+            Watch how changing early values affects the entire chain.
+          </p>
+        </Prose>
+        <div className="my-6">
+          <ChainRuleInteractive />
+        </div>
+      </ArticleSection>
+
+      {/* Gradient flow visualization */}
+      <ArticleSection>
+        <Prose>
+          <p>
+            <strong>Visualizing Gradient Flow</strong>
+          </p>
+          <p>
+            Here&apos;s a 2-layer network where you can see gradients flowing
+            backward through actual neurons. Toggle between forward and backward
+            passes. Notice how ReLU blocks gradients when neurons are inactive.
+          </p>
+        </Prose>
+        <div className="my-6">
+          <BackpropVisualization />
+        </div>
       </ArticleSection>
 
       {/* The Update */}
@@ -2457,7 +2695,9 @@ function TrainingContent() {
           From Stardust to Silicon
         </TOCHeading>
         <Prose>
-          <p>We started with a question: how do we make sand think?</p>
+          <p id="stardust-conclusion">
+            We started with a question: how do we make sand think?
+          </p>
           <p>
             The answer, it turns out, is to copy the process that made{' '}
             <em>us</em> think. Build a system that makes predictions. Compare
@@ -2509,26 +2749,637 @@ function TrainingContent() {
 function ArchitecturesContent() {
   return (
     <>
+      {/* ========== SECTION 1: THE SEQUENCE PROBLEM ========== */}
       <ArticleSection>
-        <div className="py-20 text-center">
-          <div className="text-6xl mb-6">🏗️</div>
-          <h2 className="text-2xl font-bold text-neutral-800 mb-4">
-            Coming Soon
-          </h2>
-          <Prose>
-            <p className="text-neutral-600">
-              This section will cover the evolution of neural network
-              architectures: from simple feedforward networks to RNNs, LSTMs,
-              and the transformer architecture that powers modern language
-              models.
-            </p>
-          </Prose>
+        <TOCHeading id="the-sequence-problem" level={2}>
+          The Sequence Problem
+        </TOCHeading>
+        <Prose>
+          <p id="sequence-intro">
+            The networks we&apos;ve built so far have a fundamental limitation:
+            they process inputs as isolated snapshots. Feed in &quot;The cat sat
+            on the mat&quot; and each word is processed independently, with no
+            notion that &quot;cat&quot; comes before &quot;sat&quot;.
+          </p>
+          <p>
+            But language is inherently sequential. The meaning of &quot;bank&quot;
+            depends on whether we&apos;re talking about rivers or money. The word
+            &quot;it&quot; refers back to something mentioned earlier. To truly
+            understand language, we need networks that remember.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Aside title="Michael Jordan (1986)">
+          <p>
+            The idea of recurrence in neural networks dates back to Michael
+            Jordan&apos;s &quot;Serial Order: A Parallel Distributed Processing
+            Approach&quot; which introduced networks that could process sequences
+            by feeding outputs back as inputs.
+          </p>
+        </Aside>
+        <Prose>
+          <p>
+            Think about how you read this sentence. You don&apos;t process each
+            word in isolation. You carry forward context: who the subject is,
+            what action is happening, what might come next. Your brain maintains
+            a running &quot;state&quot; that updates with each word.
+          </p>
+          <p>
+            Can we give neural networks the same ability?
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      {/* ========== SECTION 2: SIMPLE RECURRENCE ========== */}
+      <ArticleSection>
+        <TOCHeading id="simple-recurrence" level={2}>
+          Simple Recurrence
+        </TOCHeading>
+        <Prose>
+          <p id="simplest-rnn">
+            The simplest solution is beautifully elegant: give the network a
+            &quot;hidden state&quot; that persists across time steps. At each step,
+            the network takes two inputs: the current word AND its previous hidden
+            state.
+          </p>
+        </Prose>
+        <FormulaBox label="The RNN Equation">
+          {'h_t = \\tanh(W_{xh} \\cdot x_t + W_{hh} \\cdot h_{t-1} + b)'}
+        </FormulaBox>
+        <Prose>
+          <p>
+            That&apos;s it. The hidden state <Math>{'h_t'}</Math> is computed from
+            the current input <Math>{'x_t'}</Math> plus the previous hidden state{' '}
+            <Math>{'h_{t-1}'}</Math>. The tanh squashes everything to [-1, 1] to
+            keep values bounded.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Aside title="Jeffrey Elman (1990)">
+          <p>
+            Jeffrey Elman&apos;s paper &quot;Finding Structure in Time&quot;
+            introduced the simple recurrent network (now called the Elman
+            network) and showed it could learn grammatical structure from raw
+            text. This was foundational work for modern NLP.
+          </p>
+        </Aside>
+        <Prose>
+          <p id="weight-sharing">
+            The crucial insight is <strong>weight sharing</strong>. The same
+            weight matrices <Math>{'W_{xh}'}</Math> and <Math>{'W_{hh}'}</Math>{' '}
+            are used at every time step. The network learns one set of weights
+            that works for all positions in the sequence.
+          </p>
+          <p>
+            This is powerful: whether we&apos;re at position 1 or position 1000,
+            we use the same transformation. The network learns a general
+            &quot;how to update my state given new input&quot; rule rather than
+            position-specific rules.
+          </p>
+        </Prose>
+        <InsightBox title="Why Weight Sharing Matters">
+          <p className="mb-2">
+            Weight sharing gives RNNs two superpowers:
+          </p>
+          <UnorderedList>
+            <li>
+              <strong>Efficiency:</strong> The number of parameters doesn&apos;t
+              grow with sequence length
+            </li>
+            <li>
+              <strong>Generalization:</strong> Patterns learned at one position
+              transfer to all positions
+            </li>
+          </UnorderedList>
+        </InsightBox>
+        <Prose>
+          <p>
+            Try it yourself. The interactive below lets you step through how an
+            RNN processes a sequence character by character, updating its hidden
+            state at each step.
+          </p>
+        </Prose>
+        <div className="my-8 p-6 bg-neutral-50 rounded-lg">
+          <SimpleRNNInteractive />
         </div>
       </ArticleSection>
 
+      {/* ========== SECTION 3: PREDICTIONS AT EVERY STEP ========== */}
+      <ArticleSection>
+        <TOCHeading id="predictions-every-step" level={2}>
+          Predictions at Every Step
+        </TOCHeading>
+        <Prose>
+          <p id="language-modeling">
+            Here&apos;s a clever trick: instead of waiting until the end of a
+            sequence to make a prediction, we can predict at every time step.
+            Given &quot;The cat sat&quot;, predict the next word after
+            &quot;The&quot;, then after &quot;The cat&quot;, then after
+            &quot;The cat sat&quot;.
+          </p>
+          <p id="more-signal-per-batch">
+            This is called <strong>language modeling</strong>, and it&apos;s
+            incredibly data-efficient. From one sentence of N words, we get N-1
+            training examples. The network learns to predict what comes next at
+            every position.
+          </p>
+        </Prose>
+        <InsightBox title="Self-Supervised Learning">
+          <p>
+            Language modeling is &quot;self-supervised&quot; because the labels
+            come from the data itself. No human annotation needed. Just take any
+            text and use word t+1 as the label for position t. This is how
+            models like GPT are trained on trillions of tokens.
+          </p>
+        </InsightBox>
+      </ArticleSection>
+
+      {/* ========== SECTION 4: UNROLLING THE NETWORK ========== */}
+      <ArticleSection>
+        <TOCHeading id="unrolling" level={2}>
+          Unrolling the Network
+        </TOCHeading>
+        <Prose>
+          <p id="unrolled-view">
+            To understand how RNNs really work, it helps to &quot;unroll&quot;
+            them across time. The compact diagram with a self-loop becomes a
+            chain of identical cells, one for each time step.
+          </p>
+          <p id="sequence-length-flexibility">
+            When unrolled, we see that an RNN is really a very deep feedforward
+            network where the depth equals the sequence length. Process 100
+            tokens? That&apos;s 100 layers deep. The same weights are used at
+            each layer.
+          </p>
+        </Prose>
+        <InsightBox title="Depth Without Parameters">
+          <p>
+            An unrolled RNN processing 1000 tokens is 1000 layers deep, but only
+            has as many parameters as a single layer. This is both a strength
+            (efficiency) and a weakness (we&apos;ll see why soon).
+          </p>
+        </InsightBox>
+      </ArticleSection>
+
+      {/* ========== SECTION 5: BACKPROPAGATION THROUGH TIME ========== */}
+      <ArticleSection>
+        <TOCHeading id="bptt" level={2}>
+          Backpropagation Through Time
+        </TOCHeading>
+        <Aside title="Ilya Sutskever (2011)">
+          <p>
+            &quot;Generating Text with Recurrent Neural Networks&quot; by Ilya
+            Sutskever and Geoffrey Hinton showed that RNNs could generate
+            surprisingly coherent text character by character. This work
+            foreshadowed the text generation capabilities we see in modern LLMs.
+          </p>
+        </Aside>
+        <Prose>
+          <p id="full-bptt">
+            How do we train an unrolled network? The same way we train any
+            network: backpropagation. But now gradients must flow backward
+            through time. At each timestep, we compute a loss, and gradients
+            propagate all the way back to the first hidden state.
+          </p>
+        </Prose>
+        <FormulaBox label="BPTT Gradient">
+          {
+            '\\frac{\\partial L}{\\partial W} = \\sum_{t=1}^{T} \\frac{\\partial L_t}{\\partial W} = \\sum_{t} \\frac{\\partial L_t}{\\partial h_t} \\prod_{k=1}^{t} \\frac{\\partial h_k}{\\partial h_{k-1}}'
+          }
+        </FormulaBox>
+        <Prose>
+          <p>
+            This is called <strong>Backpropagation Through Time</strong> (BPTT).
+            The key insight is that product of partial derivatives. Each step
+            back multiplies another term.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Prose>
+          <p id="tbptt">
+            Full BPTT is memory-intensive: we must store all hidden states to
+            compute gradients. For long sequences, this becomes prohibitive.
+          </p>
+          <p>
+            The practical solution is <strong>Truncated BPTT</strong>: instead
+            of backpropagating through the entire sequence, we only go back k
+            steps. This trades some long-range gradient flow for tractable
+            memory usage.
+          </p>
+        </Prose>
+        <InsightBox title="Prof. Tom Yeh's Spreadsheet">
+          <p className="mb-2">
+            If you want to visualize and go step by step, a spreadsheet is a
+            great way to learn BPTT. Check out{' '}
+            <a
+              href="https://x.com/ProfTomYeh/status/1990110954043113760"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              Prof. Tom Yeh&apos;s visualization
+            </a>{' '}
+            for an interactive walkthrough.
+          </p>
+        </InsightBox>
+      </ArticleSection>
+
+      {/* ========== SECTION 6: RNN PROBLEMS ========== */}
+      <ArticleSection>
+        <TOCHeading id="rnn-problems" level={2}>
+          The Problem with RNNs
+        </TOCHeading>
+        <Prose>
+          <p id="vanishing-gradients">
+            Here&apos;s where that product of partial derivatives becomes a
+            problem. Each <Math>{'\\partial h_k / \\partial h_{k-1}'}</Math> is
+            typically less than 1. Multiply many numbers less than 1 together
+            and you get... something very close to zero.
+          </p>
+          <p>
+            This is the <strong>vanishing gradient problem</strong>. By the time
+            gradients reach the early timesteps, they&apos;ve shrunk to nearly
+            nothing. The network can&apos;t learn long-range dependencies
+            because the gradient signal disappears.
+          </p>
+        </Prose>
+        <FormulaBox label="Exponential Decay">
+          {'\\prod_{k=1}^{100} 0.9 = 0.9^{100} \\approx 0.00003'}
+        </FormulaBox>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Aside title="Sentiment Neuron (2017)">
+          <p>
+            OpenAI&apos;s &quot;Learning to Generate Reviews and Discovering
+            Sentiment&quot; found that training an LSTM on Amazon reviews
+            produced a single neuron that tracked sentiment. This emergent
+            feature showed that even simple architectures could learn
+            surprisingly rich representations.
+          </p>
+        </Aside>
+        <Prose>
+          <p id="exploding-gradients">
+            The opposite problem also exists: <strong>exploding gradients</strong>.
+            If the partial derivatives are greater than 1, the product grows
+            exponentially. Gradients become enormous, weights update wildly, and
+            training crashes with NaN values.
+          </p>
+          <p>
+            The solution to exploding gradients is simple:{' '}
+            <strong>gradient clipping</strong>. If the gradient norm exceeds a
+            threshold, we scale it down. This prevents catastrophic updates
+            while preserving gradient direction.
+          </p>
+        </Prose>
+        <InsightBox title="Gradient Clipping">
+          <p>
+            <code className="bg-neutral-100 px-1 rounded">
+              if ||g|| &gt; max_norm: g = g × (max_norm / ||g||)
+            </code>
+          </p>
+          <p className="mt-2 text-sm text-neutral-600">
+            This is standard practice in RNN training. PyTorch provides{' '}
+            <code className="bg-neutral-100 px-0.5 rounded">
+              torch.nn.utils.clip_grad_norm_()
+            </code>
+          </p>
+        </InsightBox>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Prose>
+          <p id="long-term-context-demo">
+            What does this mean in practice? Imagine processing a long document.
+            Information from the first paragraph must travel through hundreds of
+            timesteps to influence predictions near the end. With vanishing
+            gradients, this information fades away.
+          </p>
+        </Prose>
+        <div className="my-8 p-6 bg-neutral-50 rounded-lg">
+          <GradientFlowInteractive />
+        </div>
+        <Prose>
+          <p>
+            The interactive above shows how information degrades in an RNN vs
+            LSTM as sequence length increases. Slide the sequence length to see
+            how quickly RNNs lose context.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      {/* ========== SECTION 7: REGULARIZATION REVISITED ========== */}
+      <ArticleSection>
+        <TOCHeading id="regularization-rnn" level={2}>
+          Regularization Revisited
+        </TOCHeading>
+        <Prose>
+          <p id="weight-decay-rnn">
+            Remember weight decay and dropout from the Training tab? They apply
+            here too. Weight decay prevents weights from growing too large,
+            which helps with both exploding gradients and overfitting.
+          </p>
+          <p id="dropout-rnn">
+            But standard dropout has a problem in RNNs: applying different
+            dropout masks at each timestep destroys the temporal structure.
+            The hidden state becomes noisy garbage.
+          </p>
+        </Prose>
+        <InsightBox title="Variational Dropout">
+          <p className="mb-2">
+            The solution is <strong>variational dropout</strong>: use the{' '}
+            <em>same</em> dropout mask across all timesteps. This preserves
+            temporal coherence while still regularizing.
+          </p>
+          <p className="text-sm text-neutral-600">
+            We drop the same neurons at t=1, t=2, t=3... rather than randomly
+            choosing different neurons each time.
+          </p>
+        </InsightBox>
+        <Prose>
+          <p>
+            These techniques help, but they don&apos;t solve the fundamental
+            problem: vanishing gradients still prevent learning long-range
+            dependencies. We need a better architecture.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      {/* ========== SECTION 8: BUILDING THE LSTM ========== */}
+      <ArticleSection>
+        <TOCHeading id="building-lstm" level={2}>
+          Building the LSTM
+        </TOCHeading>
+        <Aside title="LSTM Paper (1997)">
+          <p>
+            Hochreiter and Schmidhuber introduced the LSTM in &quot;Long
+            Short-Term Memory.&quot; The key insight was adding a{' '}
+            <em>cell state</em> that allows information to flow unchanged across
+            many timesteps, solving the vanishing gradient problem.
+          </p>
+        </Aside>
+        <Prose>
+          <p id="the-cell-state">
+            The LSTM&apos;s key innovation is the <strong>cell state</strong>: a
+            separate pathway that runs through the entire sequence. Think of it
+            as a conveyor belt. Information can flow along it unchanged, or be
+            modified at specific points.
+          </p>
+          <p>
+            This solves vanishing gradients because gradients can flow directly
+            through the cell state without being repeatedly multiplied by small
+            numbers.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Prose>
+          <p id="forget-gate">
+            But we need control. The <strong>forget gate</strong> decides what
+            information to throw away. It looks at the previous hidden state and
+            current input, then outputs a number between 0 and 1 for each
+            position in the cell state. 0 means &quot;forget this completely,&quot;
+            1 means &quot;keep this entirely.&quot;
+          </p>
+        </Prose>
+        <FormulaBox label="Forget Gate">
+          {'f_t = \\sigma(W_f \\cdot [h_{t-1}, x_t] + b_f)'}
+        </FormulaBox>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Aside title="Seq2Seq (2014)">
+          <p>
+            Sutskever, Vinyals, and Le&apos;s &quot;Sequence to Sequence Learning
+            with Neural Networks&quot; showed that encoder-decoder LSTMs could
+            translate entire sentences. This architecture became the foundation
+            for neural machine translation.
+          </p>
+        </Aside>
+        <Prose>
+          <p id="input-gate">
+            The <strong>input gate</strong> decides what new information to add.
+            It has two parts: a sigmoid that decides which values to update, and
+            a tanh that creates candidate values. The two are multiplied
+            together.
+          </p>
+        </Prose>
+        <FormulaBox label="Input Gate">
+          {'i_t = \\sigma(W_i \\cdot [h_{t-1}, x_t] + b_i)'}
+        </FormulaBox>
+        <FormulaBox label="Candidate Values">
+          {'\\tilde{C}_t = \\tanh(W_C \\cdot [h_{t-1}, x_t] + b_C)'}
+        </FormulaBox>
+        <Prose>
+          <p>
+            The cell state is then updated: forget some old information, add
+            some new information.
+          </p>
+        </Prose>
+        <FormulaBox label="Cell State Update">
+          {'C_t = f_t \\odot C_{t-1} + i_t \\odot \\tilde{C}_t'}
+        </FormulaBox>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Prose>
+          <p id="output-gate">
+            Finally, the <strong>output gate</strong> decides what to output
+            based on the cell state. It filters the cell state through a tanh
+            (to bound values to [-1, 1]) and multiplies by a sigmoid to control
+            what gets exposed.
+          </p>
+        </Prose>
+        <FormulaBox label="Output Gate">
+          {'o_t = \\sigma(W_o \\cdot [h_{t-1}, x_t] + b_o)'}
+        </FormulaBox>
+        <FormulaBox label="Hidden State">
+          {'h_t = o_t \\odot \\tanh(C_t)'}
+        </FormulaBox>
+        <Prose>
+          <p id="lstm-complete">
+            And that&apos;s the complete LSTM! Three gates (forget, input,
+            output) controlling the flow of information through a cell state
+            that acts as long-term memory.
+          </p>
+        </Prose>
+        <InsightBox title="Why This Works">
+          <p>
+            The cell state <Math>{'C_t'}</Math> can remain almost unchanged for
+            many timesteps if the forget gate stays near 1 and the input gate
+            stays near 0. Gradients flow through this pathway without vanishing.
+          </p>
+        </InsightBox>
+        <Prose>
+          <p>
+            Experiment with the LSTM below. Toggle each gate on and off to see
+            how they affect the cell state and output. Notice how the forget
+            gate controls memory retention and the input gate controls new
+            information.
+          </p>
+        </Prose>
+        <div className="my-8 p-6 bg-neutral-50 rounded-lg">
+          <LSTMBuildupInteractive />
+        </div>
+      </ArticleSection>
+
+      {/* ========== SECTION 9: ACTIVATION FUNCTIONS ========== */}
+      <ArticleSection>
+        <TOCHeading id="activation-functions" level={2}>
+          A Note on Activation Functions
+        </TOCHeading>
+        <Prose>
+          <p>
+            You might wonder why LSTMs use different activation functions in
+            different places. It&apos;s not arbitrary.
+          </p>
+          <p>
+            <strong>Sigmoid</strong> outputs values in [0, 1]. This is perfect
+            for gates: 0 means &quot;block everything,&quot; 1 means &quot;let
+            everything through.&quot; It acts as a soft switch.
+          </p>
+          <p>
+            <strong>Tanh</strong> outputs values in [-1, 1]. This is used for
+            the candidate values and output because cell states can be positive
+            or negative. It&apos;s also zero-centered, which helps with
+            optimization.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      {/* ========== SECTION 10: LSTM OPTIMIZATIONS ========== */}
+      <ArticleSection>
+        <TOCHeading id="lstm-optimizations" level={2}>
+          Making LSTMs Better
+        </TOCHeading>
+        <Aside title="ULMFiT (2018)">
+          <p>
+            Howard and Ruder&apos;s &quot;Universal Language Model Fine-tuning
+            for Text Classification&quot; showed that pretraining an LSTM on
+            large text corpora and then fine-tuning on specific tasks worked
+            remarkably well. This &quot;pretrain then fine-tune&quot; paradigm
+            became central to modern NLP.
+          </p>
+        </Aside>
+        <Prose>
+          <p id="he-initialization">
+            Several techniques make LSTMs train better. <strong>He
+            initialization</strong> sets initial weights so activations don&apos;t
+            explode or vanish in early training.
+          </p>
+          <p id="temporal-activation-regularization">
+            <strong>Temporal Activation Regularization (TAR)</strong> penalizes
+            large changes in hidden states between timesteps. This encourages
+            smooth, stable dynamics.
+          </p>
+          <p id="awd-lstm">
+            The <strong>AWD-LSTM</strong> combines many tricks: weight dropout
+            (dropping weights rather than activations), embedding dropout,
+            weight tying (sharing embedding and output weights), and more.
+          </p>
+        </Prose>
+        <InsightBox title="Try It Yourself">
+          <p>
+            Hugging Face provides pretrained AWD-LSTM models. Check out{' '}
+            <code className="bg-neutral-100 px-1 rounded">
+              salesforce/awd-lstm-lm
+            </code>{' '}
+            for a state-of-the-art language model you can experiment with.
+          </p>
+        </InsightBox>
+      </ArticleSection>
+
+      {/* ========== SECTION 11: PROBLEMS REMAINING ========== */}
+      <ArticleSection>
+        <TOCHeading id="problems-remaining" level={2}>
+          What&apos;s Still Missing
+        </TOCHeading>
+        <Aside title="Augmented RNNs">
+          <p>
+            For visualizations of attention mechanisms and other RNN
+            enhancements, see{' '}
+            <a
+              href="https://distill.pub/2016/augmented-rnns/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              Distill&apos;s &quot;Attention and Augmented Recurrent Neural
+              Networks&quot;
+            </a>
+          </p>
+        </Aside>
+        <Prose>
+          <p id="sequential-processing">
+            LSTMs solved vanishing gradients, but they still have fundamental
+            limitations. <strong>Sequential processing</strong> means we
+            can&apos;t parallelize across timesteps. Processing a 1000-token
+            sequence requires 1000 sequential steps.
+          </p>
+          <p id="fixed-context-window">
+            And while cell states help with long-range dependencies, there&apos;s
+            still a practical limit. Very long documents remain challenging
+            because information must flow through many gates.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      {/* ========== SECTION 12: TEASER ========== */}
+      <ArticleSection>
+        <TOCHeading id="whats-next" level={2}>
+          What Comes Next
+        </TOCHeading>
+        <Prose>
+          <p>
+            We&apos;ve built RNNs from first principles, understood why they
+            struggle, and engineered LSTMs to fix the most critical problems.
+            These architectures dominated NLP for years. They powered sentiment
+            analysis, machine translation, speech recognition.
+          </p>
+          <p>
+            But they have fundamental limitations. Processing must be
+            sequential. Context windows are still limited. Very long documents
+            remain challenging.
+          </p>
+        </Prose>
+        <QuoteBox>
+          <p className="italic">
+            &quot;The next paradigm didn&apos;t come breaking down the door. It
+            came as a seemingly boring paper from a small team, with a
+            deliberately understated title:{' '}
+            <strong>&apos;Attention Is All You Need.&apos;</strong>&quot;
+          </p>
+        </QuoteBox>
+        <Prose>
+          <p>
+            That paper would obsolete everything we just learned. Not because
+            RNNs were wrong, but because attention found a better way.
+          </p>
+        </Prose>
+        <MutedText>
+          For a comprehensive history of deep learning, see{' '}
+          <a
+            href="https://people.idsia.ch/~juergen/deep-learning-history.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            J&uuml;rgen Schmidhuber&apos;s timeline
+          </a>
+          .
+        </MutedText>
+      </ArticleSection>
+
       {/* Tab switch button */}
-      <div className="mt-10 flex justify-center">
-        <TabSwitchButton targetTab="foundations" label="Back to Foundations" />
+      <div className="mt-16 flex justify-center">
+        <TabSwitchButton targetTab="training" label="Back to Training" />
       </div>
     </>
   );

@@ -99,6 +99,23 @@ Link Jupyter notebook cells to article sections automatically:
 </TabsProvider>
 ```
 
+Tabs automatically sync with URL query params (`?tab=a`), so refreshing maintains the current tab.
+
+**Organizing Large Tab Content:**
+
+For articles with substantial tab content, split into separate component files:
+
+```tsx
+// app/my-article/page.tsx
+import { FoundationsContent } from './FoundationsContent';
+import { TrainingContent } from './TrainingContent';
+
+<TabsProvider tabs={TABS}>
+  <TabContent tabId="foundations"><FoundationsContent /></TabContent>
+  <TabContent tabId="training"><TrainingContent /></TabContent>
+</TabsProvider>
+```
+
 ### Scroll Animations
 ```tsx
 <ArticleLayout
@@ -107,7 +124,7 @@ Link Jupyter notebook cells to article sections automatically:
       scrollProgress={scrollProgress}
       animations={[
         { render: (p) => <IntroAnim progress={p} />, startElementId: 'intro' },
-        { render: (p) => <SummaryAnim progress={p} />, startElementId: 'summary' },
+        { render: (p) => <SummaryAnim progress={p} />, startElementId: 'summary', mobileInline: true },
       ]}
     />
   )}
@@ -118,6 +135,10 @@ Link Jupyter notebook cells to article sections automatically:
 ```
 
 Use `startElementId` to sync animations with article sections precisely.
+
+**Key behaviors:**
+- **Early finish**: Animations reach 100% at 90% of their scroll range for smoother transitions
+- **Mobile inline**: Set `mobileInline: true` to render animations at 100% inline below their start element on mobile (where sticky panel is hidden)
 
 ### Interactive Python
 ```tsx

@@ -17,4 +17,16 @@ export { CrossEntropyInteractive } from './CrossEntropyInteractive';
 export { MatrixMathAnimation } from './MatrixMathAnimation';
 export { OverfittingAnimation } from './OverfittingAnimation';
 export { HyperparametersAnimation } from './HyperparametersAnimation';
+export { SimpleRecurrenceAnimation } from './SimpleRecurrenceAnimation';
+export { UnrolledRNNAnimation } from './UnrolledRNNAnimation';
+export { BPTTAnimation } from './BPTTAnimation';
+export { VanishingGradientAnimation } from './VanishingGradientAnimation';
+export { LSTMProgressiveAnimation } from './LSTMProgressiveAnimation';
+export { LSTMBuildupInteractive } from './LSTMBuildupInteractive';
+export { ActivationFunctionsAnimation } from './ActivationFunctionsAnimation';
+export { SimpleRNNInteractive } from './SimpleRNNInteractive';
+export { GradientFlowInteractive } from './GradientFlowInteractive';
+export { ContextLossAnimation } from './ContextLossAnimation';
+export { ChainRuleInteractive, BackpropVisualization } from './ChainRuleInteractive';
+export { StardustToSiliconAnimation } from './StardustToSiliconAnimation';
 

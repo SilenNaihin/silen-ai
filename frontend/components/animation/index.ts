@@ -1,4 +1,9 @@
 export { useScrollProgress } from './useScrollProgress';
 export { AnimationCanvas } from './AnimationCanvas';
-export { AnimationSequence } from './AnimationSequence';
-export type { AnimationConfig } from './AnimationSequence';
+export {
+  AnimationSequence,
+  AnimationsProvider,
+  MobileInlineAnimation,
+  useAnimations,
+} from './AnimationSequence';
+export type { AnimationConfig, AnimationMilestone } from './AnimationSequence';

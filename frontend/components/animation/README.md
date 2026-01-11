@@ -118,6 +118,7 @@ A powerful orchestrator that manages multiple animations in sequence with elemen
   startElementId?: string;       // Element ID that triggers animation start
   duration?: number | string;    // Fallback: weight, '500px', or '30%'
   overlap?: number;              // 0-1, overlap with next animation
+  mobileInline?: boolean;        // Render at 100% inline on mobile (default: false)
 }
 ```
 
@@ -141,8 +142,37 @@ A powerful orchestrator that manages multiple animations in sequence with elemen
 - **Automatic distribution**: Calculates scroll ranges automatically
 - **Smooth transitions**: Configurable overlap between animations
 - **Normalized progress**: Each animation receives 0-1 progress
+- **Early finish**: Animations reach 100% at 90% of their scroll range (smoother transitions)
+- **Mobile inline**: Option to render animations at 100% below their start element on mobile
 - **First animation**: Visible from start (no fade-in)
 - **Last animation**: Stays visible at end (no fade-out)
+
+**Early Finish Behavior:**
+
+Animations complete slightly before their scroll range ends (at 90% by default). This ensures the animation is fully complete before it starts fading out to the next animation, creating smoother transitions.
+
+You can customize this ratio:
+```tsx
+<AnimationSequence
+  scrollProgress={scrollProgress}
+  earlyFinishRatio={0.85}  // Complete at 85% instead of 90%
+  animations={[...]}
+/>
+```
+
+**Mobile Inline Mode:**
+
+On mobile viewports (< 1024px), the sticky animation panel is hidden. Use `mobileInline: true` to render an animation at 100% progress inline (below its `startElementId` element):
+
+```tsx
+{
+  render: (p) => <DiagramAnimation progress={p} />,
+  startElementId: 'diagram-section',
+  mobileInline: true,  // Shows completed animation inline on mobile
+}
+```
+
+This is useful for animations that serve as static diagrams - on desktop they animate as you scroll, on mobile they appear as completed visuals.
 
 ## Creating Scroll-Synced Animations
 

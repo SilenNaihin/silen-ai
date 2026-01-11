@@ -7,6 +7,8 @@ interface ArticleLayoutProps {
   children: ReactNode;
   leftContent?: (progress: number) => ReactNode;
   className?: string;
+  /** Hide the mobile animation disclaimer. Default: false */
+  hideMobileDisclaimer?: boolean;
 }
 
 /**
@@ -17,6 +19,7 @@ export function ArticleLayout({
   children,
   leftContent,
   className = '',
+  hideMobileDisclaimer = false,
 }: ArticleLayoutProps) {
   const articleRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useScrollProgress(articleRef);
@@ -41,6 +44,12 @@ export function ArticleLayout({
 
         {/* Main content - always centered, animation is fixed overlay */}
         <div className="py-16 relative z-10 max-w-3xl mx-auto px-4">
+          {/* Mobile disclaimer about animations */}
+          {leftContent && !hideMobileDisclaimer && (
+            <div className="xl:hidden mb-6 text-xs text-neutral-400 text-center">
+              Scroll-synced animations are best viewed on desktop
+            </div>
+          )}
           {children}
         </div>
       </div>
