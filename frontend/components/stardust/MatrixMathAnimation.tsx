@@ -597,27 +597,35 @@ function drawLossComputation(
   width: number,
   height: number
 ) {
-  // Prediction vs Target
-  const predX = centerX - 80;
-  const targetX = centerX + 70;
-  const barY = centerY - 10;
-  const barWidth = 50;
-  const barMaxHeight = 100;
+  const barWidth = 45;
+  const barMaxHeight = 90;
+  const barGap = 10;
+  const groupGap = 50;
 
-  // Prediction bars
+  // Calculate total width to center everything
+  const predGroupWidth = 2 * barWidth + barGap;
+  const targetGroupWidth = 2 * barWidth + barGap;
+  const totalWidth = predGroupWidth + groupGap + targetGroupWidth;
+  const startX = centerX - totalWidth / 2;
+
+  const predX = startX;
+  const targetX = startX + predGroupWidth + groupGap;
+  const barY = centerY + 20;
+
   const predValues = [0.7, 0.3];
   const targetValues = [1.0, 0.0];
   const classes = ['pos', 'neg'];
 
+  // Labels
   ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-  ctx.fillText('Prediction', predX + barWidth / 2 + 5, barY - barMaxHeight - 25);
-  ctx.fillText('Target', targetX + barWidth / 2 + 5, barY - barMaxHeight - 25);
+  ctx.fillText('Prediction', predX + predGroupWidth / 2, barY - barMaxHeight - 20);
+  ctx.fillText('Target', targetX + targetGroupWidth / 2, barY - barMaxHeight - 20);
 
   classes.forEach((cls, i) => {
-    const pX = predX + i * (barWidth + 12);
-    const tX = targetX + i * (barWidth + 12);
+    const pX = predX + i * (barWidth + barGap);
+    const tX = targetX + i * (barWidth + barGap);
     const predHeight = predValues[i] * barMaxHeight * Math.min(1, progress * 2);
     const targetHeight = targetValues[i] * barMaxHeight * Math.min(1, progress * 2);
 
@@ -634,19 +642,19 @@ function drawLossComputation(
     ctx.strokeStyle = 'rgba(40, 120, 60, 1)';
     ctx.strokeRect(tX, barY - targetHeight, barWidth, targetHeight);
 
-    // Labels
-    ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
+    // Class labels
+    ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.fillText(cls, pX + barWidth / 2, barY + 20);
-    ctx.fillText(cls, tX + barWidth / 2, barY + 20);
+    ctx.fillText(cls, pX + barWidth / 2, barY + 15);
+    ctx.fillText(cls, tX + barWidth / 2, barY + 15);
 
     // Values
     if (progress > 0.3) {
-      ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
+      ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(60, 100, 180, 1)';
-      ctx.fillText(predValues[i].toFixed(1), pX + barWidth / 2, barY - predHeight - 8);
+      ctx.fillText(predValues[i].toFixed(1), pX + barWidth / 2, barY - predHeight - 6);
       ctx.fillStyle = 'rgba(40, 120, 60, 1)';
-      ctx.fillText(targetValues[i].toFixed(1), tX + barWidth / 2, barY - targetHeight - 8);
+      ctx.fillText(targetValues[i].toFixed(1), tX + barWidth / 2, barY - targetHeight - 6);
     }
   });
 
@@ -657,15 +665,15 @@ function drawLossComputation(
 
     ctx.font = '14px system-ui, -apple-system, sans-serif';
     ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.9})`;
-    ctx.fillText('L = -log(p_true)', centerX, barY + 50);
+    ctx.fillText('L = -log(p_true)', centerX, barY + 40);
 
     ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
     ctx.fillStyle = `rgba(180, 50, 50, ${alpha})`;
-    ctx.fillText(`= ${loss.toFixed(2)}`, centerX, barY + 80);
+    ctx.fillText(`= ${loss.toFixed(2)}`, centerX, barY + 65);
   }
 }
 
-// Phase 6: Backpropagation
+// Phase 6: Backpropagation - Wheel/Gear Chain Rule Visualization
 function drawBackpropFlow(
   ctx: CanvasRenderingContext2D,
   centerX: number,
@@ -674,108 +682,123 @@ function drawBackpropFlow(
   width: number,
   height: number
 ) {
-  // Simplified network showing gradient flow
-  const nodes = [
-    { label: 'L', x: centerX + 120, y: centerY },
-    { label: 'p', x: centerX + 55, y: centerY },
-    { label: 'z', x: centerX - 10, y: centerY },
-    { label: 'h', x: centerX - 75, y: centerY },
-    { label: 'W₁', x: centerX - 140, y: centerY },
+  // Three connected wheels showing chain rule
+  // x-wheel drives u-wheel drives y-wheel
+  // du/dx and dy/du are the "gear ratios"
+
+  const wheelSpacing = 100;
+  const wheels = [
+    { label: 'x', radius: 40, x: centerX - wheelSpacing, color: '#3b82f6', derivative: 'dx' },
+    { label: 'u', radius: 30, x: centerX, color: '#22c55e', derivative: 'du' },
+    { label: 'y', radius: 25, x: centerX + wheelSpacing * 0.85, color: '#f59e0b', derivative: 'dy' },
   ];
 
-  const nodeRadius = 24;
+  const wheelY = centerY - 10;
+  const baseRotation = progress * Math.PI * 4; // Rotate with progress
 
-  // Draw gradient flow (right to left)
-  const flowProgress = progress * (nodes.length - 1);
+  // Gear ratios (derivatives)
+  const du_dx = 2; // u changes 2x as fast as x
+  const dy_du = 0.5; // y changes 0.5x as fast as u
 
-  for (let i = 0; i < nodes.length - 1; i++) {
-    const from = nodes[i];
-    const to = nodes[i + 1];
-    const isActive = i < flowProgress;
-    const isFlowing = i >= flowProgress - 1 && i < flowProgress;
+  // Draw connecting "belts" between wheels
+  if (progress > 0.2) {
+    const beltAlpha = Math.min(1, (progress - 0.2) * 3);
 
-    // Connection line
-    ctx.strokeStyle = isActive
-      ? 'rgba(180, 60, 50, 0.8)'
-      : 'rgba(0, 0, 0, 0.2)';
-    ctx.lineWidth = isActive ? 3 : 1.5;
-
+    // Belt from x to u
+    ctx.strokeStyle = `rgba(0, 0, 0, ${beltAlpha * 0.3})`;
+    ctx.lineWidth = 3;
+    ctx.setLineDash([5, 3]);
     ctx.beginPath();
-    ctx.moveTo(from.x - nodeRadius, from.y);
-    ctx.lineTo(to.x + nodeRadius, to.y);
+    ctx.moveTo(wheels[0].x + wheels[0].radius, wheelY);
+    ctx.lineTo(wheels[1].x - wheels[1].radius, wheelY);
     ctx.stroke();
 
-    // Flowing pulse
-    if (isFlowing) {
-      const pulsePos = flowProgress - i;
-      const pulseX = from.x - nodeRadius + (to.x + nodeRadius - (from.x - nodeRadius)) * pulsePos;
-
-      ctx.fillStyle = 'rgba(180, 60, 50, 1)';
-      ctx.beginPath();
-      ctx.arc(pulseX, from.y, 6, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Arrow
-    if (isActive) {
-      const arrowX = to.x + nodeRadius + 6;
-      ctx.fillStyle = 'rgba(180, 60, 50, 0.8)';
-      ctx.beginPath();
-      ctx.moveTo(arrowX, to.y);
-      ctx.lineTo(arrowX + 10, to.y - 6);
-      ctx.lineTo(arrowX + 10, to.y + 6);
-      ctx.closePath();
-      ctx.fill();
-    }
+    // Belt from u to y
+    ctx.beginPath();
+    ctx.moveTo(wheels[1].x + wheels[1].radius, wheelY);
+    ctx.lineTo(wheels[2].x - wheels[2].radius, wheelY);
+    ctx.stroke();
+    ctx.setLineDash([]);
   }
 
-  // Draw nodes
-  nodes.forEach((node, i) => {
-    const isActive = nodes.length - 1 - i < flowProgress;
+  // Draw wheels
+  wheels.forEach((wheel, i) => {
+    const rotation = i === 0
+      ? baseRotation
+      : i === 1
+        ? baseRotation * du_dx
+        : baseRotation * du_dx * dy_du;
 
+    // Wheel circle
     ctx.beginPath();
-    ctx.arc(node.x, node.y, nodeRadius, 0, Math.PI * 2);
+    ctx.arc(wheel.x, wheelY, wheel.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = wheel.color;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.fill();
 
-    if (isActive) {
-      ctx.fillStyle = 'rgba(180, 60, 50, 0.3)';
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(180, 60, 50, 1)';
-    } else {
-      ctx.fillStyle = 'rgba(255, 255, 255, 1)';
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
-    }
-    ctx.lineWidth = 2.5;
+    // Spoke showing rotation
+    ctx.beginPath();
+    ctx.moveTo(wheel.x, wheelY);
+    ctx.lineTo(
+      wheel.x + Math.cos(rotation) * wheel.radius * 0.85,
+      wheelY + Math.sin(rotation) * wheel.radius * 0.85
+    );
+    ctx.strokeStyle = wheel.color;
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
     ctx.stroke();
 
-    // Label
-    ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(wheel.x, wheelY, 4, 0, Math.PI * 2);
+    ctx.fillStyle = wheel.color;
+    ctx.fill();
+
+    // Wheel label
+    ctx.font = 'bold 16px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = isActive ? 'rgba(180, 60, 50, 1)' : 'rgba(0, 0, 0, 0.7)';
-    ctx.fillText(node.label, node.x, node.y);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillText(`${wheel.label}-wheel`, wheel.x, wheelY + wheel.radius + 20);
   });
 
-  // Gradient labels
-  if (progress > 0.3) {
-    const alpha = Math.min(1, (progress - 0.3) * 2);
-    ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(180, 60, 50, ${alpha})`;
+  // Draw derivative labels between wheels
+  if (progress > 0.4) {
+    const labelAlpha = Math.min(1, (progress - 0.4) * 2);
+    ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
 
-    ctx.fillText('∂L/∂p', centerX + 87, centerY - 40);
-    ctx.fillText('∂L/∂z', centerX + 22, centerY - 40);
-    ctx.fillText('∂L/∂h', centerX - 43, centerY - 40);
-    ctx.fillText('∂L/∂W₁', centerX - 108, centerY - 40);
+    // du/dx
+    const midX1 = (wheels[0].x + wheels[1].x) / 2;
+    ctx.fillStyle = `rgba(34, 197, 94, ${labelAlpha})`;
+    ctx.fillText('du/dx = 2', midX1, wheelY - 55);
+    ctx.font = '11px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(0, 0, 0, ${labelAlpha * 0.6})`;
+    ctx.fillText('u spins 2× faster', midX1, wheelY - 40);
+
+    // dy/du
+    const midX2 = (wheels[1].x + wheels[2].x) / 2;
+    ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(245, 158, 11, ${labelAlpha})`;
+    ctx.fillText('dy/du = 0.5', midX2, wheelY - 55);
+    ctx.font = '11px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(0, 0, 0, ${labelAlpha * 0.6})`;
+    ctx.fillText('y spins 0.5× as fast', midX2, wheelY - 40);
   }
 
-  // Chain rule note
+  // Chain rule result
   if (progress > 0.7) {
-    const alpha = Math.min(1, (progress - 0.7) * 3);
-    ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
+    const resultAlpha = Math.min(1, (progress - 0.7) * 3);
+
+    ctx.font = 'bold 16px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Chain rule: multiply local gradients', centerX, centerY + 65);
+    ctx.fillStyle = `rgba(180, 50, 50, ${resultAlpha})`;
+    ctx.fillText('dy/dx = du/dx × dy/du = 2 × 0.5 = 1', centerX, wheelY + 70);
+
+    ctx.font = '12px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(0, 0, 0, ${resultAlpha * 0.7})`;
+    ctx.fillText('Chain rule: multiply the gear ratios!', centerX, wheelY + 90);
   }
 }
 

@@ -65,16 +65,16 @@ export interface AnimationConfig {
   overlap?: number;
 
   /**
-   * When true, renders the animation at 100% progress inline (below the startElementId)
-   * on mobile viewports instead of in the sticky panel.
-   * This is useful for animations that should be visible as static content on mobile.
-   * Default: false
+   * Controls mobile inline rendering behavior.
+   * - true (default for animations with startElementId): renders at 100% progress inline
+   *   below the startElementId element on mobile, pushing content down
+   * - false: animation is hidden on mobile (not shown in background or inline)
+   *
+   * Animations without startElementId cannot render inline and this prop is ignored.
    */
   mobileInline?: boolean;
 }
 
-/** Default early finish ratio - animations reach 100% at this point of their scroll range */
-const EARLY_FINISH_RATIO = 0.9;
 
 /**
  * Context to share animation configurations for mobile inline rendering
@@ -229,14 +229,11 @@ export function AnimationSequence({
   scrollProgress,
   scrollableHeight,
   animations: animationsProp,
-  earlyFinishRatio = EARLY_FINISH_RATIO,
 }: {
   scrollProgress: number;
   scrollableHeight?: number;
   /** Animations config - can also be provided via AnimationsProvider context */
   animations?: AnimationConfig[];
-  /** Ratio at which animations reach 100% progress (default: 0.9 = 90%) */
-  earlyFinishRatio?: number;
 }) {
   // Get animations from context or props
   const context = useContext(AnimationContext);
@@ -348,9 +345,12 @@ export function AnimationSequence({
       return;
     }
 
-    // Create containers for each mobileInline animation
+    // Create containers for animations that should render inline on mobile
+    // Default: animations with startElementId render inline unless mobileInline is explicitly false
     animations.forEach((animation) => {
-      if (!animation.mobileInline || !animation.startElementId) return;
+      if (!animation.startElementId) return;
+      // Skip if explicitly set to false
+      if (animation.mobileInline === false) return;
 
       const elementId = animation.startElementId;
       const targetElement = document.getElementById(elementId);
@@ -386,9 +386,10 @@ export function AnimationSequence({
   }, [isMobile, animations]);
 
   // Render mobile inline animations via portals
+  // Default: animations with startElementId render inline unless mobileInline is explicitly false
   const mobileInlinePortals = mobileContainersReady && isMobile
     ? animations
-        .filter((animation) => animation.mobileInline && animation.startElementId)
+        .filter((animation) => animation.startElementId && animation.mobileInline !== false)
         .map((animation) => {
           const container = containerRefs.current.get(animation.startElementId!);
           if (!container) return null;
@@ -413,8 +414,9 @@ export function AnimationSequence({
       {mobileInlinePortals}
 
       {animations.map((animation, index) => {
-        // Skip mobile inline animations in sticky panel on mobile
-        if (isMobile && animation.mobileInline) return null;
+        // On mobile, skip animations that render inline (those with startElementId, unless mobileInline is false)
+        // They render via portals instead
+        if (isMobile && animation.startElementId && animation.mobileInline !== false) return null;
 
         const range = animationRanges[index];
         const isFirst = index === 0;
@@ -431,23 +433,20 @@ export function AnimationSequence({
         if (opacity <= 0) return null;
 
         // Calculate normalized progress within this animation's range
-        // Use milestones if available for more precise control
+        // Progress reaches 100% at fadeOut point (before the animation starts fading)
         let normalizedProgress: number;
 
         if (animation.milestones && animation.milestones.length > 0) {
-          // For milestone animations, pass earlyFinishRatio to adjust endpoint
-          // This preserves milestone progress values while completing at 90% of range
+          // For milestone animations, use fadeOut as the endpoint
           normalizedProgress = calculateProgressWithMilestones(
             scrollProgress,
             range,
             animation.milestones,
-            elementPositions,
-            earlyFinishRatio
+            elementPositions
           );
         } else {
-          // For non-milestone animations, scale output to reach 100% at 90% of range
+          // For non-milestone animations, scale to reach 100% at fadeOut
           normalizedProgress = calculateNormalizedProgress(scrollProgress, range);
-          normalizedProgress = Math.min(1, normalizedProgress / earlyFinishRatio);
         }
 
         // Render with opacity wrapper
@@ -665,41 +664,39 @@ function calculateOpacity(
 
 /**
  * Calculate normalized progress (0-1) within animation's active range.
- * Returns raw progress - early finish scaling is applied externally.
+ * Progress reaches 100% at fadeOut point, ensuring animation completes before fading.
  */
 function calculateNormalizedProgress(
   progress: number,
   range: AnimationRange
 ): number {
-  const duration = range.end - range.start;
-  const currentProgress = Math.max(
-    0,
-    Math.min(duration, progress - range.start)
-  );
-  return currentProgress / duration;
+  // Use fadeOut as the effective end - animation completes before fading starts
+  const effectiveDuration = range.fadeOut - range.start;
+  if (effectiveDuration <= 0) return 1;
+
+  const currentProgress = Math.max(0, progress - range.start);
+  return Math.min(1, currentProgress / effectiveDuration);
 }
 
 /**
  * Calculate progress using milestones for more precise control.
  * Interpolates linearly between milestone points.
- * Uses earlyFinishRatio to set the endpoint so animation completes early.
+ * Progress reaches 100% at fadeOut point, ensuring animation completes before fading.
  *
  * @example
- * If animation starts at scroll 0.2 and ends at 0.6, with milestone at 0.4 = 50%:
+ * If animation starts at scroll 0.2 and fadeOut at 0.55:
  * - At scroll 0.2: progress = 0
- * - At scroll 0.4: progress = 0.5 (milestone preserved)
- * - At scroll 0.56 (90% of range): progress = 1.0 (early finish)
+ * - At scroll 0.4: progress = 0.5 (if milestone defines this)
+ * - At scroll 0.55: progress = 1.0 (completes at fadeOut)
  */
 function calculateProgressWithMilestones(
   scrollProgress: number,
   range: AnimationRange,
   milestones: AnimationMilestone[],
-  elementPositions: Map<string, number>,
-  earlyFinishRatio: number = EARLY_FINISH_RATIO
+  elementPositions: Map<string, number>
 ): number {
-  // Calculate effective end point for early finish
-  const duration = range.end - range.start;
-  const effectiveEnd = range.start + duration * earlyFinishRatio;
+  // Use fadeOut as the effective end - animation completes before fading starts
+  const effectiveEnd = range.fadeOut;
 
   // Build sorted list of progress points: start (0), milestones, effectiveEnd (1)
   const points: Array<{ scrollPos: number; animProgress: number }> = [
@@ -715,7 +712,7 @@ function calculateProgressWithMilestones(
     }
   });
 
-  // Add end point at effective end (early finish)
+  // Add end point at fadeOut (where animation should complete)
   points.push({ scrollPos: effectiveEnd, animProgress: 1 });
 
   // Sort by scroll position

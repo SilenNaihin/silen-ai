@@ -269,9 +269,9 @@ function GradientBarChart({ gradients, mode, animationKey }: GradientBarChartPro
 
       {/* Gradient bars */}
       {displayedGradients.map((grad, i) => {
-        const x = padding.left + i * barSpacing + (barSpacing - barWidth) / 2;
-        const barHeight = grad.magnitude * chartHeight;
-        const y = height - padding.bottom - barHeight;
+        const x = Math.round(padding.left + i * barSpacing + (barSpacing - barWidth) / 2);
+        const barHeight = Math.round(grad.magnitude * chartHeight * 100) / 100;
+        const y = Math.round((height - padding.bottom - barHeight) * 100) / 100;
 
         // Color gradient from green to red
         const fillColor = grad.isVanishing
