@@ -353,10 +353,10 @@ export function AnimationSequence({
       const targetElement = document.getElementById(elementId);
       if (!targetElement) return;
 
-      // Create container
+      // Create container with generous vertical spacing
       const container = document.createElement('div');
       container.className = 'mobile-inline-animation';
-      container.style.cssText = 'display:block;width:100%;margin:1rem 0;';
+      container.style.cssText = 'display:block;width:100%;margin:2.5rem 0;';
       container.setAttribute('data-animation-id', elementId);
 
       // Insert after the target element's parent (usually the heading wrapper)

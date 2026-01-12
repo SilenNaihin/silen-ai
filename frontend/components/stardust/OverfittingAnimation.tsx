@@ -12,8 +12,14 @@ interface OverfittingAnimationProps {
  * Phase 1 (0-0.5): Training vs validation loss divergence
  * Phase 2 (0.5-1.0): Dropout visualization with neurons turning off
  */
-export function OverfittingAnimation({ progress, className = '' }: OverfittingAnimationProps) {
-  const renderAnimation = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+export function OverfittingAnimation({
+  progress,
+  className = '',
+}: OverfittingAnimationProps) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
     const width = canvas.width / (window.devicePixelRatio || 1);
     const height = canvas.height / (window.devicePixelRatio || 1);
 
@@ -28,14 +34,30 @@ export function OverfittingAnimation({ progress, className = '' }: OverfittingAn
     if (progress < 0.55) {
       const fadeOut = progress > 0.45 ? 1 - (progress - 0.45) / 0.1 : 1;
       const curveProgress = Math.min(1, progress / 0.45);
-      drawLossCurves(ctx, width * 0.5, height * 0.52, width * 0.85, height * 0.7, curveProgress, fadeOut);
+      drawLossCurves(
+        ctx,
+        width * 0.5,
+        height * 0.52,
+        width * 0.85,
+        height * 0.7,
+        curveProgress,
+        fadeOut
+      );
     }
 
     // Phase 2: Dropout visualization (0.45-1.0)
     if (progress >= 0.45) {
       const fadeIn = progress < 0.55 ? (progress - 0.45) / 0.1 : 1;
       const dropoutProgress = Math.min(1, (progress - 0.5) / 0.5);
-      drawDropoutVisualization(ctx, width * 0.5, height * 0.52, width * 0.85, height * 0.7, dropoutProgress, fadeIn);
+      drawDropoutVisualization(
+        ctx,
+        width * 0.5,
+        height * 0.52,
+        width * 0.85,
+        height * 0.7,
+        dropoutProgress,
+        fadeIn
+      );
     }
 
     // Phase label
@@ -57,7 +79,12 @@ function getPhase(progress: number): number {
   return 2;
 }
 
-function drawTitle(ctx: CanvasRenderingContext2D, x: number, y: number, phase: number) {
+function drawTitle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  phase: number
+) {
   ctx.font = 'bold 16px system-ui, -apple-system, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -70,10 +97,22 @@ function drawTitle(ctx: CanvasRenderingContext2D, x: number, y: number, phase: n
   ctx.fillText(titles[phase] || 'Overfitting', x, y);
 }
 
-function drawPhaseLabel(ctx: CanvasRenderingContext2D, x: number, y: number, phase: number, progress: number) {
+function drawPhaseLabel(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  phase: number,
+  progress: number
+) {
   const labels: Record<number, string> = {
-    1: progress > 0.3 ? 'Training loss drops while validation loss rises' : 'Watch the curves diverge',
-    2: progress > 0.75 ? 'The network cannot rely on any single neuron' : 'Randomly disabling neurons during training',
+    1:
+      progress > 0.3
+        ? 'Training loss drops while validation loss rises'
+        : 'Watch the curves diverge',
+    2:
+      progress > 0.75
+        ? 'The network cannot rely on any single neuron'
+        : 'Randomly disabling neurons during training',
   };
 
   const labelText = labels[phase] || '';
@@ -85,7 +124,13 @@ function drawPhaseLabel(ctx: CanvasRenderingContext2D, x: number, y: number, pha
 
   ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
   ctx.beginPath();
-  ctx.roundRect(x - textWidth / 2 - pillPadding, y - pillHeight / 2, textWidth + pillPadding * 2, pillHeight, 13);
+  ctx.roundRect(
+    x - textWidth / 2 - pillPadding,
+    y - pillHeight / 2,
+    textWidth + pillPadding * 2,
+    pillHeight,
+    13
+  );
   ctx.fill();
 
   ctx.textAlign = 'center';
@@ -153,7 +198,8 @@ function drawLossCurves(
     trainingCurve.push([x, trainY]);
 
     // Validation loss: decreases then increases (overfitting)
-    const valLoss = 2.5 * Math.exp(-2.5 * t) + 0.3 + (t > 0.4 ? Math.pow(t - 0.4, 2) * 3 : 0);
+    const valLoss =
+      2.5 * Math.exp(-2.5 * t) + 0.3 + (t > 0.4 ? Math.pow(t - 0.4, 2) * 3 : 0);
     const valY = graphTop + (1 - valLoss / 3) * graphHeight;
     validationCurve.push([x, Math.max(graphTop, valY)]);
   }
@@ -213,12 +259,21 @@ function drawLossCurves(
     const overfitStartX = graphLeft + 0.4 * graphWidth;
 
     ctx.fillStyle = `rgba(200, 60, 60, ${zoneAlpha * 0.12})`;
-    ctx.fillRect(overfitStartX, graphTop, graphWidth - (overfitStartX - graphLeft), graphHeight);
+    ctx.fillRect(
+      overfitStartX,
+      graphTop,
+      graphWidth - (overfitStartX - graphLeft),
+      graphHeight
+    );
 
     ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = `rgba(200, 60, 60, ${zoneAlpha * 0.8})`;
-    ctx.fillText('Overfitting Zone', overfitStartX + (graphWidth - (overfitStartX - graphLeft)) / 2, graphTop + 35);
+    ctx.fillText(
+      'Overfitting Zone',
+      overfitStartX + (graphWidth - (overfitStartX - graphLeft)) / 2,
+      graphTop + 35
+    );
   }
 }
 
@@ -273,7 +328,7 @@ function drawDropoutVisualization(
           const toDropped = droppedNeurons.has(`${layer + 1}-${j}`);
 
           // Fade connections if either end is dropped
-          const connectionAlpha = (fromDropped || toDropped) ? 0.08 : 0.35;
+          const connectionAlpha = fromDropped || toDropped ? 0.08 : 0.35;
 
           ctx.strokeStyle = `rgba(100, 100, 100, ${connectionAlpha * alpha})`;
           ctx.lineWidth = fromDropped || toDropped ? 0.5 : 1.5;
@@ -311,8 +366,10 @@ function drawDropoutVisualization(
         ctx.stroke();
       } else {
         // Active neuron
-        const color = isInputOrOutput ? 'rgba(100, 100, 200, ' : 'rgba(60, 140, 80, ';
-        ctx.fillStyle = color + (alpha * 0.75) + ')';
+        const color = isInputOrOutput
+          ? 'rgba(100, 100, 200, '
+          : 'rgba(60, 140, 80, ';
+        ctx.fillStyle = color + alpha * 0.75 + ')';
         ctx.beginPath();
         ctx.arc(layerX, y, neuronRadius, 0, Math.PI * 2);
         ctx.fill();
@@ -340,10 +397,14 @@ function drawDropoutVisualization(
     ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = `rgba(200, 60, 60, ${labelAlpha * 0.9})`;
-    ctx.fillText('Dropout Rate: 50%', centerX, centerY - height / 2 + 28);
+    ctx.fillText('Dropout Rate: 50%', centerX, centerY - height / 2);
 
     ctx.font = '11px system-ui, -apple-system, sans-serif';
     ctx.fillStyle = `rgba(0, 0, 0, ${labelAlpha * 0.7})`;
-    ctx.fillText('Pattern changes each training batch', centerX, centerY - height / 2 + 46);
+    ctx.fillText(
+      'Pattern changes each training batch',
+      centerX,
+      centerY - height / 2 + 20
+    );
   }
 }
