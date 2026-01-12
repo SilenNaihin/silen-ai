@@ -40,14 +40,16 @@ interface InsightBoxProps {
   className?: string;
 }
 
-export function InsightBox({ children, title, className = '' }: InsightBoxProps) {
+export function InsightBox({
+  children,
+  title,
+  className = '',
+}: InsightBoxProps) {
   return (
     <div
       className={`bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4 text-neutral-700 ${className}`}
     >
-      {title && (
-        <p className="font-medium text-neutral-800 mb-2">{title}</p>
-      )}
+      {title && <p className="font-medium text-neutral-800 mb-2">{title}</p>}
       {children}
     </div>
   );
@@ -100,7 +102,12 @@ interface DataFlowStepProps {
   label?: string;
 }
 
-export function DataFlow({ children, title, note, className = '' }: DataFlowProps) {
+export function DataFlow({
+  children,
+  title,
+  note,
+  className = '',
+}: DataFlowProps) {
   return (
     <div
       className={`bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4 font-mono ${className}`}
@@ -202,7 +209,7 @@ interface OrderedListProps {
 
 export function OrderedList({ children, className = '' }: OrderedListProps) {
   return (
-    <ol className={`list-decimal list-inside space-y-1 ml-4 ${className}`}>
+    <ol className={`list-decimal list-outside space-y-1 ml-6 ${className}`}>
       {children}
     </ol>
   );
@@ -216,9 +223,12 @@ interface UnorderedListProps {
   className?: string;
 }
 
-export function UnorderedList({ children, className = '' }: UnorderedListProps) {
+export function UnorderedList({
+  children,
+  className = '',
+}: UnorderedListProps) {
   return (
-    <ul className={`list-disc list-inside space-y-1 ml-4 ${className}`}>
+    <ul className={`list-disc list-outside space-y-1 ml-6 ${className}`}>
       {children}
     </ul>
   );
@@ -241,7 +251,7 @@ interface MutedTextProps {
 
 export function MutedText({ children, className = '' }: MutedTextProps) {
   return (
-    <p className={`text-neutral-600 italic ${className}`}>{children}</p>
+    <p className={`text-neutral-600 italic mt-2 ${className}`}>{children}</p>
   );
 }
 
@@ -294,5 +304,76 @@ export function Aside({ children, title, className = '' }: AsideProps) {
         <div className="space-y-2">{children}</div>
       </div>
     </>
+  );
+}
+
+/**
+ * Figure with image and caption.
+ * Caption can include a link (e.g., to source).
+ *
+ * @example
+ * <Figure
+ *   src="/images/diagram.png"
+ *   alt="Architecture diagram"
+ *   caption="System architecture overview"
+ *   href="https://source.com"
+ * />
+ */
+interface FigureProps {
+  src: string;
+  alt: string;
+  caption?: string;
+  href?: string;
+  className?: string;
+}
+
+export function Figure({ src, alt, caption, href, className = '' }: FigureProps) {
+  return (
+    <figure className={`my-6 ${className}`}>
+      <img
+        src={src}
+        alt={alt}
+        className="rounded-lg border border-neutral-200 w-full"
+      />
+      {caption && (
+        <figcaption className="mt-2 text-sm text-neutral-500 text-center">
+          {href ? (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-neutral-700 underline"
+            >
+              {caption}
+            </a>
+          ) : (
+            caption
+          )}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+/**
+ * Inline code styling for commands, file names, etc.
+ * Orange accent style for visibility.
+ *
+ * @example
+ * <Code>/ultrathink</Code>
+ * <Code>settings.json</Code>
+ */
+interface CodeProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function Code({ children, className = '' }: CodeProps) {
+  return (
+    <code
+      className={`text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded text-sm font-mono ${className}`}
+    >
+      {children}
+    </code>
   );
 }

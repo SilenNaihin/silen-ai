@@ -49,8 +49,11 @@ export function TOCProvider({ children }: TOCProviderProps) {
   const itemsRef = useRef<Map<string, TOCItem>>(new Map());
 
   const registerHeading = useCallback((id: string, text: string, level: number) => {
-    itemsRef.current.set(id, { id, text, level });
-    setItems(Array.from(itemsRef.current.values()));
+    // Only include levels 1-3 in the TOC (exclude 4, 5, 6)
+    if (level <= 3) {
+      itemsRef.current.set(id, { id, text, level });
+      setItems(Array.from(itemsRef.current.values()));
+    }
   }, []);
 
   const unregisterHeading = useCallback((id: string) => {

@@ -15,6 +15,8 @@ import {
   UnorderedList,
   MutedText,
   ComparisonTable,
+  Figure,
+  Code,
 } from '@/components/article/Callouts';
 
 export default function ClaudeCodeArticle() {
@@ -28,76 +30,92 @@ export default function ClaudeCodeArticle() {
           <h1 className="text-4xl font-bold mb-4 text-black leading-tight">
             I was a top 0.01% Cursor user.
             <br />
-            Here&apos;s why I switched to Claude Code.
+            Here&apos;s why I switched to Claude Code 2.0.
           </h1>
           <p className="text-lg text-neutral-600 mb-8">
             Claude Code is all the rage right now. You probably have 5 articles
             bookmarked about it already. Here&apos;s a comprehensive guide from
-            someone who&apos;s been in the AI coding game since AutoGPT, tried
-            every tool, read every guide, and finally found the new paradigm.
+            someone who&apos;s been banging his head against AI coding agents
+            since AutoGPT (and read every piece of high signal advice from the
+            community).
           </p>
-
           {/* Section 1: The Journey */}
-          <TOCHeading id="the-journey" level={2} className="mt-0 text-2xl font-bold mb-3 text-black">
+          <TOCHeading
+            id="the-journey"
+            level={2}
+            className="mt-0 text-2xl font-bold mb-3 text-black"
+          >
             The Journey
           </TOCHeading>
           <ArticleSection>
             <Prose>
               <p>
-                In 2023, I was building AutoGPT. Back then, agents could barely
-                get through a simple function generation, much less iterating
-                and building full applications. We were all just trying to make
-                something, anything, work autonomously.
+                In March of 2023, GPT-4 was released. This is when model
+                improvement wasn&apos;t taken for granted, and ChatGPT was still
+                a novelty.
               </p>
               <p>
-                Then Cursor came along. I tried it in October 2023 and churned.
-                Tried it again in May 2024 and churned. Then September 2024 it
-                finally clicked, and I became <strong>obsessed</strong>. I lived
-                in that editor. I pushed it to its limits, wrote an internal
-                guide on best practices that I never published, and figured out
-                every trick: surgical cursor placement, context window
-                management, the perfect prompting patterns for different
-                scenarios. At my peak, I was in the top 0.01% of Cursor users. I
-                genuinely thought I had found the answer.
-              </p>
-              <p>
-                I tried Claude Code when it first came out. Churned. The model
-                wasn&apos;t quite there yet, and the workflow felt like a step
-                backward from what I had built with Cursor.
-              </p>
-              <p>
-                Then Opus 4.5 dropped, and something clicked. Whatever RLHF
-                Anthropic did completely changed the equation. The model finally
-                felt like it understood what I was trying to do. I&apos;ve now
-                been using Claude Code as my daily driver, and I&apos;m not
-                going back.
-              </p>
-              <p>
-                To put this in perspective: I recently built{' '}
+                I was helping build{' '}
                 <a
-                  href="https://github.com/SilenNaihin/alab-pipeline"
-                  className="text-blue-600 hover:underline"
+                  href="https://github.com/Significant-Gravitas/AutoGPT"
+                  className="mr-1"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  alab-pipeline
+                  AutoGPT
                 </a>
-                , a project that required exploring a materials science
-                lab&apos;s MongoDB, creating schemas from scratch, running
-                complex data pipeline scripts. Pre-AI, this would have taken me
-                a month of full-time work. With Claude Code, it took a combined
-                weekend.
+                which felt like a magical new paradigm. The sparks of what could
+                be. Bit it was just sparks. If you got lucky, every one in 10
+                loops you could get a working tic tac toe game with an only
+                somewhat broken UI.
+              </p>
+              [ autoGPT image here ]
+              <p>
+                Taking yourself out of the loop? Forget about it. You might as
+                well have been saying that Google wasn&apos;t going to fall
+                victim to the Innovator&apos;s Dilemma. We all know Google was
+                dead in the water when it took them 8 months to release Bard in
+                response.
+              </p>
+              [ bard image here ]
+              <p>
+                Then Cursor came along. I want to say it was instantly magical,
+                but it wasn&apos;t. I churned from it in October 2023 and
+                churned again in May 2024. It wasn&apos;t as good as good old
+                copy and paste from ChatGPT. I had to know exactly what I was
+                adding to my codebase, and I needed to keep the mental map of
+                the codebase in my head. The level of abstraction at this point
+                was low, telling the AI exactly what functions to write and how
+                they connected.
+              </p>
+              <p>Then in September 2024 Composer came out.</p>
+              <p>From that moment, 90% of my code became AI generated.</p>
+              <p>
+                I lived in that editor. I pushed it to its limits, wrote an
+                internal guide on best practices that I never published, and
+                figured out every trick: surgical cursor placement, context
+                window management, the perfect prompting patterns for different
+                scenarios.
               </p>
               <p>
-                I&apos;ve read every guide out there. steipete&apos;s posts,
-                vibekanban, sankalp&apos;s experience reports, addyo&apos;s
-                workflows. All of them. I&apos;ve compiled the signal from all
-                of them, mixed it with my own hard-won experience from three
-                years in the trenches, and this is the result.
+                At my peak, I was in the top 0.01% of Cursor users. I genuinely
+                thought I had found the answer. [ top 0.01 tweet here ]
+              </p>
+              <p>I tried Claude Code when it first came out. Churned.</p>
+              <p>
+                The workflow felt like a step backward from what I had built
+                with Cursor. The model wasn&apos;t quite there yet, I still
+                needed to know what was going on in the code more often than
+                not.
+              </p>
+              <p>
+                <b>
+                  Why would I ever use a tool that&apos;s equal in functionality
+                  but 20x worse UX?
+                </b>
               </p>
             </Prose>
           </ArticleSection>
-
           {/* Section 2: What's Changed */}
           <TOCHeading id="whats-changed" level={2}>
             What&apos;s Changed
@@ -105,157 +123,66 @@ export default function ClaudeCodeArticle() {
           <ArticleSection>
             <Prose>
               <p>
-                The landscape has fundamentally shifted. These are the key
-                tradeoffs I&apos;ve identified, how they&apos;ve evolved, and
-                where they&apos;re going.
-              </p>
-            </Prose>
-
-            <TOCHeading id="speed-vs-accuracy" level={3}>
-              Speed vs Accuracy
-            </TOCHeading>
-            <Prose>
-              <p>
-                Being in the loop was necessary when I first started with
-                Cursor. Now it&apos;s optional. The question is:{' '}
-                <strong>
-                  would you rather be driving a car or at the dispatch center?
-                </strong>
+                Enter Claude Code 2.0. Their Claude vscode integration and
+                terminal UX had evolved. Their harness was is flexible and
+                robust. Bugs are fixed. But that&apos;s all secondary.
               </p>
               <p>
-                If you have a lot of packages from a warehouse that need to get
-                shipped, dispatch center. But if you need to drive a specific
-                route, you&apos;d rather drive.
+                The truth is that whatever RLHF Anthropic did on Opus 4.5
+                completely changed the equation.{' '}
+                <i>
+                  {' '}
+                  We&apos;ve now evolved to the next level of abstraction.{' '}
+                </i>
+                [abstraction image here]
               </p>
               <p>
-                There are still times you want to remain in the loop: when
-                reviewing things, when trying to understand how to extend during
-                planning, for pixel-perfect frontend work (especially with tab
-                completion), or when generating something educational for
-                yourself where the feedback loop needs to be quick.
+                I recently built{' '}
+                <a
+                  href="https://github.com/SilenNaihin/alab-pipeline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  alab-pipeline
+                </a>
+                , a project that required ingesting messy data, understanding
+                it, building a pipeline, to analyze, enrich, and map it to
+                parquet files, and then upload it to the MPContribs API. With a
+                Plotly dashboard for scientific visualization.
               </p>
-            </Prose>
-
-            <TOCHeading id="context-optimization" level={3}>
-              Context Optimization vs Time
-            </TOCHeading>
-            <Prose>
+              [image of dashboard here]
+              <p>Here&apos;s how things have changed over time:</p>
+              <ul className="list-disc list-outside space-y-1 ml-6">
+                <li>
+                  Pre AI, this would have taken me a month of full time work.
+                </li>
+                <li>
+                  ChatGPT era this would have taken me a week of full time work.
+                </li>
+                <li>
+                  In the Cursor era this would take me a few days of full time
+                  work.
+                </li>
+                <li>With Claude Code, it took a weekend.</li>
+              </ul>
+              [the shortening of timelines image]
               <p>
-                There&apos;s a tradeoff between optimizing context and the time
-                you spend optimizing context. I bias toward{' '}
-                <strong>not</strong> optimizing context anymore.
-              </p>
-              <p>
-                Context windows are longer, models are smarter, they can find
-                their way around. You no longer need to wait for o1 to think for
-                5 minutes and come back with the necessary understanding.
-              </p>
-              <p>
-                That said, context is still valuable. Knowing files you can
-                reference directly helps you talk about things more
-                specifically. But you can get this specificity through a
-                planning phase. Generating things in a chat that already has
-                context will always win, whether it&apos;s docs, tests, or
-                related code.
-              </p>
-              <p>
-                Others are iffy about compacting, but often the tradeoff to stay
-                in the same chat and eat the compacting is worth it. That said,
-                after compacting enough times or doing any task not directly
-                related, quality will degrade.
-              </p>
-            </Prose>
-
-            <TOCHeading id="specificity-vs-time" level={3}>
-              Specificity vs Time
-            </TOCHeading>
-            <Prose>
-              <p>
-                You used to need surgical specificity. With modern models, this
-                tradeoff is basically gone.
+                The following is my experience with Claude Code 2.0, my setup
+                (which still includes Cursor, sorry for the clickbait), advanced
+                tips, and how I use it.
               </p>
               <p>
-                You need <strong>broad specificity</strong> (linting rules, best
-                practices for splitting components when working with a team) and
-                then <strong>project-specific specificity</strong> for how you
-                want to implement specific parts. The granular stuff? Let the
-                model figure it out.
-              </p>
-            </Prose>
-
-            <TOCHeading id="planning-leverage" level={3}>
-              Planning Time vs Execution Quality
-            </TOCHeading>
-            <Prose>
-              <p>
-                <strong>This is the most valuable tradeoff currently.</strong>{' '}
-                Your time spent setting up a repository and planning is directly
-                proportional to agent output.
-              </p>
-              <p>
-                Every extra minute planning saves three minutes in review.
-                Diminishing returns once you hit a certain point, but most
-                people don&apos;t hit that point.
-              </p>
-            </Prose>
-
-            <TOCHeading id="update-time" level={3}>
-              Update Time
-            </TOCHeading>
-            <Prose>
-              <p>
-                Close the loop whenever you can. For updating docs, making sure
-                code is clean, adding commands for repeated prompts.
-              </p>
-              <p>
-                Very similar to creating components or functions: if you see
-                yourself using it more than once in that project, create
-                project-specific commands. If you find yourself using a command
-                across projects, turn it into a cross-project command.
-              </p>
-            </Prose>
-
-            <TOCHeading id="inline-edits" level={3}>
-              Inline Code Changes
-            </TOCHeading>
-            <Prose>
-              <p>
-                Inline code changes aren&apos;t broken anymore. They no longer
-                remove valuable code. In fact, they&apos;ve RLHF&apos;d it so
-                far into oblivion that you need to explicitly ask it to change
-                any previous code.
-              </p>
-            </Prose>
-
-            <TOCHeading id="early-adopter" level={3}>
-              Early Adopter vs Innovator
-            </TOCHeading>
-            <Prose>
-              <p>
-                A trend I&apos;ve noticed: it&apos;s often more valuable to be
-                an early adopter rather than an innovator when it comes to AI
-                tools. Or you can spend all your time just trying things and
-                never settling into a productive workflow.
-              </p>
-              <p>
-                Same pattern happened with both tools for me. I tried Cursor in
-                October 2023 and churned. Tried it in May 2024 and churned.
-                September 2024 when they released a major update, it finally
-                stuck. I tried Claude Code when it first came out, churned. Then
-                Opus 4.5 dropped, and it stuck.
-              </p>
-              <p>
-                The lesson:{' '}
-                <strong>don&apos;t build palaces on shaky ground.</strong>{' '}
-                Things change so fast. If you try to build an elaborate custom
-                system on top of rapidly evolving tools, you&apos;ll constantly
-                be rebuilding sections of it. MCP servers never stuck with me
-                for this reason. I generally stick with defaults and add
-                scaffolding at a basic level.
+                {' '}
+                I&apos;ve also read every high signal piece of advice from the
+                community and compiled it here. steipete&apos;s posts,
+                vibekanban, sankalp&apos;s experience reports, addyo&apos;s
+                workflows. All of them. I&apos;ve compiled the signal from all
+                of them, mixed it with my own hard won experience from three
+                years in the trenches, and this is the result. [show 3 years of
+                github commits graph here]
               </p>
             </Prose>
           </ArticleSection>
-
           {/* Section 3: Claude Code vs Cursor */}
           <TOCHeading id="cc-vs-cursor" level={2}>
             Claude Code vs Cursor
@@ -266,11 +193,10 @@ export default function ClaudeCodeArticle() {
                 A skeptic on Twitter{' '}
                 <a
                   href="https://x.com/ohabryka/status/2007322150886367719"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  asked
+                  asks
                 </a>
                 :
               </p>
@@ -285,37 +211,41 @@ export default function ClaudeCodeArticle() {
             </QuoteBox>
 
             <Prose>
-              <p>Here&apos;s the answer:</p>
+              <p>
+                I thought the same the last few weeks. Here&apos;s my tentative
+                answer:
+              </p>
             </Prose>
 
             <InsightBox title="Why Claude Code">
               <UnorderedList>
                 <li>
-                  <strong>Async-first:</strong> A fundamentally different way of
-                  thinking. You can run 4+ long-running instances at once,
-                  verifying at a high level. The terminal-native workflow is a
-                  forcing function for async thinking. Cursor has this
-                  functionality, but CC through the terminal forces you to find
-                  ways to be async.
+                  <strong>Async first mindset:</strong> Using Claude Code
+                  requires a fundamentally different way of thinking if you got
+                  used to coding in the organic world of the ancients. Cursor
+                  felt like a more natural jump since I was still in the IDE.
+                  <p className="mt-1">
+                    You can run multiple Cursor agents at once as well, as I
+                    did, but being in the IDE means I often reviewed code and
+                    made sure things were still working as expected. The
+                    terminal native workflow is a forcing function for taking a
+                    step to a higher level of abstraction.
+                  </p>
                 </li>
                 <li>
                   <strong>RLHF&apos;d for its own scaffold:</strong> Claude
-                  models perform noticeably better in their native environment.
-                  File searching, tool use, everything is tuned for this
-                  interface. GPT models are tuned for Codex. They perform
-                  certain actions like file searching better in their native
-                  scaffold.
+                  models (especially Opus 4.5+) perform noticeably better in
+                  their native environment. File searching, tool use, everything
+                  is tuned for this interface. GPT models are tuned for Codex.
                 </li>
                 <li>
-                  <strong>Cost efficiency:</strong> The API costs seem to be
-                  more bang per token compared to Cursor Ultra plans.
+                  <strong>Cost efficiency:</strong> Claude Code costs seem to be
+                  more bang per token compared to Cursor plans.
                 </li>
                 <li>
-                  <strong>Customizability:</strong> Many claim this, and
-                  it&apos;s probably true since it&apos;s CLI-focused. I
-                  generally stick with defaults and add scaffolding at a basic
-                  level. MCP servers never stuck with me, things change too
-                  fast.
+                  <strong>Customizability:</strong> It also encourages more DIY.
+                  The agent feels native to its environment. MCP servers never
+                  stuck with me, things change too fast.
                 </li>
               </UnorderedList>
             </InsightBox>
@@ -324,7 +254,7 @@ export default function ClaudeCodeArticle() {
               When to Use Cursor
             </TOCHeading>
             <Prose>
-              <p>Cursor still wins in specific scenarios:</p>
+              <p className="mb-2">Cursor still wins in specific scenarios:</p>
             </Prose>
             <UnorderedList>
               <li>
@@ -332,22 +262,22 @@ export default function ClaudeCodeArticle() {
                 changes immediately and iterate fast.
               </li>
               <li>
-                <strong>Pixel-perfect frontend:</strong> The tab completion
-                model in Cursor is world-class. Sometimes you need to be in the
-                loop to get UI right.
+                <strong>Pixel perfect frontend:</strong> Often I find myself in
+                the loop still to get a pixel perfect UI.
               </li>
               <li>
-                <strong>Learning:</strong> When generating something educational
-                for yourself, the feedback loop is much quicker.
+                <strong>Learning:</strong> When iterating on something
+                educational for yourself, the feedback loop is much quicker.
               </li>
               <li>
-                <strong>Budget constraints:</strong> If you&apos;re just getting
-                started, the Cursor $20 subscription is enough. I&apos;d
-                actually recommend starting with Cursor.
+                <strong>Recommendation:</strong> I&apos;d recommend starting
+                with Cursor if you know how to code or want to learn how to
+                code. Use CC if you never plan on learning and just care about
+                outputs. The $20 subscription is enough to get started for both.
               </li>
             </UnorderedList>
 
-            <TOCHeading id="vscode-integration" level={3}>
+            <TOCHeading id="vscode-integration" level={5}>
               VSCode Integration
             </TOCHeading>
             <Prose>
@@ -356,6 +286,11 @@ export default function ClaudeCodeArticle() {
                 extension that gives you an inline UI similar to what
                 you&apos;re used to. This can ease the transition if you prefer
                 a GUI.
+              </p>{' '}
+              <p>
+                But that defeats the purpose somewhat. The UX just isn&apos;t as
+                good as Cursor&apos;s here, and that&apos;s not their focus.
+                Give it a real shot in your terminal after reading this.{' '}
               </p>
             </Prose>
 
@@ -364,22 +299,25 @@ export default function ClaudeCodeArticle() {
             </TOCHeading>
             <Prose>
               <p>
-                <strong>Cursor with GPT 5.2</strong> for daily use where I need
-                tight feedback loops. The tab completion model is world-class.
-              </p>
-              <p>
-                <strong>Claude Code with Opus</strong> when I need something
-                specific. Deep reasoning, complex refactors, architectural
+                <strong>Claude Code with Opus 4.5</strong> for most tasks.
+                Planning, code generation, complex refactors, architectural
                 decisions.
               </p>
               <p>
-                <strong>ChatGPT</strong> for two things: (a) quick programming
-                answers that don&apos;t need project context (like setting up an
-                A100 VM in Azure), and (b) second opinions on plans when I
-                don&apos;t understand output or need clarification.
+                <strong>Cursor with GPT 5.2</strong> when I need tight feedback
+                loops. Learning, UI perfection, small changes. The tab
+                completion model is world-class.
+              </p>
+
+              <p>
+                <strong>ChatGPT</strong> for a few things: (a) programming
+                related questions that don&apos;t need project context (like
+                setting up an A100 VM in Azure), (b) second opinions on plans,
+                and (c) when I don&apos;t understand an output or need
+                clarification on something Claude said.
               </p>
               <p>
-                <strong>Wispr</strong> for voice-to-text. If you work from home
+                <strong>Wispr</strong> for voice to text. If you work from home
                 or have your own office, not having to type all the time is
                 valuable. Especially if you&apos;re a coder who has dealt with
                 carpal tunnel or feels like your hands get tired. Speaking
@@ -388,29 +326,281 @@ export default function ClaudeCodeArticle() {
               </p>
             </Prose>
 
-            <MutedText>
-              For new coders: I&apos;m not sure that learning how to code is
-              even that valuable anymore if you&apos;re good at interface
-              testing. You&apos;ll need to learn interfaces, pitfalls, and be
-              good at debugging with Claude on the spot. But if you look at
-              CTOs, the ones with actual hands-on experience who started as an
-              IC and ranked up run better engineering orgs. I suspect the same
-              is true for managing agents. Your ceiling could be capped without
-              deep understanding. If you do decide to learn to code, use Cursor
-              not Claude Code.
-            </MutedText>
+            <InsightBox>
+              For new coders: I&apos;m not sure how valuable learning how to
+              code is anymore. Being good at interface testing (aka being able
+              to tell what&apos;s wrong and explain it) is the golden skill. If
+              you look at CTOs, the ones with actual hands-on experience who
+              started as an IC run better engineering orgs. I suspect the same
+              is true for managing agents. If you plan to get hired as an AI
+              engineer I still recommend to learn how to code, you could do it
+              in a month (use Cursor for learning).
+            </InsightBox>
           </ArticleSection>
+          {/* Section 4: The Tradeoffs That Have Changed */}
+          <TOCHeading id="tradeoffs-changed" level={2}>
+            The Tradeoffs That Have Changed
+          </TOCHeading>
+          [nano banana image here on this section]
+          <ArticleSection>
+            <TOCHeading id="speed-vs-accuracy" level={3}>
+              Speed vs Accuracy
+            </TOCHeading>
+            <Prose>
+              <p>The landscape has fundamentally shifted.</p>
+              <p>
+                Being in the loop was necessary when I first started with
+                Cursor. Now it&apos;s optional. This is no longer a tradeoff
+                that exists in any meaningful way for most tasks.
+              </p>
+              <p>
+                However, Claude will not have an understanding of your
+                preference around code cleanliness. This tradeoff still exists
+                not for generating code, but for maintaining code.
+              </p>
+              <p>
+                You will have codebase rot and need to refactor things. Over
+                time you should add more context to Claude.md (more on this
+                later) that reveals your preferences around code cleanliness and
+                reduces refactoring time.
+              </p>
+            </Prose>
 
-          {/* Section 4: Claude Code Specifics */}
+            <TOCHeading id="context-optimization" level={3}>
+              Context Optimization vs Time
+            </TOCHeading>
+            <Prose>
+              <p>
+                Context windows are longer, models are smarter, they can find
+                their way around.
+              </p>
+              <p>That said, context is still unsolved. </p>
+              <p>
+                Providing specific context of the repo to your model, and being
+                as specific as possible (planning helps with this) will always
+                win, whether it&apos;s docs, tests, or related code.
+              </p>
+              <p>
+                Generating things in a chat that already has context will always
+                win, whether it&apos;s docs, tests, or related code.
+              </p>
+              <p>
+                This has not fundamentally changed since ChatGPT era circa 2022.
+              </p>
+              <p>Here&apos;s some advice I&apos;ve picked up over time:</p>
+              <ol className="list-decimal list-outside space-y-1 ml-6">
+                <li>
+                  Sometimes I&apos;ll do something manually that I could have
+                  asked the model to do or jump into Cursor and reference the
+                  exact code I want to edit.
+                </li>
+                <li>
+                  Maintain focus: one chat = roughly one task. If a chat is
+                  focused on a single task it will have more relevant context.
+                </li>
+                <li>
+                  <code className="text-orange-500 bg-orange-50 px-1 rounded-md">
+                    &quot;spawn a subagent to do deep research on this
+                    topic&quot;
+                  </code>{' '}
+                  Spawn subagents for parallel work. They do not pollute the
+                  main agent&apos;s context. They can individually do work and
+                  add just the valuable context from their work to the main
+                  agent&apos;s context.{' '}
+                </li>
+                <li>
+                  <code className="text-orange-500 bg-orange-50 px-1 rounded-md">
+                    /compact
+                  </code>{' '}
+                  - Others are iffy about compacting, but often the tradeoff to
+                  stay in the same chat and eat the compacting is worth it.
+                </li>
+                <li>
+                  <code className="text-orange-500 bg-orange-50 px-1 rounded-md">
+                    /transfer-context
+                  </code>{' '}
+                  That said, after compacting enough times or doing any task not
+                  directly related, quality will degrade. Don&apos;t be afraid
+                  to create new chats. If you need to transfer context, just
+                  tell the model to give you a prompt to put into another model
+                  with the related context for the task with the files (for
+                  anything advanced create md files, although I find managing
+                  these md files to be annoying).{' '}
+                  <a
+                    href="https://gist.github.com/SilenNaihin/63247843400345704d61210006a81065"
+                    target="_blank"
+                    className="ml-1"
+                    rel="noopener noreferrer"
+                  >
+                    Here&lsquo;s a gist of my command for this /transfer-context
+                  </a>{' '}
+                  [gist here] .
+                </li>
+                <li>
+                  <code className="text-orange-500 bg-orange-50 px-1 rounded-md">
+                    /context
+                  </code>
+                  Shows you how much context you have left. You&apos;ll get a
+                  report like this: [report showing how much context is left
+                  here] Claude will also tell you when you have ~10% context
+                  left. [image here of the % context left] Make the decision to
+                  compact or to switch chats at this point. Don&apos;t wait
+                  until it hits 0% as it will degrade your outputs, and if it
+                  compacts in the middle of a task it will forget potentially
+                  relevant context that you&apos;ve given it even in the last
+                  chat.
+                </li>
+              </ol>
+              [nano banana of the above here]
+            </Prose>
+
+            <TOCHeading id="specificity-vs-time" level={3}>
+              Specificity vs Time
+            </TOCHeading>
+            <Prose>
+              <p>
+                You used to need surgical specificity. With ChatGPT you
+                couldn&apos;t do much more than generate a function or
+                component. With early Cursor, you needed to spell out how
+                everything is connected, what should be implemented, and keep it
+                simple.
+              </p>
+              <p>With modern models, this tradeoff is basically gone.</p>
+              <p>
+                We&apos;re now roughly at the level of a senior engineer with
+                short term memory loss and an inability to learn beyond
+                it&apos;s current context encyclopedic knowledge.
+              </p>
+              [nano banana of the differnt phases throughout time here]
+              <p>
+                What&lsquo;s valuable is <strong>broad specificity</strong>{' '}
+                (linting rules, best practices for splitting components when
+                working with a team) and then{' '}
+                <strong>project-specific specificity</strong> for how you want
+                to implement specific parts. The granular stuff? Let the model
+                figure it out. More on this later.
+              </p>
+              <p>
+                This allows us to generate higher level plans because the
+                cognitive lightcone of the model is much larger.
+              </p>
+              [link Michale Levin&apos;s work on this]
+            </Prose>
+
+            <TOCHeading id="planning-leverage" level={3}>
+              Planning Time vs Execution Quality
+            </TOCHeading>
+            <Prose>
+              <p>
+                <strong>This is the most valuable tradeoff currently.</strong>{' '}
+                Your time spent planning is directly proportional to agent
+                output.
+              </p>
+              <p>
+                You will get roughly 3 minutes out for every minute you spend
+                planning.{' '}
+              </p>
+              <p>
+                So for a simple task, if you spend 5 seconds writing a prompt,
+                that&apos;s sufficient for a 15 second task. For a more complex
+                task, if you spend 5 minutes writing a prompt, that&apos;s
+                sufficient for a 15 minute task. [nano banana of the tradeoff]
+              </p>
+              <p>
+                For longer tasks there&apos;s diminishing returns because often
+                times you&apos;ll need to adjust the plan as you make your way
+                through it. Spending that time generating a solid base, good
+                &quot;verification points&quot;, and general guidelines becomes
+                more valuable.
+              </p>
+              <InsightBox>
+                For example, I built a research paper search engine that finds
+                papers related to a given topic and then ranks them based on
+                their relevance. It has an API and the ability to build agents
+                on top of it. [link to repo here]
+                <p>
+                  I spent 1 hour planning this and it worked for 3 hours. I
+                  suspect that if I spent 30 minutes less planning, I would
+                  likely have and extra 1h 30m extra fixing bugs, refactoring,
+                  and regrafting. I used Ralph for this (more on this later).
+                </p>
+              </InsightBox>
+            </Prose>
+
+            <TOCHeading id="closing-the-loop" level={3}>
+              Closing The Loop vs Starting Fresh
+            </TOCHeading>
+            <Prose>
+              <p>
+                There&apos;s a classic XKCD about programmers spending a week
+                automating a task that takes 5 minutes. The punchline: you end
+                up spending all your time on &quot;debugging, rethinking, and
+                ongoing development&quot; instead of doing the actual work.
+              </p>
+            </Prose>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Figure
+                src="https://imgs.xkcd.com/comics/automation.png"
+                alt="XKCD: Automation - showing how automation projects consume more time than they save"
+                caption="XKCD #1319: Automation"
+                href="https://xkcd.com/1319/"
+              />
+              <div className="md:self-center">
+                <Figure
+                  src="https://imgs.xkcd.com/comics/the_general_problem.png"
+                  alt="XKCD: The General Problem - engineer builds system to pass arbitrary condiments instead of just passing the salt"
+                  caption="XKCD #974: The General Problem"
+                  href="https://xkcd.com/974/"
+                />
+              </div>
+            </div>
+            <Prose>
+              <p>
+                With agentic coding, this equation has flipped.{' '}
+                <strong>Closing the loop is now almost always worth it.</strong>{' '}
+                The cost of automation has collapsed. What used to take a week
+                now takes a conversation.
+              </p>
+              <p>
+                The rule for React has always been if you find yourself writing
+                code more than once, abstract it into a component. This applies
+                to everything you do when building with agents.
+              </p>
+              <p>Close the loop whenever you can:</p>
+              <ul className="list-disc list-outside space-y-1 ml-6">
+                <li>Make commands for repeated prompts</li>
+                <li>Make agents for repeated work</li>
+                <li>Update your claude.md</li>
+                <li>Make prompts in .mds (like Cursor rules!)</li>
+                <li>Change tsconfig and other config files</li>
+              </ul>
+              <p>Etc. More on these later.</p>
+              [nano banana of the closing the loop here]
+              <p>
+                The tradeoff now isn&apos;t &quot;should I automate this?&quot;
+                It&apos;s &quot;should I close this loop now or start fresh on
+                something new?&quot; Usually, close the loop. The compounding
+                returns are real.
+              </p>
+            </Prose>
+          </ArticleSection>
+          {/* Section 5: Claude Code Specifics */}
           <TOCHeading id="cc-specifics" level={2}>
             Claude Code Specifics
           </TOCHeading>
           <ArticleSection>
             <Prose>
               <p>
-                Before diving into workflow, you need to know the tool.
-                Think about it like working with an engineer who has little context on your project.
-                Minimize the amount they need to figure out for themselves.
+                Models no longer remove valuable code that isn&apos;t directly
+                related to the current task. In fact, they&apos;ve RLHF&apos;d
+                it so far into oblivion that you need to explicitly ask it to
+                change any previous code.
+              </p>
+              <p>
+                Before diving into workflow, you need to know the tool. Think
+                about it like working with an engineer who has little context on
+                your project. Minimize the amount they need to figure out for
+                themselves.
               </p>
             </Prose>
 
@@ -420,13 +610,31 @@ export default function ClaudeCodeArticle() {
             <ComparisonTable
               headers={['Command', 'What it does']}
               rows={[
-                ['/ultrathink', 'Engages deeper reasoning. Spam this for hard tasks or when you want Opus 4.5 to be more rigorous.'],
-                ['/compact', 'Compresses context when hitting limits. Do a handoff or compact at ~60% if building something complex.'],
-                ['/context', 'Shows current context usage. Use this frequently.'],
-                ['/rewind', 'Revert to a previous checkpoint (like Cursor). Can rewind code and conversation.'],
+                [
+                  '/ultrathink',
+                  'Engages deeper reasoning. Spam this for hard tasks or when you want Opus 4.5 to be more rigorous.',
+                ],
+                [
+                  '/compact',
+                  'Compresses context when hitting limits. Do a handoff or compact at ~60% if building something complex.',
+                ],
+                [
+                  '/context',
+                  'Shows current context usage. Use this frequently.',
+                ],
+                [
+                  '/rewind',
+                  'Revert to a previous checkpoint (like Cursor). Can rewind code and conversation.',
+                ],
                 ['/resume', 'Continue from a previous chat context.'],
-                ['/init', 'Analyzes your project and generates starter CLAUDE.md configuration.'],
-                ['/agents', 'Manage and create sub-agents. Recommended approach for parallel work.'],
+                [
+                  '/init',
+                  'Analyzes your project and generates starter CLAUDE.md configuration.',
+                ],
+                [
+                  '/agents',
+                  'Manage and create sub-agents. Recommended approach for parallel work.',
+                ],
               ]}
             />
 
@@ -628,7 +836,6 @@ export default function ClaudeCodeArticle() {
               </p>
             </Prose>
           </ArticleSection>
-
           {/* Section 5: Planning */}
           <TOCHeading id="planning" level={2}>
             Planning
@@ -702,9 +909,7 @@ Do not make any modifications until I say "<GO>"`}
               The Interview/Spec Prompt
             </TOCHeading>
             <Prose>
-              <p>
-                For fleshing out requirements before building:
-              </p>
+              <p>For fleshing out requirements before building:</p>
             </Prose>
             <pre className="bg-neutral-100 p-4 rounded text-sm overflow-x-auto my-4">
               {`Read @SPEC.md and interview me in detail using the
@@ -778,7 +983,6 @@ until it's complete, then write the spec to the file.`}
               </p>
             </Prose>
           </ArticleSection>
-
           {/* Section 6: Verifiability */}
           <TOCHeading id="verifiability" level={2}>
             Verifiability
@@ -871,12 +1075,10 @@ until it's complete, then write the spec to the file.`}
               </p>
             </Prose>
           </ArticleSection>
-
           {/* Section 7: Domain Playbooks */}
           <TOCHeading id="domain-playbooks" level={2}>
             Domain Playbooks
           </TOCHeading>
-
           {/* Frontend */}
           <TOCHeading id="frontend" level={3}>
             Frontend
@@ -894,7 +1096,6 @@ until it's complete, then write the spec to the file.`}
                 For example, for the books section of{' '}
                 <a
                   href="https://silennai.com/content"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -954,7 +1155,6 @@ until it's complete, then write the spec to the file.`}
 ]`}
             </pre>
           </ArticleSection>
-
           {/* Backend */}
           <TOCHeading id="backend" level={3}>
             Backend
@@ -986,7 +1186,6 @@ until it's complete, then write the spec to the file.`}
               </li>
             </UnorderedList>
           </ArticleSection>
-
           {/* Research */}
           <TOCHeading id="research" level={3}>
             Research
@@ -1002,7 +1201,6 @@ until it's complete, then write the spec to the file.`}
                 Karpathy{' '}
                 <a
                   href="https://x.com/karpathy/status/2005421816110862601"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1016,12 +1214,12 @@ until it's complete, then write the spec to the file.`}
               <p>
                 Claude has been running my nanochat experiments since morning.
                 It writes implementations, debugs them with toy examples, writes
-                tests and makes them fail/pass, launches training runs,
-                babysits them by tailing logs and pulling stats from wandb,
-                keeps a running markdown file of highlights, keeps a running
-                record of runs and results so far, presents results in nice
-                tables, we just finished some profiling, noticed inefficiencies
-                in the optimizer resolved them and measured improvements.
+                tests and makes them fail/pass, launches training runs, babysits
+                them by tailing logs and pulling stats from wandb, keeps a
+                running markdown file of highlights, keeps a running record of
+                runs and results so far, presents results in nice tables, we
+                just finished some profiling, noticed inefficiencies in the
+                optimizer resolved them and measured improvements.
               </p>
               <p className="mt-3">
                 It&apos;s not perfect but I&apos;m used to doing all of these
@@ -1041,7 +1239,6 @@ until it's complete, then write the spec to the file.`}
               </p>
             </Prose>
           </ArticleSection>
-
           {/* Learning */}
           <TOCHeading id="learning" level={3}>
             Learning
@@ -1076,7 +1273,6 @@ until it's complete, then write the spec to the file.`}
                 I have a{' '}
                 <a
                   href="https://silen.notion.site/My-prompt-for-learning-new-computational-concepts-2d72b9e381378056beced8f7ff14878f"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1086,7 +1282,6 @@ until it's complete, then write the spec to the file.`}
               </p>
             </Prose>
           </ArticleSection>
-
           {/* Section 8: Your CLAUDE.md */}
           <TOCHeading id="claude-md" level={2}>
             Your CLAUDE.md
@@ -1139,7 +1334,9 @@ until it's complete, then write the spec to the file.`}
                 confuse the model with unrelated files.
               </li>
               <li>
-                <strong>Directly add relevant context within larger files:</strong>{' '}
+                <strong>
+                  Directly add relevant context within larger files:
+                </strong>{' '}
                 Use specific function references or paste specific blocks.
               </li>
               <li>
@@ -1154,7 +1351,8 @@ until it's complete, then write the spec to the file.`}
               </li>
               <li>
                 <strong>Write out a PRD and reference it:</strong> Give
-                surrounding context so the model minimizes gaps it needs to fill.
+                surrounding context so the model minimizes gaps it needs to
+                fill.
               </li>
             </UnorderedList>
 
@@ -1163,10 +1361,10 @@ until it's complete, then write the spec to the file.`}
             </TOCHeading>
             <Prose>
               <p>
-                Maintain docs for subsystems and features in a <code>docs/</code>{' '}
-                folder. Use a script + instructions to force the model to read
-                docs on certain topics. This pays off more the larger the
-                project is.
+                Maintain docs for subsystems and features in a{' '}
+                <code>docs/</code> folder. Use a script + instructions to force
+                the model to read docs on certain topics. This pays off more the
+                larger the project is.
               </p>
               <p>
                 &quot;Write docs to docs/*.md&quot; and let the model pick a
@@ -1210,7 +1408,6 @@ until it's complete, then write the spec to the file.`}
               </p>
             </Prose>
           </ArticleSection>
-
           {/* Section 9: Advanced */}
           <TOCHeading id="advanced" level={2}>
             Advanced
@@ -1245,7 +1442,6 @@ until it's complete, then write the spec to the file.`}
                 use{' '}
                 <a
                   href="https://x.com/ryancarson/status/2008548371712135632"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1264,7 +1460,6 @@ until it's complete, then write the spec to the file.`}
                 Use{' '}
                 <a
                   href="https://vibetunnel.sh"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1309,6 +1504,39 @@ until it's complete, then write the spec to the file.`}
               </p>
             </Prose>
 
+            <TOCHeading id="automated-review" level={3}>
+              Automated PR and Commit Review
+            </TOCHeading>
+            <Prose>
+              <p>
+                Tools like{' '}
+                <a
+                  href="https://coderabbit.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Coderabbit
+                </a>{' '}
+                automatically review your PRs and commits. They catch issues,
+                suggest improvements, and provide context-aware feedback before
+                human review even begins.
+              </p>
+              <p>
+                This is another form of closing the loop. Instead of manually
+                reviewing every diff, you get an AI first-pass that catches the
+                obvious stuff: security issues, style violations, potential
+                bugs, missing tests. Human reviewers can then focus on
+                architecture and business logic.
+              </p>
+              <p>
+                You can also wire up Claude Code to do this yourself. Use
+                headless mode (<code>-p</code>) with custom prompts tailored to
+                your codebase, or set up a hook that triggers on every commit.
+                The hooks system lets you run Claude Code automatically on file
+                changes, commits, or any git event.
+              </p>
+            </Prose>
+
             <TOCHeading id="refactoring" level={3}>
               Refactoring and Cleanup
             </TOCHeading>
@@ -1350,8 +1578,8 @@ until it's complete, then write the spec to the file.`}
             </TOCHeading>
             <Prose>
               <p>
-                I don&apos;t use MCP servers heavily since things change so fast,
-                but here are patterns others have found useful:
+                I don&apos;t use MCP servers heavily since things change so
+                fast, but here are patterns others have found useful:
               </p>
             </Prose>
             <UnorderedList>
@@ -1365,7 +1593,6 @@ until it's complete, then write the spec to the file.`}
               </li>
             </UnorderedList>
           </ArticleSection>
-
           {/* Section 10: The Baseline */}
           <TOCHeading id="baseline" level={2}>
             The Baseline
@@ -1447,7 +1674,6 @@ until it's complete, then write the spec to the file.`}
               </p>
             </InsightBox>
           </ArticleSection>
-
           {/* Section 11: Links */}
           <TOCHeading id="links" level={2}>
             Links and Credits
@@ -1467,7 +1693,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://steipete.me"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1478,7 +1703,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://www.vibekanban.com/vibe-guide"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1489,7 +1713,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://sankalp.bearblog.dev/my-experience-with-claude-code-20-and-how-to-get-better-at-using-coding-agents/"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1500,7 +1723,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://addyo.substack.com/p/my-llm-coding-workflow-going-into"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1517,7 +1739,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://steipete.me/posts/just-talk-to-it"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1528,7 +1749,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://steipete.me/posts/2025/optimal-ai-development-workflow"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1538,7 +1758,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://steipete.me/posts/2025/shipping-at-inference-speed"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1548,7 +1767,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://claude.com/blog/using-claude-md-files"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1559,7 +1777,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://code.claude.com/docs/en/vs-code"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1569,7 +1786,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://x.com/bcherny/status/2007179832300581177"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1586,7 +1802,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://vibetunnel.sh"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1597,7 +1812,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://knip.dev"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1608,7 +1822,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://github.com/kucherenko/jscpd"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1619,7 +1832,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://ast-grep.github.io"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1630,7 +1842,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://github.com/steipete/agent-scripts"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1641,7 +1852,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://x.com/ryancarson/status/2008548371712135632"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1652,7 +1862,6 @@ until it's complete, then write the spec to the file.`}
               <li>
                 <a
                   href="https://wispr.com"
-                  className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1662,18 +1871,16 @@ until it's complete, then write the spec to the file.`}
               </li>
             </UnorderedList>
           </ArticleSection>
-
           {/* Footer */}
           <div className="mt-16 pt-8 border-t border-neutral-200">
             <MutedText>
               This guide captures a moment in time. The tools will change, the
-              models will improve, but the principles of planning, verifiability,
-              and closing the loop will persist. Take what works, leave what
-              doesn&apos;t, and develop your own workflow through
+              models will improve, but the principles of planning,
+              verifiability, and closing the loop will persist. Take what works,
+              leave what doesn&apos;t, and develop your own workflow through
               experimentation.
             </MutedText>
           </div>
-
           {/* Spacing */}
           <div className="h-32" />
         </ArticleLayout>
