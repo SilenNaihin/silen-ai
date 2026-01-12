@@ -39,7 +39,6 @@ export default function ResearchTastesArticle() {
             Inspired by{' '}
             <a
               href="https://x.com/jaschasd/status/1972360405885637021"
-              className="text-blue-600 hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -86,7 +85,7 @@ export default function ResearchTastesArticle() {
                 Richard Sutton&apos;s{' '}
                 <a
                   href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -191,7 +190,7 @@ export default function ResearchTastesArticle() {
                 Jason Wei articulated this principle in his{' '}
                 <a
                   href="https://www.jasonwei.net/blog/asymmetry-of-verification-and-verifiers-law"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -239,7 +238,7 @@ export default function ResearchTastesArticle() {
               <p>
                 <a
                   href="https://deepmind.google/discover/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -256,7 +255,7 @@ export default function ResearchTastesArticle() {
                 are more verifiable than others. In materials science,{' '}
                 <a
                   href="https://en.wikipedia.org/wiki/Density_functional_theory"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -280,7 +279,7 @@ export default function ResearchTastesArticle() {
                 OpenAI&apos;s{' '}
                 <a
                   href="https://arxiv.org/abs/2305.20050"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -353,7 +352,7 @@ export default function ResearchTastesArticle() {
                 <strong>RLVR (Reinforcement Learning from Verifiable Rewards):</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2501.12948"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -368,7 +367,7 @@ export default function ResearchTastesArticle() {
                 <strong>Prior work:</strong>{' '}
                 <a
                   href="https://allenai.org/blog/tulu-3-technical"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -378,7 +377,7 @@ export default function ResearchTastesArticle() {
                 name RLVR as a distinct methodology.{' '}
                 <a
                   href="https://arxiv.org/abs/2402.03300"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -390,7 +389,7 @@ export default function ResearchTastesArticle() {
                 <strong>Formal Verification:</strong>{' '}
                 <a
                   href="https://deepmind.google/discover/blog/ai-solves-imo-problems-at-silver-medal-level/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -405,7 +404,7 @@ export default function ResearchTastesArticle() {
                 <strong>Prior work:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2210.12283"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -415,7 +414,7 @@ export default function ResearchTastesArticle() {
                 sketches.{' '}
                 <a
                   href="https://leanprover-community.github.io/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -427,7 +426,7 @@ export default function ResearchTastesArticle() {
                 <strong>Process Reward Models:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2312.08935"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -437,7 +436,7 @@ export default function ResearchTastesArticle() {
                 annotation.{' '}
                 <a
                   href="https://arxiv.org/abs/2406.06592"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -462,7 +461,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://arxiv.org/abs/2408.03314"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -480,7 +479,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://www.nature.com/articles/s41586-023-06735-9"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -498,7 +497,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://openai.com/index/weak-to-strong-generalization/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -543,7 +542,7 @@ export default function ResearchTastesArticle() {
                 I&apos;m working on the{' '}
                 <a
                   href="https://www.genesismission.ai/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -577,7 +576,7 @@ export default function ResearchTastesArticle() {
                 generation capability, but verification capability.{' '}
                 <a
                   href="https://deepmind.google/discover/blog/funsearch-making-new-discoveries-in-mathematical-sciences-using-large-language-models/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -598,7 +597,7 @@ export default function ResearchTastesArticle() {
                 happen. Bryan Johnson wrote about{' '}
                 <a
                   href="https://medium.com/future-literacy/zeroth-principles-thinking-9376d0b7e7f5"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -648,7 +647,7 @@ export default function ResearchTastesArticle() {
               <p>
                 <a
                   href="https://deepmind.google/discover/blog/funsearch-making-new-discoveries-in-mathematical-sciences-using-large-language-models/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -674,7 +673,7 @@ export default function ResearchTastesArticle() {
                 (
                 <a
                   href="https://arxiv.org/abs/2305.18654"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -707,7 +706,7 @@ export default function ResearchTastesArticle() {
                 <strong>Test-Time Compute Scaling:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2408.03314"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -722,7 +721,7 @@ export default function ResearchTastesArticle() {
                 <strong>Prior work:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2407.21787"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -736,7 +735,7 @@ export default function ResearchTastesArticle() {
                 <strong>Can LLMs Generate Novel Research Ideas?</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2409.04109"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -751,7 +750,7 @@ export default function ResearchTastesArticle() {
                 <strong>AI Scientists:</strong>{' '}
                 <a
                   href="https://sakana.ai/ai-scientist/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -761,7 +760,7 @@ export default function ResearchTastesArticle() {
                 per paper.{' '}
                 <a
                   href="https://www.kosmos.ai/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -795,7 +794,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://arxiv.org/abs/2309.16797"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -805,7 +804,7 @@ export default function ResearchTastesArticle() {
                 diversity.{' '}
                 <a
                   href="https://arxiv.org/abs/2206.08896"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -824,7 +823,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://arxiv.org/abs/2406.07394"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -960,7 +959,7 @@ export default function ResearchTastesArticle() {
                 sparse dictionaries of interpretable features.{' '}
                 <a
                   href="https://transformer-circuits.pub/2024/scaling-monosemanticity/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -973,7 +972,7 @@ export default function ResearchTastesArticle() {
                 <strong>Prior work:</strong>{' '}
                 <a
                   href="https://transformer-circuits.pub/2023/monosemantic-features/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -983,7 +982,7 @@ export default function ResearchTastesArticle() {
                 transformer.{' '}
                 <a
                   href="https://openai.com/index/extracting-concepts-from-gpt-4/"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -995,7 +994,7 @@ export default function ResearchTastesArticle() {
                 <strong>Circuit Tracing:</strong>{' '}
                 <a
                   href="https://www.anthropic.com/research/tracing-thoughts-language-model"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1019,7 +1018,7 @@ export default function ResearchTastesArticle() {
                 <strong>Automated Circuit Discovery:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2304.14997"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1030,7 +1029,7 @@ export default function ResearchTastesArticle() {
                 Greater-Than circuit.{' '}
                 <a
                   href="https://arxiv.org/abs/2403.19647"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1054,7 +1053,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://arxiv.org/abs/2406.04093"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1080,7 +1079,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://www.anthropic.com/research/probes-catch-sleeper-agents"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1096,7 +1095,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://transformer-circuits.pub/2022/toy_model/"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1107,7 +1106,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://transformer-circuits.pub/2024/scaling-monosemanticity/"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1118,7 +1117,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://www.anthropic.com/research/tracing-thoughts-language-model"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1129,7 +1128,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1208,7 +1207,7 @@ export default function ResearchTastesArticle() {
                 limited.{' '}
                 <a
                   href="https://www.youtube.com/watch?v=pd0JmT6rYcI"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1218,7 +1217,7 @@ export default function ResearchTastesArticle() {
                 knowledge structures.{' '}
                 <a
                   href="https://openreview.net/pdf?id=BZ5a1r-kVsf"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1251,7 +1250,7 @@ export default function ResearchTastesArticle() {
                 <strong>Representational Collapse:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2406.04267"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1277,7 +1276,7 @@ export default function ResearchTastesArticle() {
                 <strong>Mamba:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2312.00752"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1291,7 +1290,7 @@ export default function ResearchTastesArticle() {
                 <strong>Hybrids:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2403.19887"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1301,7 +1300,7 @@ export default function ResearchTastesArticle() {
                 + MoE. Fits in single 80GB GPU with 256K token context.{' '}
                 <a
                   href="https://arxiv.org/abs/2501.00663"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1314,7 +1313,7 @@ export default function ResearchTastesArticle() {
                 <strong>SSM Limitations:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2402.01032"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1369,7 +1368,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://arxiv.org/abs/2008.02217"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1386,7 +1385,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://arxiv.org/abs/2402.19427"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1410,7 +1409,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2312.00752"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1421,7 +1420,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2403.19887"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1432,7 +1431,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2402.19427"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1443,7 +1442,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2501.00663"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1489,7 +1488,7 @@ export default function ResearchTastesArticle() {
                 cognition:{' '}
                 <a
                   href="https://arcprize.org/blog/oai-o3-pub-breakthrough"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1524,7 +1523,7 @@ export default function ResearchTastesArticle() {
                 forgetting of safety alignment (
                 <a
                   href="https://arxiv.org/abs/2601.04199"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1548,7 +1547,7 @@ export default function ResearchTastesArticle() {
                 <strong>Parameter-Efficient Methods:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2405.09673"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1561,7 +1560,7 @@ export default function ResearchTastesArticle() {
                 <strong>Task Arithmetic:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2212.04089"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1575,7 +1574,7 @@ export default function ResearchTastesArticle() {
                 <strong>Episodic Memory:</strong>{' '}
                 <a
                   href="https://arxiv.org/abs/2601.03192"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1589,7 +1588,7 @@ export default function ResearchTastesArticle() {
                 <strong>Agentic Approaches:</strong> Systems like{' '}
                 <a
                   href="https://github.com/princeton-nlp/SWE-agent"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1598,7 +1597,7 @@ export default function ResearchTastesArticle() {
                 and{' '}
                 <a
                   href="https://www.cognition.ai/blog/introducing-devin"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1624,7 +1623,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://arxiv.org/abs/2304.03442"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1642,7 +1641,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://arxiv.org/abs/2501.00663"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1658,7 +1657,7 @@ export default function ResearchTastesArticle() {
                 <em>Prior work:</em>{' '}
                 <a
                   href="https://arxiv.org/abs/2310.02304"
-                  className="text-blue-600 hover:underline"
+                 
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -1674,7 +1673,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2405.09673"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1685,7 +1684,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2212.04089"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1696,7 +1695,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2402.01364"
-                    className="text-blue-600 hover:underline"
+                   
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1894,7 +1893,7 @@ export default function ResearchTastesArticle() {
               any of these problems, I&apos;d love to talk. Reach out on{' '}
               <a
                 href="https://twitter.com/silennai"
-                className="text-blue-600 hover:underline"
+               
                 target="_blank"
                 rel="noopener noreferrer"
               >

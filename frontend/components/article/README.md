@@ -154,6 +154,101 @@ import { Aside } from '@/components/article/Callouts';
 - Desktop (xl+): Floats in the right margin at the same vertical position
 - Mobile (<xl): Renders inline as a styled callout box
 
+### Callout Components
+
+All imported from `@/components/article/Callouts`:
+
+#### `Prose`
+Container for article text. Provides consistent spacing and line height.
+```tsx
+<Prose>
+  <p>First paragraph.</p>
+  <p>Second paragraph with automatic spacing.</p>
+</Prose>
+```
+
+#### `MutedText`
+Italic, muted text for secondary information or asides.
+```tsx
+<MutedText>This is a side note or closing thought.</MutedText>
+```
+
+#### `Code`
+Inline code styling (orange accent) for commands, file names, variables.
+```tsx
+<Code>/ultrathink</Code>
+<Code>settings.json</Code>
+<Code>CLAUDE.md</Code>
+```
+
+#### `InsightBox`
+Key takeaways or explanations. Full border, neutral background.
+```tsx
+<InsightBox title="Why does this work?">
+  Explanation text here.
+</InsightBox>
+```
+
+#### `QuoteBox`
+Quotes or comparisons. Left border accent style.
+```tsx
+<QuoteBox>
+  <p>"Quote text here."</p>
+  <p className="text-neutral-500 mt-2">— Attribution</p>
+</QuoteBox>
+```
+
+#### `UnorderedList` / `OrderedList`
+Lists with proper alignment (text wraps under first line, not bullet).
+```tsx
+<UnorderedList>
+  <li><strong>Item:</strong> Description here.</li>
+  <li>Another item.</li>
+</UnorderedList>
+```
+
+#### `Figure`
+Image with optional caption and link.
+```tsx
+<Figure
+  src="/images/diagram.png"
+  alt="Architecture diagram"
+  caption="System architecture overview"
+  href="https://source.com"
+/>
+```
+
+For external images (e.g., XKCD):
+```tsx
+<Figure
+  src="https://imgs.xkcd.com/comics/automation.png"
+  alt="XKCD: Automation"
+  caption="XKCD #1319: Automation"
+  href="https://xkcd.com/1319/"
+/>
+```
+
+#### `ComparisonTable`
+Styled table with optional cell highlighting.
+```tsx
+<ComparisonTable
+  headers={['Feature', 'Tool A', 'Tool B']}
+  rows={[
+    ['Speed', 'Fast', { value: 'Faster', highlight: true }],
+    ['Cost', '$10', '$20'],
+  ]}
+/>
+```
+
+#### `DataFlow`
+Pipeline or transformation diagrams with monospace font.
+```tsx
+<DataFlow title="Processing pipeline">
+  <DataFlow.Step label="Input">raw data → parse</DataFlow.Step>
+  <DataFlow.Step label="Output">→ formatted result</DataFlow.Step>
+</DataFlow>
+```
+
 ## Layout Structure
 
 The article system uses a three-column layout:
