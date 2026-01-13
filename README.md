@@ -2,6 +2,8 @@
 
 Personal AI/ML learning repository combining interactive educational articles with Jupyter notebook experiments.
 
+This repo is constantly evolving and contains a lot of unfinished code.
+
 **Live site:** [silennai.com/blog](https://silennai.com/blog)
 
 ## What's Here
