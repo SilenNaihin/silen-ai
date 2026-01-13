@@ -12,8 +12,6 @@ Deep-dive technical articles with scroll-synced animations, interactive visualiz
 
 - **Positional Embeddings** — First-principles derivation from integer positions → sine waves → RoPE, with 15+ custom animations
 - **Tied Embeddings** — Mathematical analysis proving why weight sharing creates fundamental limitations
-- **Research Tastes** — Reflections on research directions and recursive improvement
-- **Claude Code Guide** — Practical guide from a former Cursor power user
 
 Each article pairs with Jupyter notebooks for reproducible learning.
 
