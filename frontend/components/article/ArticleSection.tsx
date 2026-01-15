@@ -148,7 +148,7 @@ export function ArticleSection({
       {hasRightContent && (
         <div
           ref={rightPanelRef}
-          className="hidden xl:block absolute left-full ml-8 top-0 w-[26rem] z-10 hover:z-50 transition-[z-index] duration-0"
+          className="hidden xl:block absolute left-full ml-4 2xl:ml-8 top-0 w-80 2xl:w-[26rem] z-10 hover:z-50 transition-[z-index] duration-0"
         >
           {renderRightContent(false)}
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 /**
  * Prose container for article text content.
@@ -19,7 +19,9 @@ interface ProseProps {
 
 export function Prose({ children, className = '' }: ProseProps) {
   return (
-    <div className={`leading-relaxed space-y-3 text-neutral-900 ${className}`}>
+    <div
+      className={`leading-relaxed space-y-3 mb-1 text-neutral-900 ${className}`}
+    >
       {children}
     </div>
   );
@@ -147,6 +149,7 @@ DataFlow.Step = function DataFlowStep({ children, label }: DataFlowStepProps) {
 interface TableCell {
   value: string;
   highlight?: boolean;
+  html?: boolean;
 }
 
 interface ComparisonTableProps {
@@ -162,7 +165,24 @@ export function ComparisonTable({
 }: ComparisonTableProps) {
   const renderCell = (cell: string | TableCell) => {
     if (typeof cell === 'string') {
+      // Auto-detect HTML links
+      if (cell.includes('<a ')) {
+        return (
+          <span
+            className="[&_a]:underline [&_a]:text-neutral-600 [&_a:hover]:text-black"
+            dangerouslySetInnerHTML={{ __html: cell }}
+          />
+        );
+      }
       return cell;
+    }
+    if (cell.html) {
+      return (
+        <span
+          className={cell.highlight ? 'text-green-700 font-medium' : ''}
+          dangerouslySetInnerHTML={{ __html: cell.value }}
+        />
+      );
     }
     return (
       <span className={cell.highlight ? 'text-green-700 font-medium' : ''}>
@@ -172,22 +192,25 @@ export function ComparisonTable({
   };
 
   return (
-    <div className={`my-4 overflow-x-auto ${className}`}>
-      <table className="min-w-full text-sm border border-neutral-200">
-        <thead className="bg-neutral-50">
-          <tr>
+    <div className={`my-6 overflow-x-auto ${className}`}>
+      <table className="min-w-full text-sm">
+        <thead>
+          <tr className="border-b border-neutral-200">
             {headers.map((header, i) => (
-              <th key={i} className="px-3 py-2 text-left border-b font-medium">
+              <th
+                key={i}
+                className="px-4 py-2.5 text-left text-xs font-medium text-neutral-500 uppercase tracking-wide"
+              >
                 {header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-neutral-100">
           {rows.map((row, i) => (
-            <tr key={i}>
+            <tr key={i} className="hover:bg-neutral-50 transition-colors">
               {row.map((cell, j) => (
-                <td key={j} className="px-3 py-2 border-b">
+                <td key={j} className="px-4 py-2.5 text-neutral-700">
                   {renderCell(cell)}
                 </td>
               ))}
@@ -209,7 +232,9 @@ interface OrderedListProps {
 
 export function OrderedList({ children, className = '' }: OrderedListProps) {
   return (
-    <ol className={`list-decimal list-outside space-y-1 ml-6 ${className}`}>
+    <ol
+      className={`list-decimal list-outside space-y-1 ml-6 mb-2 ${className}`}
+    >
       {children}
     </ol>
   );
@@ -228,7 +253,7 @@ export function UnorderedList({
   className = '',
 }: UnorderedListProps) {
   return (
-    <ul className={`list-disc list-outside space-y-1 ml-6 ${className}`}>
+    <ul className={`list-disc list-outside space-y-1 ml-6 my-2 ${className}`}>
       {children}
     </ul>
   );
@@ -279,7 +304,7 @@ export function Aside({ children, title, className = '' }: AsideProps) {
     <>
       {/* Desktop: Right margin positioning */}
       <div
-        className={`hidden xl:block absolute left-full ml-8 w-[22rem] ${className}`}
+        className={`hidden xl:block absolute left-full ml-4 w-72 2xl:ml-8 2xl:w-88 ${className}`}
         style={{ top: 'auto' }}
       >
         <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 text-sm text-neutral-600">
@@ -324,12 +349,26 @@ interface FigureProps {
   alt: string;
   caption?: string;
   href?: string;
+  /**
+   * On desktop (xl+): render in the right margin (like `Aside`).
+   * On mobile (<xl): render inline (default behavior).
+   *
+   * Must be used within an `ArticleSection` (position: relative) for correct positioning.
+   */
+  side?: boolean;
   className?: string;
 }
 
-export function Figure({ src, alt, caption, href, className = '' }: FigureProps) {
-  return (
-    <figure className={`my-6 ${className}`}>
+export function Figure({
+  src,
+  alt,
+  caption,
+  href,
+  side = false,
+  className = '',
+}: FigureProps) {
+  const content = (
+    <>
       <img
         src={src}
         alt={alt}
@@ -351,7 +390,26 @@ export function Figure({ src, alt, caption, href, className = '' }: FigureProps)
           )}
         </figcaption>
       )}
-    </figure>
+    </>
+  );
+
+  if (!side) {
+    return <figure className={`mt-4 mb-2 ${className}`}>{content}</figure>;
+  }
+
+  return (
+    <>
+      {/* Desktop: Right margin positioning (like `Aside`) */}
+      <figure
+        className={`hidden xl:block absolute left-full ml-4 w-72 2xl:ml-8 2xl:w-88 my-6 ${className}`}
+        style={{ top: 'auto' }}
+      >
+        {content}
+      </figure>
+
+      {/* Mobile: Inline figure */}
+      <figure className={`xl:hidden my-6 ${className}`}>{content}</figure>
+    </>
   );
 }
 
@@ -375,5 +433,37 @@ export function Code({ children, className = '' }: CodeProps) {
     >
       {children}
     </code>
+  );
+}
+
+/**
+ * Code block with copy button and horizontal scroll.
+ */
+interface CodeBlockProps {
+  children: string;
+  className?: string;
+}
+
+export function CodeBlock({ children, className = '' }: CodeBlockProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(children);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className={`relative my-4 ${className}`}>
+      <button
+        onClick={handleCopy}
+        className="absolute top-2 right-2 px-2 py-1 text-xs font-medium text-neutral-500 hover:text-neutral-700 bg-white/80 hover:bg-white border border-neutral-200 rounded transition-colors"
+      >
+        {copied ? 'Copied!' : 'Copy'}
+      </button>
+      <pre className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 pt-10 overflow-x-auto text-sm font-mono text-neutral-800 whitespace-pre-wrap">
+        {children}
+      </pre>
+    </div>
   );
 }
