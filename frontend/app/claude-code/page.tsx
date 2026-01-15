@@ -1025,6 +1025,13 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 checkpointing. Reverts to a previous checkpoint when Claude
                 messes something up. Can rewind both code and conversation.
               </p>
+              <p>
+                <strong>
+                  <Code>!</Code>:
+                </strong>{' '}
+                You can type any bash command in the chat by prefixing your
+                message with <Code>!</Code>.
+              </p>
               <Figure src="/articles/claude-code/rewind.png" alt="Rewind" />
               <p>
                 <strong>Useful Mac shortcuts:</strong>
