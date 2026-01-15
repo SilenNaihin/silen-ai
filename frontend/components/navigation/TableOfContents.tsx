@@ -249,3 +249,77 @@ export function useTOCItems(): TOCItem[] {
   const { items } = useTOCContext();
   return items;
 }
+
+/**
+ * Inline Table of Contents block with configurable columns.
+ * Place at the start of an article for quick navigation.
+ *
+ * @example
+ * <TableOfContentsBlock columns={2} />
+ * <TableOfContentsBlock columns={3} title="Contents" />
+ */
+interface TableOfContentsBlockProps {
+  columns?: 1 | 2 | 3 | 4;
+  title?: string;
+  className?: string;
+  /** Only show headings of these levels (default: [2, 3]) */
+  levels?: number[];
+}
+
+export function TableOfContentsBlock({
+  columns = 2,
+  title,
+  className = '',
+  levels = [2, 3],
+}: TableOfContentsBlockProps) {
+  const { items, activeId } = useTOCContext();
+
+  const filteredItems = items.filter((item) => levels.includes(item.level));
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  if (filteredItems.length === 0) {
+    return null;
+  }
+
+  const columnClass = {
+    1: 'columns-1',
+    2: 'columns-1 sm:columns-2',
+    3: 'columns-1 sm:columns-2 lg:columns-3',
+    4: 'columns-1 sm:columns-2 lg:columns-4',
+  }[columns];
+
+  return (
+    <nav className={`my-6 ${className}`}>
+      {title && (
+        <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wide mb-3">
+          {title}
+        </h2>
+      )}
+      <ul className={`${columnClass} gap-x-8`}>
+        {filteredItems.map((item) => (
+          <li
+            key={item.id}
+            className="break-inside-avoid mb-1.5"
+          >
+            <button
+              onClick={() => scrollToSection(item.id)}
+              className={`text-left text-sm hover:text-black transition-colors ${
+                item.level === 2
+                  ? 'font-medium text-neutral-700'
+                  : 'text-neutral-500 pl-3'
+              } ${activeId === item.id ? 'text-black' : ''}`}
+            >
+              {item.text}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}

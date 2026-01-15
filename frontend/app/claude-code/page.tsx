@@ -5,6 +5,7 @@ import { ArticleSection } from '@/components/article/ArticleSection';
 import {
   TOCProvider,
   TOCHeading,
+  TableOfContentsBlock,
 } from '@/components/navigation/TableOfContents';
 import { StickyHeader } from '@/components/navigation/StickyHeader';
 import {
@@ -42,35 +43,26 @@ export default function ClaudeCodeArticle() {
               since 2021 and read all those Claude Code guides so you don&apos;t
               have to.
             </p>
-
-            <p>
-              The goal for this article is for the only limit to be your own
-              ideas.
-            </p>
             <Figure
               src="/articles/claude-code/curve-cursor-claude.jpeg"
               alt="Cursor vs Claude Code"
               caption="You'll be on the right side after reading this"
               side
             />
-            <p>
-              A combination of
-              <OrderedList>
-                <li>my experience from 5 years of coding with AI</li>
-                <li>my experience with Claude Code</li>
-                <li>
-                  10+ articles and countless X posts I consolidated about Claude
-                  Code (references at the bottom)
-                </li>
-                <li>my setup</li>
-                <li>advanced tips</li>
-              </OrderedList>
-            </p>
-            <p>
-              I&apos;ll set the stage for you with my 5 year journey with AI
-              coding.
-            </p>
+            <p>This is a guide that combines:</p>
+            <OrderedList>
+              <li>my experience from 5 years of coding with AI</li>
+              <li>my experience with Claude Code</li>
+              <li>
+                10+ articles and countless X posts I consolidated about Claude
+                Code (references at the bottom)
+              </li>
+              <li>my setup</li>
+              <li>advanced tips</li>
+            </OrderedList>
+            <p>After this article, the only limit to be your own ideas.</p>
           </Prose>
+          <TableOfContentsBlock columns={3} />
           {/* Section 1: The Journey */}
           <TOCHeading
             id="the-journey"
@@ -82,20 +74,18 @@ export default function ClaudeCodeArticle() {
           <ArticleSection>
             <Prose>
               <p>
-                It&apos;s March of 2023. I had been using Github Copilot for a
-                couple years.
+                It&apos;s March of 2023. Github Copilot is our frontier of AI
+                coding.
               </p>
               <p>
                 ChatGPT is still a novelty. Model improvement isn&apos;t taken
                 for granted.
               </p>
               <p>GPT-4 gets released.</p>
+              <p>Instantly it&apos;s clear that this is paradigm shifting.</p>
               <p>
-                It&apos;s clear that this is the first &quot;smart&quot; model.{' '}
-              </p>
-              <p>
-                It enables us to create loops that would actually somewhat work
-                for things like searching the web and writing code for us.{' '}
+                We could create a loop of AI thinking with some tools to search
+                the web and write code for us. The smell of AGI is in the air!
               </p>
               <p>
                 We decide to call these loops &quot;agents&quot;. I was lucky
@@ -108,35 +98,29 @@ export default function ClaudeCodeArticle() {
                 >
                   AutoGPT
                 </a>
-                which went mega viral and is still the fastest growing project
-                on GitHub to 100k stars.
+                which went mega viral and is to this day the fastest growing
+                repo to 100k stars.
               </p>
-              <p>It was mind blowing.</p>
               <p>
                 But it didn&apos;t really work. If you got lucky, every once in
                 a while you could get an almost working tic tac toe game.
               </p>
-              <Figure
+              {/* <Figure
                 side
                 src="/articles/claude-code/bard-vs-chatgpt.png"
                 alt="Bard vs ChatGPT"
                 caption="Bard vs ChatGPT circa 2023"
-              />
-              <p>
-                For anything more complex? Forget about it. This sacrilege would
+              /> */}
+              <p>For anything more complex? Forget about it.</p>
+              {/* This sacrilege would
                 have been equivalent to saying that Google wasn&apos;t on its
                 way out. When it took them 8 months to release Bard this was
-                obvious. Who even names those things?
-              </p>
+                obvious. Who even names those things? */}
 
               <p>
-                Cursor came along in mid 2023. I want to say it was instantly
-                magical.
-              </p>
-              <p>
-                But it wasn&apos;t. I churned from it in October 2023 and
-                churned again in May 2024. Good old copy and paste from ChatGPT
-                was still better.
+                Cursor came along in 2023 with promises. I tried and churned in
+                October 2023 and again in May 2024. Good old copy and paste from
+                ChatGPT was still better.
               </p>
               <p>Then in September 2024 Cursor Composer came out.</p>
               <p>From that moment, 90% of my code became AI generated.</p>
@@ -160,7 +144,7 @@ export default function ClaudeCodeArticle() {
                   rel="noopener noreferrer"
                   href="https://x.com/silennai/status/1923114661253411203?s=20"
                 >
-                  I had found the answer to all my problems.
+                  I had found the answer to all my problems.{' '}
                 </a>
                 I even got an email from the team that I was a top 0.01% Cursor
                 user.{' '}
@@ -289,7 +273,7 @@ export default function ClaudeCodeArticle() {
             <UnorderedList>
               <li>
                 <a
-                  href="https://github.com/SilenNaihin/wright-simulator"
+                  href="https://x.com/silennai/status/2011764666297717225?s=20"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -354,29 +338,24 @@ export default function ClaudeCodeArticle() {
             <Prose>
               <p>
                 Until a month ago, I shared the sentiment. Here&apos;s my
-                tentative answer:
+                answer:
               </p>
             </Prose>
 
             <InsightBox>
               <UnorderedList>
                 <li>
-                  <strong>Async first mindset:</strong> Using Claude Code
-                  requires a fundamentally different way of thinking. I learned
-                  how to code in the organic world of the ancients. Cursor was a
-                  gentler transition since I was still in the IDE.
-                  <p className="mt-1">
-                    Being in the IDE lends to instinctive code review and
-                    perfection. But we&apos;ve ascended to the next level of
-                    abstraction. And the terminal native workflow is a forcing
-                    function for taking that next step.
-                  </p>
+                  <strong>Async first mindset:</strong> Being in the IDE lends
+                  to instinctive code review and perfection. But we&apos;ve
+                  ascended to the next level of abstraction. And the terminal
+                  native workflow is a forcing function for taking that next
+                  step.
                 </li>
                 <li>
                   <strong>RLHF&apos;d for its own scaffold:</strong> Claude
                   models (especially Opus 4.5+) perform noticeably better in
-                  their native environment. File searching, tool use, everything
-                  is tuned for this interface.
+                  Claude Code. File searching, tool use, everything is tuned for
+                  this interface.
                 </li>
                 <li>
                   <strong>Cost efficiency:</strong>{' '}
@@ -405,11 +384,6 @@ export default function ClaudeCodeArticle() {
             <TOCHeading id="when-cursor" level={3}>
               When to use Cursor
             </TOCHeading>
-            <Prose>
-              <p className="mb-2">
-                Yep I still use Cursor. Sorry friends. These are the scenarios:
-              </p>
-            </Prose>
             <UnorderedList>
               <li>
                 <strong>Pixel perfect frontend:</strong> Often I find myself in
@@ -440,7 +414,7 @@ export default function ClaudeCodeArticle() {
               <p className="pl-2">
                 a) never plan on learning and just care about outputs, or
                 <br />
-                b) are a degenerate abstractionist.
+                b) are an abstraction maximilist.
               </p>
               <p>
                 There is a VSCode extension for Claude Code which can ease your
@@ -492,16 +466,6 @@ export default function ClaudeCodeArticle() {
                 to use it.
               </p>
             </Prose>
-
-            <InsightBox title="For new coders">
-              I&apos;m not sure how valuable learning how to code is anymore.
-              Being good at interface testing is the golden skill. I suspect
-              that for the next year or so coders that first learned to code
-              organically will still have an advantage. Otherwise, for anything
-              that isn&apos;t pushing some frontier, we&apos;ll have parity. If
-              you plan to get hired as an AI engineer you should learn how to
-              code. You could do it in a month using Cursor.
-            </InsightBox>
           </ArticleSection>
           {/* Section 4: The Tradeoffs That Have Changed */}
           <TOCHeading id="pillars-of-agentic-coding" level={2}>
@@ -555,13 +519,6 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
               Context
             </TOCHeading>
             <Prose>
-              <p>
-                Generating things in a chat that already has context will always
-                win, whether it&apos;s docs, tests, or related code.
-              </p>
-              <p>
-                This has not fundamentally changed since ChatGPT era circa 2022.
-              </p>
               <p>
                 Here&apos;s some tips I&apos;ve picked up over time on context
                 management:
@@ -638,16 +595,14 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                   what it used to be. Test the limits and see what works for
                   you.
                 </li>
+                <li>
+                  Generating things in a chat that already has context will
+                  always perform best, whether it&apos;s docs, tests, or related
+                  code.
+                </li>
               </ol>
               <p>
-                <strong>Subagents:</strong> Use <Code>/agents</Code> to manage
-                them. The benefit is a) they don&apos;t inherit the context,
-                which saves the main agent&apos;s context, and b) they can run
-                in parallel. Ctrl+B to run them in the background.
-              </p>
-              <p>
-                Use <Code>/resume</Code> to continue from a previous chat when
-                you need to pick up where you left off.
+                Use <Code>/resume</Code> to continue from a previous chat.
               </p>
               <p>
                 <strong>Note on context limits:</strong> Claude Code has a 200k
@@ -665,23 +620,18 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 output.
               </p>
               <p>
-                You will save roughly 3 minutes of time on follow up prompts and
-                debugging for every minute you spend planning.{' '}
+                Rule of thumb: a good prompt will save you 3 minutes of time on
+                follow up prompts and debugging for every 1 minute you spend
+                planning.
               </p>
               <p>
-                There&apos;s diminishing returns depending on task complexity
-                but broadly this holds. For big tasks, spending time generating
-                a solid base, good &quot;verification points&quot;, and general
-                guidelines becomes very valuable.
-              </p>
-              <p>
-                <strong>Shift+Tab twice:</strong> Enter plan mode. I often use
-                it, but only for larger tasks when the exact shape of what I
-                want it to be is unclear. Note: plan mode saves to a{' '}
-                <Code>.md</Code> in the global <Code>~/.claude</Code> folder,
-                which isn&apos;t accessible within your repo. I&apos;ll either
-                ask Claude to create a <Code>plan.md</Code> in the repo after
-                plan mode, or skip plan mode entirely and plan in-chat.
+                <strong>Shift+Tab twice:</strong> Enter plan mode. I use it, but
+                only for larger tasks or when the exact shape of what I want it
+                to be is unclear. Note: plan mode saves to a <Code>.md</Code> in
+                the global <Code>~/.claude</Code> folder, which isn&apos;t
+                accessible within your repo. I&apos;ll either ask Claude to
+                create a <Code>plan.md</Code> in the repo after plan mode, or
+                skip plan mode entirely and plan in-chat.
               </p>
             </Prose>
 
@@ -1074,8 +1024,8 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 <strong>Esc+Esc:</strong> Access <Code>/rewind</Code>{' '}
                 checkpointing. Reverts to a previous checkpoint when Claude
                 messes something up. Can rewind both code and conversation.
-                <Figure src="/articles/claude-code/rewind.png" alt="Rewind" />
               </p>
+              <Figure src="/articles/claude-code/rewind.png" alt="Rewind" />
               <p>
                 <strong>Useful Mac shortcuts:</strong>
               </p>
@@ -1121,7 +1071,7 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
               </p>
             </Prose>
             <TOCHeading id="blast-radius" level={3}>
-              All the homies hate worktrees{' '}
+              All the homies hate worktrees
             </TOCHeading>
             <Prose>
               <p>
@@ -1334,7 +1284,7 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                     src="/articles/claude-code/wright-bros.gif"
                     alt="My Wright Brothers UI"
                     caption="My UI with the screenshot and a few prompts"
-                    href="https://github.com/SilenNaihin/wright-simulator"
+                    href="https://x.com/silennai/status/2011764666297717225?s=20"
                   />
                 </div>
               </div>
@@ -1776,7 +1726,7 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
           </ArticleSection>
           {/* Section 10: The Baseline */}
           <TOCHeading id="baseline" level={2}>
-            The Baseline
+            The bottom line
           </TOCHeading>
           <InsightBox>
             To make your life easier, I&apos;ve encoded the entire alpha of this
@@ -1989,6 +1939,56 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                   How Claude&apos;s Memory System Works
                 </a>{' '}
                 — Deep dive into Claude&apos;s memory vs ChatGPT&apos;s approach
+              </li>
+              <li>
+                <a
+                  href="https://x.com/arjunpatel_ai/status/2008794995080458719"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Anthropic Context Engineering
+                </a>{' '}
+                — Thread on context management
+              </li>
+              <li>
+                <a
+                  href="https://x.com/rohanpaul_ai/status/2009277278048637145"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Claude Code Skills Guide
+                </a>{' '}
+                — Deep dive into skills system
+              </li>
+              <li>
+                <a
+                  href="https://x.com/dabit3/status/2009139688959852701"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Claude Code Agents
+                </a>{' '}
+                — Guide on using agents effectively
+              </li>
+              <li>
+                <a
+                  href="https://justin.abrah.ms/blog/2026-01-05-wrapping-my-head-around-gas-town.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Wrapping My Head Around Gas Town
+                </a>{' '}
+                — Understanding the gas/token economy
+              </li>
+              <li>
+                <a
+                  href="https://huggingface.co/blog/hf-skills-training"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  HuggingFace Skills Training
+                </a>{' '}
+                — Training custom skills
               </li>
             </UnorderedList>
 
