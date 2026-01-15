@@ -48,13 +48,16 @@ export function TOCProvider({ children }: TOCProviderProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const itemsRef = useRef<Map<string, TOCItem>>(new Map());
 
-  const registerHeading = useCallback((id: string, text: string, level: number) => {
-    // Only include levels 1-3 in the TOC (exclude 4, 5, 6)
-    if (level <= 3) {
-      itemsRef.current.set(id, { id, text, level });
-      setItems(Array.from(itemsRef.current.values()));
-    }
-  }, []);
+  const registerHeading = useCallback(
+    (id: string, text: string, level: number) => {
+      // Only include levels 1-3 in the TOC (exclude 4, 5, 6)
+      if (level <= 3) {
+        itemsRef.current.set(id, { id, text, level });
+        setItems(Array.from(itemsRef.current.values()));
+      }
+    },
+    []
+  );
 
   const unregisterHeading = useCallback((id: string) => {
     itemsRef.current.delete(id);
@@ -91,7 +94,13 @@ export function TOCProvider({ children }: TOCProviderProps) {
 
   return (
     <TOCContext.Provider
-      value={{ items, activeId, registerHeading, unregisterHeading, setActiveId }}
+      value={{
+        items,
+        activeId,
+        registerHeading,
+        unregisterHeading,
+        setActiveId,
+      }}
     >
       {children}
     </TOCContext.Provider>
@@ -194,12 +203,19 @@ export function TOCDropdown({ className = '' }: TOCDropdownProps) {
           {activeItem?.text || 'Contents'}
         </span>
         <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 transition-transform ${
+            isOpen ? 'rotate-180' : ''
+          }`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
 
@@ -287,6 +303,24 @@ export function TableOfContentsBlock({
     return null;
   }
 
+  // Group items by level 2 sections so they break together
+  const sections: { parent: TOCItem; children: TOCItem[] }[] = [];
+  let currentSection: { parent: TOCItem; children: TOCItem[] } | null = null;
+
+  filteredItems.forEach((item) => {
+    if (item.level === 2) {
+      if (currentSection) {
+        sections.push(currentSection);
+      }
+      currentSection = { parent: item, children: [] };
+    } else if (currentSection) {
+      currentSection.children.push(item);
+    }
+  });
+  if (currentSection) {
+    sections.push(currentSection);
+  }
+
   const columnClass = {
     1: 'columns-1',
     2: 'columns-1 sm:columns-2',
@@ -301,25 +335,40 @@ export function TableOfContentsBlock({
           {title}
         </h2>
       )}
-      <ul className={`${columnClass} gap-x-8`}>
-        {filteredItems.map((item) => (
-          <li
-            key={item.id}
-            className="break-inside-avoid mb-1.5"
-          >
+      <div className={`${columnClass} gap-x-8`}>
+        {sections.map((section) => (
+          <div key={section.parent.id} className="break-inside-avoid mb-3">
             <button
-              onClick={() => scrollToSection(item.id)}
-              className={`text-left text-sm hover:text-black transition-colors ${
-                item.level === 2
-                  ? 'font-medium text-neutral-700'
-                  : 'text-neutral-500 pl-3'
-              } ${activeId === item.id ? 'text-black' : ''}`}
+              onClick={() => scrollToSection(section.parent.id)}
+              className={`text-left text-sm font-medium hover:text-black transition-colors ${
+                activeId === section.parent.id
+                  ? 'text-black'
+                  : 'text-neutral-700'
+              }`}
             >
-              {item.text}
+              {section.parent.text}
             </button>
-          </li>
+            {section.children.length > 0 && (
+              <ul className="mt-1">
+                {section.children.map((child) => (
+                  <li key={child.id} className="mb-0.5">
+                    <button
+                      onClick={() => scrollToSection(child.id)}
+                      className={`text-left text-sm pl-3 hover:text-black transition-colors ${
+                        activeId === child.id
+                          ? 'text-black'
+                          : 'text-neutral-500'
+                      }`}
+                    >
+                      {child.text}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         ))}
-      </ul>
+      </div>
     </nav>
   );
 }

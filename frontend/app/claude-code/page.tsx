@@ -994,7 +994,7 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
           </ArticleSection>
           {/* Section 5: Tips for an Effective Claude Coder */}
           <TOCHeading id="cc-specifics" level={2}>
-            Tips for an effective Claude Coder (non-derogatory)
+            Tips for an effective Claude Coder
           </TOCHeading>
           <ArticleSection>
             <Prose>
@@ -1449,11 +1449,11 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
               </li>
             </UnorderedList>
           </ArticleSection>
-
-          {/* Section 9: Scaling Up */}
           <TOCHeading id="scaling-up" level={2}>
-            For Claude Code gigabrains
+            Advanced Claude Code usage
           </TOCHeading>
+          {/* Section 9: Scaling Up */}
+
           <ArticleSection>
             <Aside>
               From{' '}

@@ -1,5 +1,15 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import articles from '@/data/articles.json';
+
+export const metadata: Metadata = {
+  title: "Silen's Blog",
+  description: 'Interactive articles on AI, ML, and software engineering by Silen Naihin',
+  openGraph: {
+    title: "Silen's Blog",
+    description: 'Interactive articles on AI, ML, and software engineering',
+  },
+};
 
 type Article = {
   slug: string;
