@@ -1517,33 +1517,10 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
           {/* Section 9: Scaling Up */}
 
           <ArticleSection>
-            <Aside>
-              From{' '}
-              <a
-                href="https://www.anthropic.com/engineering/claude-code-best-practices"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Anthropic&apos;s best practices
-              </a>
-              : &quot;Ask Claude to make a plan for how to approach a specific
-              problem. We recommend using the word &apos;think&apos; to trigger
-              extended thinking mode, which gives Claude additional computation
-              time to evaluate alternatives more thoroughly. These specific
-              phrases are mapped directly to increasing levels of thinking
-              budget in the system: &apos;think&apos; &lt; &apos;think
-              hard&apos; &lt; &apos;think harder&apos; &lt;
-              &apos;ultrathink.&apos; Each level allocates progressively more
-              thinking budget for Claude to use.&quot;
-            </Aside>
             <Prose>
-              <p>
-                I spam <Code>ultrathink</Code>. The only downside is that it
-                takes more time (and thinking tokens). I don&apos;t mind.
-              </p>
               <Figure
-                src="/articles/claude-code/ultrathink.png"
-                alt="ultrathink"
+                src="/articles/claude-code/deprecated.png"
+                alt="ultrathink deprecated"
               />
             </Prose>
             <Prose>
