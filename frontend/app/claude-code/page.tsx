@@ -2097,7 +2097,6 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
             <ComparisonTable
               headers={['Command', 'Type', 'Usage']}
               rows={[
-                ['/ultrathink', 'Default', 'Every chat'],
                 ['/compact', 'Default', 'Every chat'],
                 ['/context', 'Default', 'Every chat'],
                 ['/rewind', 'Default', 'Situational'],
