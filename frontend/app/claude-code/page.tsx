@@ -581,7 +581,6 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                   <Figure
                     src="/articles/claude-code/context.png"
                     alt="Context Report"
-                    caption="This is in the bottom right of the terminal."
                   />{' '}
                   Claude will also tell you when you&apos;re running low on
                   context.{' '}
