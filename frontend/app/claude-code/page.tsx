@@ -1518,17 +1518,25 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
 
           <ArticleSection>
             <Prose>
-              <Figure
-                src="/articles/claude-code/deprecated.png"
-                alt="ultrathink deprecated"
-              />
-            </Prose>
-            <Prose>
               <p>
                 On Mac, run <Code>caffeinate -dimsu</Code> to prevent your
                 laptop from sleeping while Claude works. Start a task, close
                 your laptop, go places.
               </p>
+              <p>
+                We used to have shiny rainbow text whenever we typed
+                &apos;ultrathink&apos; which would maximize Claude&apos;s
+                thinking.
+              </p>
+              <Figure
+                src="/articles/claude-code/ultrathink.png"
+                alt="ultrathink old"
+              />
+              <p>But it&apos;s &apos;on&apos; by default now.</p>
+              <Figure
+                src="/articles/claude-code/deprecated.png"
+                alt="ultrathink deprecated"
+              />
             </Prose>
             <TOCHeading id="ralph" level={3}>
               Ralph for larger projects
