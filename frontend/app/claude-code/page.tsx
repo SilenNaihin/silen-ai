@@ -136,7 +136,15 @@ export default function ClaudeCodeArticle() {
                 >
                   Cursor rules
                 </a>
-                , the perfect prompting patterns for different scenarios.
+                ,{' '}
+                <a
+                  href="https://x.com/silennai/status/1920221901202358760?s=20"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  the spiky edges of model capability
+                </a>
+                .
               </p>
               <p>
                 <a
