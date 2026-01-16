@@ -598,7 +598,9 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 <li>
                   Generating things in a chat that already has context will
                   always perform best, whether it&apos;s docs, tests, or related
-                  code.
+                  code. Sometimes for one off changes (like a bug fix), I&apos;ll
+                  do them within the chat context, commit changes, and then
+                  rewind the conversation back to save context.
                 </li>
               </ol>
               <p>
