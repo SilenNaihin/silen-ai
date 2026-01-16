@@ -1081,6 +1081,24 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
               All the homies hate worktrees
             </TOCHeading>
             <Prose>
+              <p className="text-sm text-neutral-500">
+                <a
+                  href="https://x.com/mitsuhiko/status/2011773404207337549"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  Armin agrees.
+                </a>{' '}
+                <a
+                  href="https://x.com/steipete/status/2011880333348913355"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  So does Pete.
+                </a>
+              </p>
               <p>
                 The natural instinct is to use git worktrees to isolate parallel
                 work.
