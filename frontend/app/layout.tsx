@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { GlobalNotebookProvider } from "@/contexts/NotebookContext";
 
@@ -44,6 +45,7 @@ export default function RootLayout({
         <GlobalNotebookProvider>
           {children}
         </GlobalNotebookProvider>
+        <Analytics />
       </body>
     </html>
   );

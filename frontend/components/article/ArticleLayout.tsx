@@ -26,7 +26,7 @@ export function ArticleLayout({
 
   return (
     <div ref={articleRef} className={`min-h-screen ${className}`}>
-      <div className="relative max-w-[1600px] mx-auto px-8">
+      <div className="relative max-w-[1600px] mx-auto px-2 min-[412px]:px-4 md:px-8">
         {/* Animation - centered vertically on viewport */}
         {leftContent && (
           <>
@@ -43,7 +43,7 @@ export function ArticleLayout({
         )}
 
         {/* Main content - always centered, animation is fixed overlay */}
-        <div className="py-16 relative z-10 max-w-3xl mx-auto px-4">
+        <div className="py-16 relative z-10 max-w-3xl mx-auto px-1 min-[412px]:px-2 sm:px-4">
           {/* Mobile disclaimer about animations */}
           {leftContent && !hideMobileDisclaimer && (
             <div className="xl:hidden mb-6 text-xs text-neutral-400 text-center">
