@@ -1171,6 +1171,12 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                   branches.
                 </li>
               </OrderedList>
+              <p>
+                Another tip is when I have one session doing something like a
+                refactor but I already have your next prompt typed out for a
+                feature add, you can do <Code>!sleep 600</Code> in that second
+                instance and then send in your prompt.
+              </p>
             </Prose>
           </ArticleSection>
           {/* Section 8: Your CLAUDE.md */}
