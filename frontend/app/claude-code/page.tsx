@@ -1535,12 +1535,6 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 prompt into your terminal.
               </p>
               <p>
-                FYI, the way the paste command works: when you paste it creates
-                a pointer to your text. So if you copy + paste the{' '}
-                <Code>[Pasted text #x +x lines]</Code> with the correct values
-                filled in, it will expand it to the full pasted text.
-              </p>
-              <p>
                 We used to have shiny rainbow text whenever we typed
                 &apos;ultrathink&apos; which would maximize Claude&apos;s
                 thinking.
@@ -1560,7 +1554,7 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
             </TOCHeading>
             <Prose>
               <p>
-                Unfortunately, for almost everything{' '}
+                Unfortunately, for almost everything,{' '}
                 <a
                   href="https://x.com/ryancarson/status/2008548371712135632"
                   target="_blank"
@@ -1568,18 +1562,17 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 >
                   Ralph
                 </a>{' '}
-                is more pain to get to work than it&apos;s worth. Sorry to
-                disappoint.
+                is more of a pain to get working than it&apos;s worth. Sorry to
+                disappoint the hype.
               </p>
               <p>
-                However, I often use it for when I&apos;m creating a greenfield
-                project where a lot needs to get done. It requires a{' '}
-                <Code>progress.txt</Code> and <Code>prd.json</Code>. Good for
-                larger projects or changes that get speedrun with multiple
-                coordinated Claude Code agents.
+                Ralph basically puts a bunch of Claude codes into a loop and
+                coordinates them using a <Code>prd.json</Code> and{' '}
+                <Code>progress.txt</Code>. I do sometimes use it when I&apos;m
+                starting a new project.
               </p>
               <p>
-                The{' '}
+                If you are brave enough to give it a shot, the{' '}
                 <a
                   href="https://gist.github.com/SilenNaihin/e370eb10c468916b98e4df57cf042c9a"
                   target="_blank"
