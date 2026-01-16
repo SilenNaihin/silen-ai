@@ -1078,7 +1078,7 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
               </p>
             </Prose>
             <TOCHeading id="blast-radius" level={3}>
-              Using 8 parallel terminals at once
+              Using 12 parallel terminals at once
             </TOCHeading>
             <Prose>
               <p>
@@ -1123,15 +1123,17 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 </a>
               </p>
               <p>
-                Think in <strong>&quot;blast radius&quot;</strong>. Evaluate the
-                scope of changes before prompting. If the blast radius of your
-                task overlaps with another instance, stop and ask Claude to do
-                it in a different instance.
+                Think in terms of the{' '}
+                <strong>&quot;blast radius&quot;</strong> of one of your
+                terminals. Evaluate the scope of your changes prior to sending
+                your prompt. If it overlaps with another instance, you should be
+                getting Claude to do it in that instance. You&apos;ll find that
+                it&apos;s truly rare that this mindset doesn&apos;t work.
               </p>
               <p>
-                If there were errors, or more edits you want to make, accept so
-                that you can see the diff from the next edit. You can always go
-                back with <Code>/rewind</Code>.
+                Worst case if there are errors or you miscalculated, you can
+                always revert or fix it. The cost of the rare times this happens
+                is worth it.
               </p>
               <p>
                 Our{' '}
@@ -1143,10 +1145,30 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 >
                   <Code>/commit-smart</Code>
                 </a>{' '}
-                command helps to make contextual commits. It commits only the
-                files I touched and lists each path explicitly. Allows me to
-                revert a specific change without losing unrelated work.
+                command helps to make contextual commits. It only commits files
+                that the Claude Code instance touched which allows me to revert
+                a specific change without losing unrelated work.
               </p>
+              <p>
+                For solo projects I just push to <Code>main</Code> directly.
+                When working with others
+              </p>
+              <OrderedList>
+                <li>
+                  if it&apos;s one person I&apos;ll have a branch called{' '}
+                  <Code>silen</Code> which I periodically create a PR for and
+                  merge in, or
+                </li>
+                <li>
+                  if it&apos;s multiple collaborators I&apos;ll create branches
+                  and check out the Claude instances on that branch, and
+                </li>
+                <li>
+                  if it&apos;s a more established repo I&apos;ll create a second
+                  worktree, and have two terminals associated with two different
+                  branches.
+                </li>
+              </OrderedList>
             </Prose>
           </ArticleSection>
           {/* Section 8: Your CLAUDE.md */}
