@@ -1552,31 +1552,35 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
             </TOCHeading>
             <Prose>
               <p>
-                For larger &quot;sprints&quot; where a lot needs to get done,
-                try using{' '}
+                Unfortunately, for almost everything{' '}
                 <a
                   href="https://x.com/ryancarson/status/2008548371712135632"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Ralph
-                </a>
-                . It requires a <Code>progress.txt</Code> and{' '}
-                <Code>prd.json</Code>. Good for larger projects or changes that
-                get speedrun with multiple coordinated Claude Code agents.
+                </a>{' '}
+                is more pain to get to work than it&apos;s worth. Sorry to
+                disappoint.
+              </p>
+              <p>
+                However, I often use it for when I&apos;m creating a greenfield
+                project where a lot needs to get done. It requires a{' '}
+                <Code>progress.txt</Code> and <Code>prd.json</Code>. Good for
+                larger projects or changes that get speedrun with multiple
+                coordinated Claude Code agents.
               </p>
               <p>
                 The{' '}
                 <a
-                  href="https://gist.github.com/SilenNaihin/e402188c89aab94de61df3da1c10d6ca"
+                  href="https://gist.github.com/SilenNaihin/e370eb10c468916b98e4df57cf042c9a"
                   target="_blank"
                   className="underline"
                   rel="noopener noreferrer"
                 >
-                  <Code>/setup-repo</Code> command
+                  <Code>/setup-ralph</Code> command
                 </a>{' '}
-                sets up CLAUDE.md, directory structure, and Ralph files if you
-                ask it to.
+                sets up all the Ralph files for you.
               </p>
 
               <p>
@@ -2136,6 +2140,11 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                   '/setup-repo',
                   'Once per project',
                   '<a href="https://gist.github.com/SilenNaihin/e402188c89aab94de61df3da1c10d6ca">gist</a>',
+                ],
+                [
+                  '/setup-ralph',
+                  'When using Ralph',
+                  '<a href="https://gist.github.com/SilenNaihin/e370eb10c468916b98e4df57cf042c9a">gist</a>',
                 ],
                 [
                   '/commit-smart',
