@@ -1524,6 +1524,36 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 your laptop, go places.
               </p>
               <p>
+                When you paste something longer, Claude simplifies in the
+                terminal to look at the recent changes and make sure we capture
+                those as well in our migration (the neural net changes, sim
+                changes, longest surviving changes, bug fixes), we&apos;ve added
+                interface tests for them already so don&apos;t worry about that,
+                just making you aware of those. I&apos;m sure you would have
+                caught it anyways because you&apos;re going file by file.
+                We&apos;ve also completely refactored our frontend to contain
+                less 4000 line files and have documented it in /frontend.md
+                <br />
+                <br />
+                after connecting everything make sure it passes our tests, and
+                spawn a /claude-critic subagent with context to check if
+                anything may be misaligned comprehensively
+                <br />
+                <br />
+                then connect the frontend, then double check again to make sure
+                our end to end functionality works
+                <br />
+                <br />
+                then update our README and our backend.md, as well as
+                referencing it in the /update-claudemd. 9/10 times I like this.
+              </p>
+              <p>
+                The other 10% here&apos;s my workaround: I send a bash command
+                like <Code>!sleep 100</Code>, then I click enter on my prompt,
+                then the up arrow. This will bring the fully expanded queued
+                prompt into your terminal.
+              </p>
+              <p>
                 We used to have shiny rainbow text whenever we typed
                 &apos;ultrathink&apos; which would maximize Claude&apos;s
                 thinking.
