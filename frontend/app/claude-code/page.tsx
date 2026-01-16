@@ -1078,10 +1078,33 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
               </p>
             </Prose>
             <TOCHeading id="blast-radius" level={3}>
-              All the homies hate worktrees
+              Using 8 parallel terminals at once
             </TOCHeading>
             <Prose>
-              <p className="text-sm text-neutral-500">
+              <p>
+                I often don&apos;t even have an IDE open for a repo anymore. I
+                have 12 terminals open at once, actively working from on 1-8 at
+                any given time. Typically 2 per project: one for context
+                management or Ralph, one for active multithreading.
+              </p>
+              <Figure
+                src="/articles/claude-code/terminals-4.png"
+                alt="Parallel terminals"
+              />
+              <p>
+                Making real progress in 4 projects at once requires the projects
+                to be more execution than thinking. And I have to be locked in
+                off a Celsius and a pack of Zyns (metaphorically, I don&apos;t
+                consume either. Just hard drugs like life).
+              </p>
+              <p>
+                The natural instinct is to use git worktrees to isolate parallel
+                work.
+              </p>
+              <p>
+                But hammering the same branch is the best approach when running
+                multiple instances. For speed and simplicity. In practice if you
+                do this right you&apos;ll rarely need to use worktrees.{' '}
                 <a
                   href="https://x.com/mitsuhiko/status/2011773404207337549"
                   target="_blank"
@@ -1098,15 +1121,6 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 >
                   So does Pete.
                 </a>
-              </p>
-              <p>
-                The natural instinct is to use git worktrees to isolate parallel
-                work.
-              </p>
-              <p>
-                But hammering the same branch is the best approach when running
-                multiple instances. For speed and simplicity. In practice if you
-                do this right you&apos;ll rarely need to use worktrees.
               </p>
               <p>
                 Think in <strong>&quot;blast radius&quot;</strong>. Evaluate the
@@ -1509,28 +1523,6 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 your laptop, go places.
               </p>
             </Prose>
-            <TOCHeading id="parallel-terminals" level={3}>
-              Parallel terminal workflows
-            </TOCHeading>
-            <Prose>
-              <p>
-                I often don&apos;t even have an IDE open for a repo anymore. I
-                have 12 terminals open at once, actively working from on 1-8 at
-                any given time. Typically 2 per project: one for context
-                management or Ralph, one for active multithreading.
-              </p>
-              <Figure
-                src="/articles/claude-code/terminals-4.png"
-                alt="Parallel terminals"
-              />
-              <p>
-                Making real progress in 4 projects at once requires the projects
-                to be more execution than thinking. And I have to be locked in
-                off a Celsius and a pack of Zyns (metaphorically, I don&apos;t
-                consume either. Just hard drugs like life).
-              </p>
-            </Prose>
-
             <TOCHeading id="ralph" level={3}>
               Ralph for larger projects
             </TOCHeading>
