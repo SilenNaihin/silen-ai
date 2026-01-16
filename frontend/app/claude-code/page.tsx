@@ -153,7 +153,7 @@ export default function ClaudeCodeArticle() {
                 src="/articles/claude-code/top-cursor-users.png"
                 alt="Cursor Top 0.01%"
                 caption="Tweet link"
-                href="https://x.com/silennai/status/1920221901202358760?s=20"
+                href="https://x.com/silennai/status/1907540814890521023?s=20"
               />
               <p>I tried Claude Code earlier this year. Churned.</p>
               <p>
@@ -598,9 +598,9 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 <li>
                   Generating things in a chat that already has context will
                   always perform best, whether it&apos;s docs, tests, or related
-                  code. Sometimes for one off changes (like a bug fix), I&apos;ll
-                  do them within the chat context, commit changes, and then
-                  rewind the conversation back to save context.
+                  code. Sometimes for one off changes (like a bug fix),
+                  I&apos;ll do them within the chat context, commit changes, and
+                  then rewind the conversation back to save context.
                 </li>
               </ol>
               <p>
@@ -1125,12 +1125,12 @@ Then run /setup-claude-code to install everything else.`}</CodeBlock>
                 </a>
               </p>
               <p>
-                Think in terms of the{' '}
-                <strong>&quot;blast radius&quot;</strong> of one of your
-                terminals. Evaluate the scope of your changes prior to sending
-                your prompt. If it overlaps with another instance, you should be
-                getting Claude to do it in that instance. You&apos;ll find that
-                it&apos;s truly rare that this mindset doesn&apos;t work.
+                Think in terms of the <strong>&quot;blast radius&quot;</strong>{' '}
+                of one of your terminals. Evaluate the scope of your changes
+                prior to sending your prompt. If it overlaps with another
+                instance, you should be getting Claude to do it in that
+                instance. You&apos;ll find that it&apos;s truly rare that this
+                mindset doesn&apos;t work.
               </p>
               <p>
                 Worst case if there are errors or you miscalculated, you can
