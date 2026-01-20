@@ -58,7 +58,7 @@ export function ArticleLayout({
               href="https://silennai.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-neutral-400 hover:text-white transition-colors text-sm"
+              className="text-neutral-400 hover:text-neutral-900 transition-colors text-sm"
             >
               silennai.com
             </a>

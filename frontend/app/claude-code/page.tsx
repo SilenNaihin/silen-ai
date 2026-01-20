@@ -25,7 +25,7 @@ import {
 export default function ClaudeCodeArticle() {
   return (
     <TOCProvider>
-      <StickyHeader title="Claude Code Guide" />
+      <StickyHeader title="Why I Switched to Claude Code" />
 
       <div className="pt-14">
         <ArticleLayout className="bg-white">
