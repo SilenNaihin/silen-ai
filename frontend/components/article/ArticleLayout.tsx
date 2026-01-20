@@ -51,6 +51,18 @@ export function ArticleLayout({
             </div>
           )}
           {children}
+
+          {/* Footer link */}
+          <div className="mt-16 pt-8 border-t border-neutral-800 text-center">
+            <a
+              href="https://silennai.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-400 hover:text-white transition-colors text-sm"
+            >
+              silennai.com
+            </a>
+          </div>
         </div>
       </div>
     </div>
