@@ -16,6 +16,7 @@ import {
   MutedText,
   ComparisonTable,
   Aside,
+  Figure,
 } from '@/components/article/Callouts';
 
 export default function VerifiabilityArticle() {
@@ -93,6 +94,12 @@ export default function VerifiabilityArticle() {
                 accelerate and where it will stall.
               </p>
             </Prose>
+
+            <Figure
+              src="/articles/verifiability/verification-loop.png"
+              alt="The verification loop: Generate, Verify, Learn, Improve"
+              caption="The speed of this loop determines the speed of progress"
+            />
           </ArticleSection>
 
           {/* Section 2: Dimensions of Verifiability */}
@@ -487,6 +494,12 @@ export default function VerifiabilityArticle() {
                 ],
               ]}
             />
+
+            <Figure
+              src="/articles/verifiability/dimensions.png"
+              alt="Radar chart showing the 10 dimensions of verifiability"
+              caption="The 10 dimensions of verifiability"
+            />
           </ArticleSection>
 
           {/* Section 3: The Verifiability Spectrum */}
@@ -658,6 +671,12 @@ export default function VerifiabilityArticle() {
                   'No ground truth exists',
                 ],
               ]}
+            />
+
+            <Figure
+              src="/articles/verifiability/spectrum.png"
+              alt="The verifiability spectrum from high (code, math) to low (social science, creative)"
+              caption="The verifiability spectrum across domains"
             />
 
             <InsightBox title="Historical Parallels">
@@ -1652,6 +1671,12 @@ export default function VerifiabilityArticle() {
                 verification.
               </p>
             </Prose>
+
+            <Figure
+              src="/articles/verifiability/meta-bottleneck.png"
+              alt="Verifiability as the bottleneck constraining AI capabilities"
+              caption="Verifiability is the meta-bottleneck"
+            />
           </ArticleSection>
 
           {/* Footer */}
