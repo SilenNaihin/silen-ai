@@ -14,10 +14,11 @@ import { Math, FormulaBox } from '@/components/article/Math';
 
 // Animation components
 import {
-  TokenFlowAnimation,
-  DirectPathAnimation,
-  LanguageFlowAnimation,
-  SymmetryProblemAnimation,
+  IntroAnimation,
+  TwoMatricesAnimation,
+  DirectPathMatrixAnimation,
+  BigramDirectionalityAnimation,
+  SymmetryConstraintAnimation,
   SGDCantFixAnimation,
   UntiedSolutionAnimation,
   MLPWorkaroundAnimation,
@@ -41,7 +42,7 @@ export default function TiedEmbeddingsArticle() {
         githubUrl={NOTEBOOK_GITHUB_URL}
       />
 
-      <StickyHeader title="Tied Embeddings" />
+      <StickyHeader title="The pragmatic tradeoff of tied embeddings" />
 
       <div className="pt-14">
         <ArticleLayout
@@ -50,22 +51,27 @@ export default function TiedEmbeddingsArticle() {
               scrollProgress={scrollProgress}
               animations={[
                 {
-                  render: (p) => <TokenFlowAnimation progress={p} />,
-                  startElementId: 'two-matrices',
+                  render: (p) => <IntroAnimation progress={p} />,
+                  startElementId: 'article-start',
                   overlap: 0.15,
                 },
                 {
-                  render: (p) => <DirectPathAnimation progress={p} />,
+                  render: (p) => <TwoMatricesAnimation progress={p} />,
+                  startElementId: 'two-matrices',
+                  overlap: 0.1,
+                },
+                {
+                  render: (p) => <DirectPathMatrixAnimation progress={p} />,
                   startElementId: 'direct-path',
                   overlap: 0.15,
                 },
                 {
-                  render: (p) => <LanguageFlowAnimation progress={p} />,
+                  render: (p) => <BigramDirectionalityAnimation progress={p} />,
                   startElementId: 'bigrams',
                   overlap: 0.15,
                 },
                 {
-                  render: (p) => <SymmetryProblemAnimation progress={p} />,
+                  render: (p) => <SymmetryConstraintAnimation progress={p} />,
                   startElementId: 'symmetry-problem',
                   overlap: 0.15,
                 },
@@ -90,11 +96,14 @@ export default function TiedEmbeddingsArticle() {
           className="bg-white"
         >
           {/* Article Title */}
-          <h1 className="text-4xl font-bold mb-2 text-black">
-            Tied Embeddings
+          <h1 id="article-start" className="text-4xl font-bold mb-2 text-black">
+            The pragmatic tradeoff of tied embeddings
           </h1>
           <p className="text-lg text-neutral-600 mb-8">
-            Why Sharing Weights Isn't Always Principled
+            In deep learning, we constantly trade compute for accuracy.
+            Quantization sacrifices precision for speed. Distillation trades
+            model size for latency. Weight sharing reduces parameters at the
+            cost of expressivity.
           </p>
 
           <TiedEmbeddingsContent />
@@ -113,22 +122,23 @@ function TiedEmbeddingsContent() {
       <ArticleSection>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
-            In deep learning, we constantly trade compute for accuracy.
-            Quantization sacrifices precision for speed. Distillation trades
-            model size for latency. Weight sharing reduces parameters at the
-            cost of expressivity.
+            Tied embeddings are one such tradeoff. It comes from a simple
+            observation &quot;hey bro. we have a 617 million parameter embedding
+            matrix on both sides of our nn. why not just make them the same
+            matrix?&quot;
           </p>
           <p>
-            <strong>Tied embeddings</strong> are one such trade: using the same
-            weight matrix for both input embeddings and output predictions. It
-            saves roughly 200M parameters for a typical LLM. For smaller models,
-            this works surprisingly well.
+            In other words: since the embedding matrix encodes semantic meaning
+            in words, it serves roughly the same purpose for both input and
+            output predictions.
+          </p>
+          <p>
+            And yes, the GPT-3 size embedding matrix is 617 million parameters
+            <Math className="ml-1">{'(50,257 tokens) × (12,288 dims)'}</Math>.
           </p>
           <p>
             But there's a fundamental mathematical reason why tied embeddings
-            can't capture something as basic as "New York" being common while
-            "York New" is rare. This isn't a training issue or a matter of more
-            data. It's linear algebra.
+            don't work at scale. Linear algebra exists.
           </p>
         </div>
       </ArticleSection>
@@ -140,7 +150,7 @@ function TiedEmbeddingsContent() {
           level={2}
           className="text-2xl font-bold mb-2 text-black"
         >
-          The Two Matrices
+          Two sides of the same coin
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>Transformers have two matrices that deal with tokens:</p>
@@ -155,9 +165,9 @@ function TiedEmbeddingsContent() {
             </li>
           </ul>
           <p>
-            With <strong>tied embeddings</strong>, we use the same weights:{' '}
-            <Math>{'W_U = W_E^T'}</Math>. This seems elegant. Fewer parameters,
-            shared structure, and a nice symmetry between input and output.
+            With tied embeddings, we use the same weights:{' '}
+            <Math>{'W_U = W_E^T'}</Math>. So elegant. Fewer parameters.
+            Symmetry.
           </p>
         </div>
       </ArticleSection>

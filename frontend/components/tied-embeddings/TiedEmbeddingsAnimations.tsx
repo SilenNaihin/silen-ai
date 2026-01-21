@@ -3,101 +3,373 @@
 import { AnimationCanvas } from '@/components/animation/AnimationCanvas';
 
 /**
- * Shared helper to draw a 3x3 matrix with labels
+ * Intro Animation - simple orbiting dots that respond to scroll
+ * Shows this is a scroll-synced animation from the start
  */
-function drawMatrix(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  values: number[][],
-  options: {
-    cellSize?: number;
-    labels?: string[];
-    title?: string;
-    highlightDiagonal?: boolean;
-    highlightPair?: [number, number] | null;
-    maxVal?: number;
-    colorPositive?: string;
-    colorNegative?: string;
-  } = {}
-) {
-  const {
-    cellSize = 50,
-    labels = ['A', 'B', 'C'],
-    title,
-    highlightDiagonal = false,
-    highlightPair = null,
-    maxVal = Math.max(...values.flat().map(Math.abs)),
-    colorPositive = '#000',
-    colorNegative = '#000',
-  } = options;
+export function IntroAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+    const cx = width / 2;
+    const cy = height / 2;
 
-  const matrixSize = cellSize * 3;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
 
-  // Title
-  if (title) {
+    // Central dot
     ctx.fillStyle = '#000';
-    ctx.font = '13px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(title, x + matrixSize / 2, y - 12);
-  }
+    ctx.beginPath();
+    ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    ctx.fill();
 
-  // Draw cells
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
-      const val = values[i][j];
-      const normalized = maxVal > 0 ? Math.abs(val) / maxVal : 0;
-      const cellX = x + j * cellSize;
-      const cellY = y + i * cellSize;
+    // Orbiting dots - positions based on scroll progress
+    const numDots = 8;
+    const baseRadius = 60 + progress * 40;
 
-      // Background - grayscale intensity
-      const grayVal = Math.round(255 - normalized * 180);
-      ctx.fillStyle = `rgb(${grayVal}, ${grayVal}, ${grayVal})`;
-      ctx.fillRect(cellX, cellY, cellSize - 2, cellSize - 2);
+    for (let i = 0; i < numDots; i++) {
+      const angle = (i / numDots) * Math.PI * 2 + progress * Math.PI * 2;
+      const x = cx + Math.cos(angle) * baseRadius;
+      const y = cy + Math.sin(angle) * baseRadius;
+      const dotSize = 3 + (i % 3);
 
-      // Highlight diagonal
-      if (highlightDiagonal && i === j) {
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(cellX, cellY, cellSize - 2, cellSize - 2);
-      }
-
-      // Highlight symmetric pair
-      if (highlightPair && ((i === highlightPair[0] && j === highlightPair[1]) ||
-                            (i === highlightPair[1] && j === highlightPair[0]))) {
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(cellX + 1, cellY + 1, cellSize - 4, cellSize - 4);
-      }
-
-      // Value text
-      ctx.fillStyle = normalized > 0.5 ? '#fff' : '#000';
-      ctx.font = '12px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(val.toFixed(2), cellX + cellSize / 2, cellY + cellSize / 2 + 4);
+      ctx.globalAlpha = 0.3 + (i / numDots) * 0.7;
+      ctx.beginPath();
+      ctx.arc(x, y, dotSize, 0, Math.PI * 2);
+      ctx.fill();
     }
-  }
 
-  // Row labels (left)
-  ctx.fillStyle = '#666';
-  ctx.font = '11px sans-serif';
-  ctx.textAlign = 'right';
-  labels.forEach((label, i) => {
-    ctx.fillText(label, x - 8, y + i * cellSize + cellSize / 2 + 4);
-  });
+    ctx.globalAlpha = 1;
+  };
 
-  // Column labels (bottom)
-  ctx.textAlign = 'center';
-  labels.forEach((label, j) => {
-    ctx.fillText(label, x + j * cellSize + cellSize / 2, y + matrixSize + 15);
-  });
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
 }
 
 /**
- * Animation showing token flowing through embedding and unembedding matrices
- * Clean, minimalist design with clear visibility
+ * Two Matrices Animation - sequential walkthrough of embedding/unembedding
+ * Matches article values: 3 tokens × 2 embedding dimensions
+ * 1. Empty W_E and W_U matrices with arrow
+ * 2. Token labels fade in (New, York, City)
+ * 3. W_E fills in with numbers
+ * 4. York row gets outlined
+ * 5. W_U fills in
+ * 6. City column in W_U gets outlined with percentages
  */
-export function TokenFlowAnimation({ progress }: { progress: number }) {
+export function TwoMatricesAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+    const cx = width / 2;
+    const cy = height / 2;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    const ease = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+    const fadeIn = (start: number, end: number) => {
+      if (progress < start) return 0;
+      if (progress > end) return 1;
+      return ease((progress - start) / (end - start));
+    };
+
+    const tokens = ['New', 'York', 'City'];
+    const cellW = 44;
+    const cellH = 36;
+
+    // W_E: 3 rows × 2 cols (left side) - matches article
+    const gap = 50; // gap between matrices
+    const weWidth = cellW * 2;
+    const wuWidth = cellW * 3;
+    const totalWidth = weWidth + gap + wuWidth;
+
+    const weX = cx - totalWidth / 2;
+    const weY = cy - (cellH * 3) / 2 + 10;
+
+    // W_U: 2 rows × 3 cols (right side) - W_E transposed
+    const wuX = weX + weWidth + gap;
+    const wuY = cy - (cellH * 2) / 2 + 10;
+
+    // Embedding values from the article
+    const W_E = [
+      [1.0, 0.5],  // "New"
+      [0.8, 0.9],  // "York"
+      [0.3, 1.2],  // "City"
+    ];
+
+    // ========================================
+    // STEP 1: Empty matrices + arrow (0 - 0.15)
+    // ========================================
+    const boxAlpha = fadeIn(0, 0.08);
+    ctx.globalAlpha = boxAlpha;
+
+    // W_E outline
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(weX, weY, cellW * 2, cellH * 3);
+
+    // W_U outline
+    ctx.strokeRect(wuX, wuY, cellW * 3, cellH * 2);
+
+    // Labels
+    ctx.fillStyle = '#000';
+    ctx.font = 'bold 13px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('W_E', weX + cellW, weY - 14);
+    ctx.fillText('W_U', wuX + (cellW * 3) / 2, wuY - 14);
+
+    // Arrow between matrices
+    const arrowY = cy + 10;
+    const arrowStartX = weX + cellW * 2 + 10;
+    const arrowEndX = wuX - 10;
+
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(arrowStartX, arrowY);
+    ctx.lineTo(arrowEndX - 8, arrowY);
+    ctx.stroke();
+
+    // Arrowhead
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.moveTo(arrowEndX, arrowY);
+    ctx.lineTo(arrowEndX - 8, arrowY - 5);
+    ctx.lineTo(arrowEndX - 8, arrowY + 5);
+    ctx.closePath();
+    ctx.fill();
+
+    // ========================================
+    // STEP 2: Token labels fade in (0.12 - 0.28)
+    // ========================================
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'right';
+    tokens.forEach((token, i) => {
+      const alpha = fadeIn(0.12 + i * 0.04, 0.2 + i * 0.04);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#000';
+      ctx.fillText(token, weX - 10, weY + i * cellH + cellH / 2 + 4);
+    });
+
+    // Column labels for W_U (same tokens)
+    ctx.textAlign = 'center';
+    tokens.forEach((token, i) => {
+      const alpha = fadeIn(0.12 + i * 0.04, 0.2 + i * 0.04);
+      ctx.globalAlpha = alpha;
+      ctx.fillText(token, wuX + i * cellW + cellW / 2, wuY + cellH * 2 + 16);
+    });
+
+    // ========================================
+    // STEP 3: W_E fills in (0.25 - 0.45)
+    // ========================================
+    W_E.forEach((row, ri) => {
+      row.forEach((val, ci) => {
+        const alpha = fadeIn(0.25 + ri * 0.05 + ci * 0.02, 0.35 + ri * 0.05 + ci * 0.02);
+        if (alpha <= 0) return;
+
+        ctx.globalAlpha = alpha;
+        const x = weX + ci * cellW;
+        const y = weY + ri * cellH;
+        const norm = val / 1.2; // normalize to max value
+        const gray = Math.round(220 - norm * 140);
+
+        ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
+        ctx.fillRect(x + 1, y + 1, cellW - 2, cellH - 2);
+
+        ctx.fillStyle = norm > 0.5 ? '#fff' : '#000';
+        ctx.font = '12px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(val.toFixed(1), x + cellW / 2, y + cellH / 2 + 4);
+      });
+    });
+
+    // ========================================
+    // STEP 4: York row outlined (0.45 - 0.55)
+    // ========================================
+    const yorkAlpha = fadeIn(0.45, 0.52);
+    if (yorkAlpha > 0) {
+      ctx.globalAlpha = yorkAlpha;
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(weX - 1, weY + cellH - 1, cellW * 2 + 2, cellH + 2);
+    }
+
+    // ========================================
+    // STEP 5: W_U fills in (0.52 - 0.72)
+    // ========================================
+    for (let ri = 0; ri < 2; ri++) {
+      for (let ci = 0; ci < 3; ci++) {
+        const val = W_E[ci][ri]; // transposed
+        const alpha = fadeIn(0.52 + ri * 0.05 + ci * 0.02, 0.62 + ri * 0.05 + ci * 0.02);
+        if (alpha <= 0) continue;
+
+        ctx.globalAlpha = alpha;
+        const x = wuX + ci * cellW;
+        const y = wuY + ri * cellH;
+        const norm = val / 1.2;
+        const gray = Math.round(220 - norm * 140);
+
+        ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
+        ctx.fillRect(x + 1, y + 1, cellW - 2, cellH - 2);
+
+        ctx.fillStyle = norm > 0.5 ? '#fff' : '#000';
+        ctx.font = '12px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(val.toFixed(1), x + cellW / 2, y + cellH / 2 + 4);
+      }
+    }
+
+    // ========================================
+    // STEP 6: City column outlined + percentages (0.75 - 1.0)
+    // ========================================
+    const cityAlpha = fadeIn(0.75, 0.82);
+    if (cityAlpha > 0) {
+      ctx.globalAlpha = cityAlpha;
+
+      // Outline City column (column 2)
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(wuX + cellW * 2 - 1, wuY - 1, cellW + 2, cellH * 2 + 2);
+
+      // Percentages below each column (from article: 13%, 32%, 55%)
+      const percentages = ['13%', '32%', '55%'];
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#666';
+
+      percentages.forEach((pct, i) => {
+        const pctAlpha = fadeIn(0.82 + i * 0.03, 0.9 + i * 0.03);
+        ctx.globalAlpha = pctAlpha;
+        ctx.fillText(pct, wuX + i * cellW + cellW / 2, wuY + cellH * 2 + 30);
+      });
+    }
+
+    ctx.globalAlpha = 1;
+  };
+
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
+}
+
+/**
+ * Direct path matrix animation - shows actual W_E @ W_E^T values
+ * Matrix builds up as you scroll, highlighting rows progressively
+ */
+export function DirectPathMatrixAnimation({ progress }: { progress: number }) {
+  const renderAnimation = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    const tokens = ['New', 'York', 'City'];
+    const result = [
+      [1.25, 1.25, 0.90],
+      [1.25, 1.45, 1.32],
+      [0.90, 1.32, 1.53],
+    ];
+
+    const cellSize = 55;
+    const matrixX = width / 2 - (cellSize * 3) / 2;
+    const matrixY = 50;
+
+    // Title
+    ctx.fillStyle = '#000';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('W_E @ W_E^T', width / 2, 30);
+
+    // Draw cells - reveal based on progress
+    const cellsToShow = Math.floor(progress * 12); // 9 cells + some buffer
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const cellIndex = i * 3 + j;
+        const cellX = matrixX + j * cellSize;
+        const cellY = matrixY + i * cellSize;
+
+        if (cellIndex < cellsToShow) {
+          const val = result[i][j];
+          const normalized = val / 1.53;
+          const grayVal = Math.round(255 - normalized * 180);
+
+          // Cell background
+          ctx.fillStyle = `rgb(${grayVal}, ${grayVal}, ${grayVal})`;
+          ctx.fillRect(cellX, cellY, cellSize - 2, cellSize - 2);
+
+          // Value text
+          ctx.fillStyle = normalized > 0.5 ? '#fff' : '#000';
+          ctx.font = '13px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(val.toFixed(2), cellX + cellSize / 2, cellY + cellSize / 2 + 5);
+        } else {
+          // Empty cell placeholder
+          ctx.fillStyle = '#f5f5f5';
+          ctx.fillRect(cellX, cellY, cellSize - 2, cellSize - 2);
+        }
+      }
+    }
+
+    // Row labels (left)
+    ctx.fillStyle = '#666';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'right';
+    tokens.forEach((label, i) => {
+      ctx.fillText(label, matrixX - 8, matrixY + i * cellSize + cellSize / 2 + 4);
+    });
+
+    // Column labels (bottom)
+    ctx.textAlign = 'center';
+    tokens.forEach((label, j) => {
+      ctx.fillText(label, matrixX + j * cellSize + cellSize / 2, matrixY + cellSize * 3 + 18);
+    });
+
+    // Highlight diagonal (symmetry indicator) at high progress
+    if (progress > 0.8) {
+      const highlightAlpha = (progress - 0.8) / 0.2;
+      ctx.globalAlpha = highlightAlpha;
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+
+      // Highlight symmetric pairs [0,1] and [1,0]
+      ctx.setLineDash([4, 3]);
+      ctx.strokeRect(matrixX + cellSize, matrixY, cellSize - 2, cellSize - 2);
+      ctx.strokeRect(matrixX, matrixY + cellSize, cellSize - 2, cellSize - 2);
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
+  };
+
+  return (
+    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
+      {renderAnimation}
+    </AnimationCanvas>
+  );
+}
+
+/**
+ * Bigram directionality - shows asymmetric flow between tokens
+ * Arrow weights change with scroll to emphasize the asymmetry
+ */
+export function BigramDirectionalityAnimation({ progress }: { progress: number }) {
   const renderAnimation = (
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement
@@ -110,242 +382,97 @@ export function TokenFlowAnimation({ progress }: { progress: number }) {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
-    // Title
-    ctx.font = '16px sans-serif';
-    ctx.textAlign = 'center';
+    // Two token circles
+    const leftX = width * 0.28;
+    const rightX = width * 0.72;
+    const tokenRadius = 28;
+
+    // Labels
     ctx.fillStyle = '#000';
-    ctx.fillText('The Direct Path', width / 2, 35);
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('New', leftX, centerY + tokenRadius + 22);
+    ctx.fillText('York', rightX, centerY + tokenRadius + 22);
 
-    // Define stages with larger boxes
-    const stages = [
-      { label: 'token', x: width * 0.12 },
-      { label: 'W_E', x: width * 0.32 },
-      { label: 'residual', x: width * 0.52 },
-      { label: 'W_U', x: width * 0.72 },
-      { label: 'logits', x: width * 0.92 },
-    ];
+    // Draw tokens
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(leftX, centerY, tokenRadius, 0, Math.PI * 2);
+    ctx.fill();
 
-    const boxWidth = 70;
-    const boxHeight = 45;
+    ctx.beginPath();
+    ctx.arc(rightX, centerY, tokenRadius, 0, Math.PI * 2);
+    ctx.fill();
 
-    // All elements visible after initial fade-in
-    const fadeIn = Math.min(1, progress * 3);
+    // White centers
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(leftX, centerY, tokenRadius * 0.45, 0, Math.PI * 2);
+    ctx.fill();
 
-    ctx.globalAlpha = fadeIn;
+    ctx.beginPath();
+    ctx.arc(rightX, centerY, tokenRadius * 0.45, 0, Math.PI * 2);
+    ctx.fill();
 
-    stages.forEach((stage, i) => {
-      const isMatrix = stage.label === 'W_E' || stage.label === 'W_U';
+    const arrowGap = 42;
+    const arrowY1 = centerY - 16;
+    const arrowY2 = centerY + 16;
 
-      // Draw box
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(stage.x - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight);
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = isMatrix ? 2 : 1;
-      ctx.strokeRect(stage.x - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight);
+    // Strong arrow: New → York (top) - grows with progress
+    const strongWeight = 2 + progress * 5;
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = strongWeight;
+    ctx.beginPath();
+    ctx.moveTo(leftX + arrowGap, arrowY1);
+    ctx.lineTo(rightX - arrowGap - 14, arrowY1);
+    ctx.stroke();
 
-      // Label
-      ctx.fillStyle = '#000';
-      ctx.font = isMatrix ? 'bold 14px monospace' : '13px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(stage.label, stage.x, centerY + 5);
+    // Strong arrowhead
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.moveTo(rightX - arrowGap, arrowY1);
+    ctx.lineTo(rightX - arrowGap - 14, arrowY1 - 8);
+    ctx.lineTo(rightX - arrowGap - 14, arrowY1 + 8);
+    ctx.closePath();
+    ctx.fill();
 
-      // Draw arrow to next stage
-      if (i < stages.length - 1) {
-        const nextStage = stages[i + 1];
-        const arrowStart = stage.x + boxWidth / 2 + 8;
-        const arrowEnd = nextStage.x - boxWidth / 2 - 8;
-
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(arrowStart, centerY);
-        ctx.lineTo(arrowEnd - 6, centerY);
-        ctx.stroke();
-
-        // Arrowhead
-        ctx.beginPath();
-        ctx.moveTo(arrowEnd, centerY);
-        ctx.lineTo(arrowEnd - 8, centerY - 5);
-        ctx.lineTo(arrowEnd - 8, centerY + 5);
-        ctx.closePath();
-        ctx.fill();
-      }
-    });
-
-    // Show "tied" connection after full visibility
+    // Weak arrow: York → New (bottom) - appears after 30% progress
     if (progress > 0.3) {
-      const tieOpacity = Math.min(1, (progress - 0.3) / 0.3);
-      ctx.globalAlpha = tieOpacity;
+      const weakAlpha = Math.min(1, (progress - 0.3) / 0.3);
+      const weakWeight = 1.5;
 
-      // Draw curved dashed line connecting W_E and W_U
+      ctx.globalAlpha = weakAlpha * 0.4;
       ctx.strokeStyle = '#000';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([6, 4]);
+      ctx.lineWidth = weakWeight;
       ctx.beginPath();
-      const weX = width * 0.32;
-      const wuX = width * 0.72;
-      ctx.moveTo(weX, centerY - boxHeight / 2 - 8);
-      ctx.quadraticCurveTo(width * 0.52, centerY - 90, wuX, centerY - boxHeight / 2 - 8);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Label for tied connection
-      ctx.fillStyle = '#000';
-      ctx.font = '13px sans-serif';
-      ctx.fillText('Tied: W_U = W_E^T', width * 0.52, centerY - 75);
-    }
-
-    ctx.globalAlpha = 1;
-
-    // Subtitle
-    ctx.fillStyle = '#666';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('Same matrix used for input and output', width / 2, height - 25);
-  };
-
-  return (
-    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
-      {renderAnimation}
-    </AnimationCanvas>
-  );
-}
-
-/**
- * Animation showing the direct path matrix computation
- * Larger, cleaner visualization
- */
-export function DirectPathAnimation({ progress }: { progress: number }) {
-  const renderAnimation = (
-    ctx: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement
-  ) => {
-    const dpr = window.devicePixelRatio || 1;
-    const width = canvas.width / dpr;
-    const height = canvas.height / dpr;
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, width, height);
-
-    // Title
-    ctx.font = '16px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#000';
-    ctx.fillText('W_E @ W_E^T = Direct Path Matrix', width / 2, 30);
-
-    const tokens = ['New', 'York', 'City'];
-    const result = [
-      [1.25, 1.25, 0.90],
-      [1.25, 1.45, 1.32],
-      [0.90, 1.32, 1.53],
-    ];
-
-    // Draw single large matrix in center
-    const cellSize = 55;
-    const matrixX = width / 2 - (cellSize * 3) / 2;
-    const matrixY = 60;
-
-    // Animate row highlight
-    const highlightRow = Math.floor(progress * 4) % 3;
-
-    drawMatrix(ctx, matrixX, matrixY, result, {
-      cellSize,
-      labels: tokens,
-      maxVal: 1.53,
-    });
-
-    // Highlight current row
-    if (progress > 0.1) {
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(
-        matrixX,
-        matrixY + highlightRow * cellSize,
-        cellSize * 3 - 2,
-        cellSize - 2
-      );
-    }
-
-    // Explanation text
-    ctx.fillStyle = '#000';
-    ctx.font = '13px sans-serif';
-    ctx.textAlign = 'center';
-    const explanations = [
-      `Input "New" → logits for each output`,
-      `Input "York" → logits for each output`,
-      `Input "City" → logits for each output`,
-    ];
-    ctx.fillText(explanations[highlightRow], width / 2, height - 25);
-  };
-
-  return (
-    <AnimationCanvas progress={progress} className="w-full h-full bg-white rounded-lg">
-      {renderAnimation}
-    </AnimationCanvas>
-  );
-}
-
-/**
- * Aesthetic animation - abstract wave patterns representing language flow
- * Replaces the confusing bigrams animation
- */
-export function LanguageFlowAnimation({ progress }: { progress: number }) {
-  const renderAnimation = (
-    ctx: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement
-  ) => {
-    const dpr = window.devicePixelRatio || 1;
-    const width = canvas.width / dpr;
-    const height = canvas.height / dpr;
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, width, height);
-
-    // Title
-    ctx.font = '16px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#000';
-    ctx.fillText('Language Has Direction', width / 2, 30);
-
-    // Draw flowing lines representing directional language
-    const numLines = 5;
-    const lineSpacing = (height - 100) / (numLines + 1);
-
-    for (let i = 0; i < numLines; i++) {
-      const y = 60 + lineSpacing * (i + 1);
-      const phase = progress * Math.PI * 2 + i * 0.5;
-
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-
-      for (let x = 30; x < width - 30; x += 2) {
-        const normalizedX = (x - 30) / (width - 60);
-        const amplitude = 15 * Math.sin(normalizedX * Math.PI);
-        const yOffset = Math.sin(normalizedX * Math.PI * 3 + phase) * amplitude;
-
-        if (x === 30) {
-          ctx.moveTo(x, y + yOffset);
-        } else {
-          ctx.lineTo(x, y + yOffset);
-        }
-      }
+      ctx.moveTo(rightX - arrowGap, arrowY2);
+      ctx.lineTo(leftX + arrowGap + 10, arrowY2);
       ctx.stroke();
 
-      // Arrow at end
-      const arrowX = width - 35;
+      // Weak arrowhead
       ctx.beginPath();
-      ctx.moveTo(arrowX, y);
-      ctx.lineTo(arrowX - 10, y - 5);
-      ctx.lineTo(arrowX - 10, y + 5);
+      ctx.moveTo(leftX + arrowGap, arrowY2);
+      ctx.lineTo(leftX + arrowGap + 10, arrowY2 - 5);
+      ctx.lineTo(leftX + arrowGap + 10, arrowY2 + 5);
       ctx.closePath();
-      ctx.fillStyle = '#000';
       ctx.fill();
+
+      ctx.globalAlpha = 1;
     }
 
-    // Subtitle
-    ctx.fillStyle = '#666';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('"New → York" common, "York → New" rare', width / 2, height - 20);
+    // Probability labels at high progress
+    if (progress > 0.6) {
+      const labelAlpha = (progress - 0.6) / 0.4;
+      ctx.globalAlpha = labelAlpha;
+      ctx.fillStyle = '#000';
+      ctx.font = '12px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('P = 0.85', width / 2, arrowY1 - 12);
+
+      ctx.globalAlpha = labelAlpha * 0.5;
+      ctx.fillText('P = 0.10', width / 2, arrowY2 + 20);
+      ctx.globalAlpha = 1;
+    }
   };
 
   return (
@@ -356,9 +483,10 @@ export function LanguageFlowAnimation({ progress }: { progress: number }) {
 }
 
 /**
- * Animation showing the symmetry problem - stacked matrices for visibility
+ * Symmetry constraint - side by side comparison
+ * Target (asymmetric) vs Tied (symmetric) with actual values
  */
-export function SymmetryProblemAnimation({ progress }: { progress: number }) {
+export function SymmetryConstraintAnimation({ progress }: { progress: number }) {
   const renderAnimation = (
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement
@@ -370,96 +498,115 @@ export function SymmetryProblemAnimation({ progress }: { progress: number }) {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
-    const tokens = ['New', 'York', 'City'];
-    const cellSize = 45;
-    const matrixWidth = cellSize * 3;
+    const cellSize = 38;
+    const tokens = ['N', 'Y', 'C'];
 
-    // Target (asymmetric bigrams) - TOP
+    // Target bigrams (asymmetric) - what we want
     const target = [
       [0.05, 0.85, 0.10],
       [0.10, 0.05, 0.85],
       [0.60, 0.30, 0.10],
     ];
 
-    // Tied result (symmetric) - BOTTOM
+    // Tied result (symmetric) - what we get
     const tied = [
       [1.25, 1.25, 0.90],
       [1.25, 1.45, 1.32],
       [0.90, 1.32, 1.53],
     ];
 
-    const topY = 35;
-    const bottomY = height / 2 + 20;
-    const matrixX = width / 2 - matrixWidth / 2;
+    const leftX = width * 0.22 - (cellSize * 3) / 2;
+    const rightX = width * 0.78 - (cellSize * 3) / 2;
+    const matrixY = 55;
 
-    // Fade in based on progress
-    const fadeIn = Math.min(1, progress * 2);
-    ctx.globalAlpha = fadeIn;
+    // Reveal based on progress
+    const revealCells = Math.floor(progress * 12);
 
-    // Top matrix - Target
-    ctx.fillStyle = '#000';
-    ctx.font = '13px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Target: Bigram Probabilities (asymmetric)', width / 2, topY - 5);
+    // Helper to draw matrix
+    const drawMatrix = (
+      x: number,
+      values: number[][],
+      maxVal: number,
+      title: string
+    ) => {
+      // Title
+      ctx.fillStyle = '#000';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(title, x + (cellSize * 3) / 2, matrixY - 12);
 
-    drawMatrix(ctx, matrixX, topY + 10, target, {
-      cellSize,
-      labels: tokens,
-      maxVal: 0.85,
-    });
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          const cellIndex = i * 3 + j;
+          const cellX = x + j * cellSize;
+          const cellY = matrixY + i * cellSize;
 
-    // Highlight asymmetric pair in target
-    if (progress > 0.4) {
+          if (cellIndex < revealCells) {
+            const val = values[i][j];
+            const normalized = maxVal > 0 ? val / maxVal : 0;
+            const grayVal = Math.round(255 - normalized * 180);
+
+            ctx.fillStyle = `rgb(${grayVal}, ${grayVal}, ${grayVal})`;
+            ctx.fillRect(cellX, cellY, cellSize - 1, cellSize - 1);
+
+            ctx.fillStyle = normalized > 0.5 ? '#fff' : '#000';
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(val.toFixed(2), cellX + cellSize / 2, cellY + cellSize / 2 + 3);
+          } else {
+            ctx.fillStyle = '#f5f5f5';
+            ctx.fillRect(cellX, cellY, cellSize - 1, cellSize - 1);
+          }
+        }
+      }
+
+      // Labels
+      ctx.fillStyle = '#666';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'right';
+      tokens.forEach((label, i) => {
+        ctx.fillText(label, x - 5, matrixY + i * cellSize + cellSize / 2 + 3);
+      });
+    };
+
+    // Draw both matrices
+    drawMatrix(leftX, target, 0.85, 'Target (bigrams)');
+    drawMatrix(rightX, tied, 1.53, 'Tied result');
+
+    // Highlight asymmetric vs symmetric pairs at high progress
+    if (progress > 0.7) {
+      const highlightAlpha = (progress - 0.7) / 0.3;
+      ctx.globalAlpha = highlightAlpha;
+
+      // Left matrix: highlight [0,1]=0.85 vs [1,0]=0.10 (different!)
       ctx.strokeStyle = '#000';
       ctx.lineWidth = 2;
-      // [0,1] and [1,0] are different
-      ctx.setLineDash([4, 2]);
-      ctx.strokeRect(matrixX + cellSize, topY + 10, cellSize - 2, cellSize - 2);
-      ctx.strokeRect(matrixX, topY + 10 + cellSize, cellSize - 2, cellSize - 2);
+      ctx.setLineDash([3, 2]);
+      ctx.strokeRect(leftX + cellSize, matrixY, cellSize - 1, cellSize - 1);
+      ctx.strokeRect(leftX, matrixY + cellSize, cellSize - 1, cellSize - 1);
+
+      // Right matrix: highlight [0,1]=1.25 vs [1,0]=1.25 (same!)
+      ctx.strokeRect(rightX + cellSize, matrixY, cellSize - 1, cellSize - 1);
+      ctx.strokeRect(rightX, matrixY + cellSize, cellSize - 1, cellSize - 1);
       ctx.setLineDash([]);
 
-      // Show values
-      ctx.fillStyle = '#000';
+      // Labels
       ctx.font = '11px sans-serif';
-      ctx.fillText('0.85 ≠ 0.10', width / 2 + matrixWidth / 2 + 40, topY + 10 + cellSize / 2 + 4);
-    }
-
-    // Bottom matrix - Tied
-    ctx.fillStyle = '#000';
-    ctx.font = '13px sans-serif';
-    ctx.fillText('Tied: W_E @ W_E^T (forced symmetric)', width / 2, bottomY - 5);
-
-    drawMatrix(ctx, matrixX, bottomY + 10, tied, {
-      cellSize,
-      labels: tokens,
-      maxVal: 1.53,
-    });
-
-    // Highlight symmetric pair in tied
-    if (progress > 0.6) {
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([4, 2]);
-      ctx.strokeRect(matrixX + cellSize, bottomY + 10, cellSize - 2, cellSize - 2);
-      ctx.strokeRect(matrixX, bottomY + 10 + cellSize, cellSize - 2, cellSize - 2);
-      ctx.setLineDash([]);
-
-      // Show values are equal
       ctx.fillStyle = '#000';
-      ctx.font = '11px sans-serif';
-      ctx.fillText('1.25 = 1.25', width / 2 + matrixWidth / 2 + 40, bottomY + 10 + cellSize / 2 + 4);
+      ctx.textAlign = 'center';
+      ctx.fillText('≠', leftX + (cellSize * 3) / 2, matrixY + cellSize * 3 + 22);
+      ctx.fillText('=', rightX + (cellSize * 3) / 2, matrixY + cellSize * 3 + 22);
+
+      ctx.globalAlpha = 1;
     }
 
-    // NOT EQUAL sign between matrices
-    if (progress > 0.5) {
-      ctx.globalAlpha = Math.min(1, (progress - 0.5) * 4);
-      ctx.fillStyle = '#000';
-      ctx.font = 'bold 24px sans-serif';
-      ctx.fillText('≠', width / 2, (topY + 10 + cellSize * 3 + bottomY) / 2 + 5);
-      ctx.globalAlpha = fadeIn;
-    }
-
-    ctx.globalAlpha = 1;
+    // Center divider
+    ctx.strokeStyle = '#e5e5e5';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(width / 2, 30);
+    ctx.lineTo(width / 2, height - 20);
+    ctx.stroke();
   };
 
   return (
@@ -470,7 +617,8 @@ export function SymmetryProblemAnimation({ progress }: { progress: number }) {
 }
 
 /**
- * Animation showing random matrices all producing symmetric results
+ * SGD can't fix - shows multiple random W_E all producing symmetric results
+ * Cycles through configurations as you scroll, all symmetric
  */
 export function SGDCantFixAnimation({ progress }: { progress: number }) {
   const renderAnimation = (
@@ -484,30 +632,25 @@ export function SGDCantFixAnimation({ progress }: { progress: number }) {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
-    // Title
-    ctx.font = '16px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#000';
-    ctx.fillText('Any W_E Produces Symmetric W_E @ W_E^T', width / 2, 28);
-
-    // Generate pseudo-random matrices based on progress
+    // Progress determines which random seed we show
     const trial = Math.floor(progress * 6);
 
+    // Seeded random
     const seededRandom = (seed: number) => {
-      const x = Math.sin(seed * 12.9898) * 43758.5453;
+      const x = Math.sin(seed * 12.9898 + trial * 78.233) * 43758.5453;
       return x - Math.floor(x);
     };
 
-    // Generate W_E for current trial
+    // Generate W_E (3x2)
     const W_E: number[][] = [];
     for (let i = 0; i < 3; i++) {
       W_E[i] = [];
       for (let j = 0; j < 2; j++) {
-        W_E[i][j] = Math.round((seededRandom(trial * 100 + i * 10 + j) - 0.5) * 20) / 10;
+        W_E[i][j] = Math.round((seededRandom(i * 10 + j) - 0.5) * 20) / 10;
       }
     }
 
-    // Compute W_E @ W_E^T
+    // Compute W_E @ W_E^T (always symmetric!)
     const result: number[][] = [];
     for (let i = 0; i < 3; i++) {
       result[i] = [];
@@ -516,35 +659,56 @@ export function SGDCantFixAnimation({ progress }: { progress: number }) {
       }
     }
 
-    const cellSize = 50;
-    const matrixX = width / 2 - (cellSize * 3) / 2;
-    const matrixY = 55;
-
-    // Draw result matrix
-    drawMatrix(ctx, matrixX, matrixY, result, {
-      cellSize,
-      labels: ['A', 'B', 'C'],
-      highlightPair: [0, 1],
-    });
-
-    // Trial counter
-    ctx.fillStyle = '#666';
-    ctx.font = '12px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(`Random W_E #${trial + 1}`, width / 2, matrixY + cellSize * 3 + 35);
-
-    // Symmetry verification
+    // Title
     ctx.fillStyle = '#000';
     ctx.font = '13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`Random W_E #${trial + 1}`, width / 2, 25);
+
+    // Draw result matrix
+    const cellSize = 50;
+    const matrixX = width / 2 - (cellSize * 3) / 2;
+    const matrixY = 45;
+    const maxVal = Math.max(...result.flat().map(Math.abs)) || 1;
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const val = result[i][j];
+        const normalized = Math.abs(val) / maxVal;
+        const grayVal = Math.round(255 - normalized * 180);
+        const cellX = matrixX + j * cellSize;
+        const cellY = matrixY + i * cellSize;
+
+        ctx.fillStyle = `rgb(${grayVal}, ${grayVal}, ${grayVal})`;
+        ctx.fillRect(cellX, cellY, cellSize - 2, cellSize - 2);
+
+        ctx.fillStyle = normalized > 0.5 ? '#fff' : '#000';
+        ctx.font = '12px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(val.toFixed(2), cellX + cellSize / 2, cellY + cellSize / 2 + 4);
+      }
+    }
+
+    // Highlight symmetric pair
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 3]);
+    ctx.strokeRect(matrixX + cellSize, matrixY, cellSize - 2, cellSize - 2);
+    ctx.strokeRect(matrixX, matrixY + cellSize, cellSize - 2, cellSize - 2);
+    ctx.setLineDash([]);
+
+    // Symmetry check
+    ctx.fillStyle = '#000';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
     ctx.fillText(
-      `[A,B] = ${result[0][1].toFixed(2)}  =  [B,A] = ${result[1][0].toFixed(2)}`,
+      `[0,1] = ${result[0][1].toFixed(2)}  =  [1,0] = ${result[1][0].toFixed(2)}`,
       width / 2,
-      height - 25
+      matrixY + cellSize * 3 + 25
     );
 
-    // Checkmark
-    ctx.font = 'bold 14px sans-serif';
-    ctx.fillText('✓ Always symmetric', width / 2, height - 8);
+    ctx.font = '13px sans-serif';
+    ctx.fillText('Always symmetric', width / 2, height - 15);
   };
 
   return (
@@ -555,7 +719,8 @@ export function SGDCantFixAnimation({ progress }: { progress: number }) {
 }
 
 /**
- * Animation showing untied embeddings achieving asymmetry
+ * Untied solution - shows W_E @ W_U can be asymmetric
+ * Matrix appears and highlights the asymmetric values
  */
 export function UntiedSolutionAnimation({ progress }: { progress: number }) {
   const renderAnimation = (
@@ -570,47 +735,90 @@ export function UntiedSolutionAnimation({ progress }: { progress: number }) {
     ctx.fillRect(0, 0, width, height);
 
     // Title
-    ctx.font = '16px sans-serif';
-    ctx.textAlign = 'center';
     ctx.fillStyle = '#000';
-    ctx.fillText('Untied: W_E @ W_U (separate matrices)', width / 2, 28);
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('W_E @ W_U (untied)', width / 2, 28);
 
     const tokens = ['New', 'York', 'City'];
 
-    // Untied result - can be asymmetric
+    // Untied can match the target bigrams!
     const untied = [
       [0.04, 0.82, 0.14],
       [0.12, 0.08, 0.80],
       [0.55, 0.28, 0.17],
     ];
 
-    const cellSize = 50;
+    const cellSize = 52;
     const matrixX = width / 2 - (cellSize * 3) / 2;
-    const matrixY = 55;
+    const matrixY = 50;
 
-    drawMatrix(ctx, matrixX, matrixY, untied, {
-      cellSize,
-      labels: tokens,
-      maxVal: 0.82,
-      highlightPair: [0, 1],
+    // Reveal based on progress
+    const revealCells = Math.floor(progress * 12);
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const cellIndex = i * 3 + j;
+        const cellX = matrixX + j * cellSize;
+        const cellY = matrixY + i * cellSize;
+
+        if (cellIndex < revealCells) {
+          const val = untied[i][j];
+          const normalized = val / 0.82;
+          const grayVal = Math.round(255 - normalized * 180);
+
+          ctx.fillStyle = `rgb(${grayVal}, ${grayVal}, ${grayVal})`;
+          ctx.fillRect(cellX, cellY, cellSize - 2, cellSize - 2);
+
+          ctx.fillStyle = normalized > 0.5 ? '#fff' : '#000';
+          ctx.font = '12px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(val.toFixed(2), cellX + cellSize / 2, cellY + cellSize / 2 + 4);
+        } else {
+          ctx.fillStyle = '#f5f5f5';
+          ctx.fillRect(cellX, cellY, cellSize - 2, cellSize - 2);
+        }
+      }
+    }
+
+    // Row labels
+    ctx.fillStyle = '#666';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'right';
+    tokens.forEach((label, i) => {
+      ctx.fillText(label, matrixX - 8, matrixY + i * cellSize + cellSize / 2 + 4);
     });
 
-    // Show asymmetry
-    if (progress > 0.3) {
-      const fadeIn = Math.min(1, (progress - 0.3) / 0.3);
-      ctx.globalAlpha = fadeIn;
+    // Column labels
+    ctx.textAlign = 'center';
+    tokens.forEach((label, j) => {
+      ctx.fillText(label, matrixX + j * cellSize + cellSize / 2, matrixY + cellSize * 3 + 16);
+    });
 
+    // Highlight asymmetric pair at high progress
+    if (progress > 0.6) {
+      const highlightAlpha = (progress - 0.6) / 0.4;
+      ctx.globalAlpha = highlightAlpha;
+
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 3]);
+      ctx.strokeRect(matrixX + cellSize, matrixY, cellSize - 2, cellSize - 2);
+      ctx.strokeRect(matrixX, matrixY + cellSize, cellSize - 2, cellSize - 2);
+      ctx.setLineDash([]);
+
+      // Show they're different
       ctx.fillStyle = '#000';
-      ctx.font = '13px sans-serif';
+      ctx.font = '12px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(
         `[New,York] = 0.82  ≠  [York,New] = 0.12`,
         width / 2,
-        matrixY + cellSize * 3 + 35
+        matrixY + cellSize * 3 + 38
       );
 
-      ctx.font = 'bold 14px sans-serif';
-      ctx.fillText('Can represent asymmetric relationships', width / 2, height - 15);
+      ctx.font = '13px sans-serif';
+      ctx.fillText('Can represent asymmetry', width / 2, height - 12);
 
       ctx.globalAlpha = 1;
     }
@@ -624,7 +832,8 @@ export function UntiedSolutionAnimation({ progress }: { progress: number }) {
 }
 
 /**
- * Animation showing MLP0 breaking symmetry - cleaner, longer visibility
+ * MLP workaround - shows how MLP₀ breaks symmetry
+ * Flow diagram with progress-based reveal
  */
 export function MLPWorkaroundAnimation({ progress }: { progress: number }) {
   const renderAnimation = (
@@ -634,80 +843,96 @@ export function MLPWorkaroundAnimation({ progress }: { progress: number }) {
     const dpr = window.devicePixelRatio || 1;
     const width = canvas.width / dpr;
     const height = canvas.height / dpr;
-    const centerY = height / 2;
+    const centerY = height / 2 - 10;
 
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
     // Title
-    ctx.font = '16px sans-serif';
-    ctx.textAlign = 'center';
     ctx.fillStyle = '#000';
-    ctx.fillText('MLP Breaks the Symmetry', width / 2, 30);
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('MLP Breaks Symmetry', width / 2, 25);
 
-    const boxWidth = 60;
-    const boxHeight = 40;
+    const boxW = 55;
+    const boxH = 45;
 
-    // Show the path with MLP
+    // Three stages
     const stages = [
-      { label: 'W_E', x: width * 0.2 },
-      { label: 'MLP₀', x: width * 0.5 },
-      { label: 'W_E^T', x: width * 0.8 },
+      { x: width * 0.18, label: 'W_E' },
+      { x: width * 0.5, label: 'MLP₀' },
+      { x: width * 0.82, label: 'W_E^T' },
     ];
 
-    // All elements visible throughout
-    stages.forEach((stage, i) => {
-      const isMLP = stage.label === 'MLP₀';
+    // Reveal stages based on progress
+    const stagesRevealed = Math.floor(progress * 4) + 1;
 
-      // Draw box
+    stages.forEach((stage, i) => {
+      if (i >= stagesRevealed) return;
+
+      const isMLP = i === 1;
+      const revealProgress = Math.min(1, (progress * 4 - i));
+
+      ctx.globalAlpha = revealProgress;
+
+      // Box
       ctx.fillStyle = '#fff';
-      ctx.fillRect(stage.x - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight);
+      ctx.fillRect(stage.x - boxW / 2, centerY - boxH / 2, boxW, boxH);
       ctx.strokeStyle = '#000';
-      ctx.lineWidth = isMLP ? 2 : 1;
-      ctx.strokeRect(stage.x - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight);
+      ctx.lineWidth = isMLP ? 2.5 : 1.5;
+      ctx.strokeRect(stage.x - boxW / 2, centerY - boxH / 2, boxW, boxH);
 
       // Label
       ctx.fillStyle = '#000';
-      ctx.font = 'bold 13px monospace';
+      ctx.font = isMLP ? 'bold 13px sans-serif' : '13px monospace';
       ctx.textAlign = 'center';
       ctx.fillText(stage.label, stage.x, centerY + 5);
 
-      // Draw arrow to next
-      if (i < stages.length - 1) {
+      // Arrow to next
+      if (i < stages.length - 1 && i + 1 < stagesRevealed) {
         const nextStage = stages[i + 1];
-        const arrowStart = stage.x + boxWidth / 2 + 8;
-        const arrowEnd = nextStage.x - boxWidth / 2 - 8;
+        const arrowStart = stage.x + boxW / 2 + 8;
+        const arrowEnd = nextStage.x - boxW / 2 - 8;
 
         ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(arrowStart, centerY);
-        ctx.lineTo(arrowEnd - 6, centerY);
+        ctx.lineTo(arrowEnd - 8, centerY);
         ctx.stroke();
 
+        // Arrowhead
+        ctx.fillStyle = '#000';
         ctx.beginPath();
         ctx.moveTo(arrowEnd, centerY);
-        ctx.lineTo(arrowEnd - 8, centerY - 5);
-        ctx.lineTo(arrowEnd - 8, centerY + 5);
+        ctx.lineTo(arrowEnd - 10, centerY - 6);
+        ctx.lineTo(arrowEnd - 10, centerY + 6);
         ctx.closePath();
         ctx.fill();
       }
+
+      ctx.globalAlpha = 1;
     });
 
-    // Formula
-    ctx.fillStyle = '#000';
-    ctx.font = '14px monospace';
-    ctx.fillText('W_E @ M @ W_E^T', width / 2, centerY + 55);
+    // Formula and explanation at high progress
+    if (progress > 0.5) {
+      const textAlpha = (progress - 0.5) / 0.5;
+      ctx.globalAlpha = textAlpha;
 
-    // Explanation - visible throughout
-    ctx.fillStyle = '#666';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('M is learnable → product can be asymmetric', width / 2, centerY + 80);
+      ctx.fillStyle = '#000';
+      ctx.font = '13px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('W_E @ M @ W_E^T', width / 2, centerY + boxH / 2 + 30);
 
-    // Trade-off note
-    ctx.fillStyle = '#000';
-    ctx.font = '13px sans-serif';
-    ctx.fillText('Trade-off: MLP capacity spent on this fix', width / 2, height - 20);
+      ctx.font = '12px sans-serif';
+      ctx.fillStyle = '#666';
+      ctx.fillText('M is learnable → can be asymmetric', width / 2, centerY + boxH / 2 + 50);
+
+      ctx.fillStyle = '#000';
+      ctx.fillText('Trade-off: uses MLP capacity', width / 2, height - 15);
+
+      ctx.globalAlpha = 1;
+    }
   };
 
   return (
@@ -718,7 +943,7 @@ export function MLPWorkaroundAnimation({ progress }: { progress: number }) {
 }
 
 /**
- * Blank animation for sections with interactive content
+ * Blank animation placeholder
  */
 export function BlankAnimation({ progress }: { progress: number }) {
   const renderAnimation = (
