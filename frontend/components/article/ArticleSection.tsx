@@ -69,9 +69,12 @@ export function ArticleSection({
   // Get the cell if it exists
   const cell = detectedId ? cells[detectedId] : null;
   const isInline = cell?.inline === true;
+  const isCodeAside = cell?.codeAside === true;
 
-  // Determine what to show in right panel (non-inline cells)
-  const hasRightContent = !isInline && (rightContent || cell);
+  // code-aside: output inline, code in sidebar
+  // Regular inline: both code and output inline
+  // Default: code and output in sidebar
+  const hasRightContent = rightContent || (cell && (!isInline || isCodeAside));
 
   // Desktop sidebar collapse state - controlled to respond to scroll
   const [desktopCollapsed, setDesktopCollapsed] = useState(true);
@@ -87,7 +90,15 @@ export function ArticleSection({
       return rightContent;
     }
 
-    if (cell && !isInline) {
+    // For code-aside: show only code in sidebar (no output)
+    // For regular cells: show full cell
+    if (cell && (!isInline || isCodeAside)) {
+      // For code-aside on mobile, we hide the sidebar code since output is inline
+      // Users can still access code via the inline output's "View Code" or GitHub link
+      if (isCodeAside && isMobile) {
+        return null;
+      }
+
       if (isMobile) {
         // Mobile: uncontrolled, starts collapsed
         return (
@@ -98,20 +109,24 @@ export function ArticleSection({
             collapsible={true}
             defaultCollapsed={mobileCollapsed}
             previewLines={3}
+            codeOnly={isCodeAside}
           />
         );
       }
 
       // Desktop: controlled by scroll position
+      // For code-aside, expanded flag controls the sidebar instead of inline
+      const shouldStartExpanded = isCodeAside && cell.expanded;
       return (
         <NotebookCell
           cell={cell}
           loading={loading}
           error={error}
           collapsible={true}
-          collapsed={desktopCollapsed}
+          collapsed={shouldStartExpanded ? false : desktopCollapsed}
           onCollapsedChange={setDesktopCollapsed}
           previewLines={3}
+          codeOnly={isCodeAside}
         />
       );
     }
@@ -130,16 +145,24 @@ export function ArticleSection({
       </div>
 
       {/* Inline code cell - renders in article body on all screen sizes */}
+      {/* For code-aside: only show output inline, code goes to sidebar */}
       {isInline && cell && (
-        <div className="mt-3">
+        <div className="mt-3 relative">
           <NotebookCell
             cell={cell}
             loading={loading}
             error={error}
-            collapsible={true}
-            defaultCollapsed={!cell.expanded}
+            collapsible={!isCodeAside}
+            defaultCollapsed={isCodeAside ? false : !cell.expanded}
             previewLines={3}
+            outputOnly={isCodeAside}
           />
+          {/* Dashed connector line from output to sidebar code (desktop only, code-aside only) */}
+          {isCodeAside && (
+            <div
+              className="hidden xl:block absolute top-1/2 -translate-y-1/2 left-full w-4 2xl:w-8 h-px border-t border-dashed border-neutral-300 pointer-events-none"
+            />
+          )}
         </div>
       )}
 

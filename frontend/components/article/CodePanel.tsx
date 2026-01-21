@@ -25,6 +25,10 @@ interface CodePanelProps {
   previewLines?: number;
   /** Visualization mode: show only output (no code), for graphs/plots where code is implementation detail */
   visualization?: boolean;
+  /** Show only code (no output) - used for code-aside sidebar */
+  codeOnly?: boolean;
+  /** Show only output (no code) - used for code-aside inline */
+  outputOnly?: boolean;
 }
 
 /**
@@ -141,6 +145,8 @@ export function CodePanel({
   collapsedLabel = 'View Code',
   previewLines = 0,
   visualization = false,
+  codeOnly = false,
+  outputOnly = false,
 }: CodePanelProps) {
   const [internalCollapsed, setInternalCollapsed] = useState(collapsible && defaultCollapsed);
 
@@ -219,6 +225,30 @@ export function CodePanel({
     );
   }
 
+  // Output only mode (for code-aside inline): show output with minimal chrome
+  if (outputOnly) {
+    if (!outputImage && !output) {
+      return null;
+    }
+
+    return (
+      <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white ${className}`}>
+        {outputImage && (
+          <img
+            src={outputImage}
+            alt="Output"
+            className="max-w-full h-auto"
+          />
+        )}
+        {output && !outputImage && (
+          <div className="p-3 bg-neutral-50">
+            <pre className="font-mono text-sm text-neutral-800 whitespace-pre-wrap">{output}</pre>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   // Collapsed view: show preview lines if specified, otherwise just a bar
   if (collapsible && isCollapsed) {
     // Preview mode: show first N lines collapsed
@@ -262,8 +292,8 @@ export function CodePanel({
             <FiChevronDown className="w-4 h-4" />
           </button>
 
-          {/* Output/Image if present - shown below expand button */}
-          {(output || outputImage) && (
+          {/* Output/Image if present - shown below expand button, skip when codeOnly */}
+          {!codeOnly && (output || outputImage) && (
             <>
               <div className="border-t border-neutral-200" />
               <div className="px-4 py-3 bg-neutral-50">
@@ -348,8 +378,8 @@ export function CodePanel({
         </motion.div>
       </AnimatePresence>
 
-      {/* Output section */}
-      {(output || outputImage) && (
+      {/* Output section - skip when codeOnly */}
+      {!codeOnly && (output || outputImage) && (
         <>
           <div className="border-t border-neutral-200" />
           <div className="px-4 py-3 bg-neutral-50">

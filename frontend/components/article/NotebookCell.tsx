@@ -21,6 +21,10 @@ interface NotebookCellProps {
   previewLines?: number;
   /** Override GitHub URL (defaults to context value) */
   githubUrl?: string;
+  /** Show only code (no output) - for code-aside sidebar */
+  codeOnly?: boolean;
+  /** Show only output (no code) - for code-aside inline */
+  outputOnly?: boolean;
 }
 
 /**
@@ -40,6 +44,8 @@ export function NotebookCell({
   onCollapsedChange,
   previewLines = 0,
   githubUrl: githubUrlProp,
+  codeOnly = false,
+  outputOnly = false,
 }: NotebookCellProps) {
   const { githubUrl: contextGithubUrl } = useNotebookContext();
   const githubUrl = githubUrlProp ?? contextGithubUrl;
@@ -86,6 +92,8 @@ export function NotebookCell({
       previewLines={previewLines}
       githubUrl={githubUrl ?? undefined}
       visualization={cell.visualization}
+      codeOnly={codeOnly}
+      outputOnly={outputOnly}
     />
   );
 }

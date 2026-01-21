@@ -97,7 +97,7 @@ export default function StardustArticle() {
 ## Directive Format
 
 ```python
-# | targetId [inline] [expanded] [visualization]
+# | targetId [inline] [expanded] [visualization] [code-aside]
 ```
 
 - `#` - Python comment
@@ -106,6 +106,7 @@ export default function StardustArticle() {
 - `inline` - (optional) Render in article body instead of right margin
 - `expanded` - (optional) Start expanded instead of collapsed
 - `visualization` - (optional) Show only output (no code), for graphs/plots
+- `code-aside` - (optional) With `inline`: output goes inline, code goes to sidebar
 
 **The directive line is automatically removed from displayed code.**
 
@@ -117,6 +118,8 @@ export default function StardustArticle() {
 # | implementation expanded   # Right margin, expanded
 # | demo inline expanded      # In article body, expanded
 # | parabola visualization    # Output only, no code shown
+# | plot inline code-aside    # Output inline, code in sidebar
+# | chart inline expanded code-aside  # Output inline, code in sidebar (expanded)
 ```
 
 **Placement Behavior:**
@@ -128,6 +131,8 @@ export default function StardustArticle() {
 | `# \| id expanded` | Right margin, expanded | Inline expanded |
 | `# \| id inline expanded` | Inline, expanded | Inline expanded |
 | `# \| id visualization` | Output only (graph/plot) | Output only |
+| `# \| id inline code-aside` | Output inline, code in sidebar | Output inline only |
+| `# \| id inline expanded code-aside` | Output inline, code in sidebar (expanded) | Output inline only |
 
 ### Visualization Mode
 
@@ -287,6 +292,7 @@ interface NotebookCell {
   inline?: boolean;        // Render in article body (not margin)
   expanded?: boolean;      // Start expanded (not collapsed)
   visualization?: boolean; // Show only output (no code), for graphs/plots
+  codeAside?: boolean;     // With inline: output inline, code in sidebar
 }
 ```
 

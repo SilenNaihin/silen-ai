@@ -15,6 +15,7 @@ export interface NotebookCell {
   inline?: boolean; // If true, render inline in article instead of side panel
   expanded?: boolean; // If true, start expanded instead of collapsed
   visualization?: boolean; // If true, show only output (no code), for graphs/plots
+  codeAside?: boolean; // If true with inline, output goes inline and code goes to sidebar
 }
 
 export interface NotebookData {
@@ -30,6 +31,8 @@ export interface NotebookData {
  * - # | targetId inline           - Shown inline in article body (collapsed)
  * - # | targetId inline expanded  - Shown inline, expanded by default
  * - # | targetId visualization    - Output only (graph/plot), no code shown
+ * - # | targetId inline code-aside - Output inline, code in sidebar
+ * - # | targetId inline expanded code-aside - Output inline, code in sidebar (expanded)
  */
 export function parseNotebook(notebookJson: any, notebookPath: string): NotebookData {
   const cells: Record<string, NotebookCell> = {};
@@ -46,9 +49,9 @@ export function parseNotebook(notebookJson: any, notebookPath: string): Notebook
       ? cell.source.join('')
       : cell.source;
 
-    // Look for directive: # | targetId [inline] [expanded] [visualization] (with optional trailing >)
+    // Look for directive: # | targetId [inline] [expanded] [visualization] [code-aside] (with optional trailing >)
     // Flags can appear in any order after targetId
-    const directiveMatch = source.match(/^#\s*\|\s*([\w-]+)((?:\s+(?:inline|expanded|visualization))*)\s*>?\s*$/m);
+    const directiveMatch = source.match(/^#\s*\|\s*([\w-]+)((?:\s+(?:inline|expanded|visualization|code-aside))*)\s*>?\s*$/m);
 
     if (!directiveMatch) return;
 
@@ -57,6 +60,7 @@ export function parseNotebook(notebookJson: any, notebookPath: string): Notebook
     const isInline = flags.includes('inline');
     const isExpanded = flags.includes('expanded');
     const isVisualization = flags.includes('visualization');
+    const isCodeAside = flags.includes('code-aside');
 
     // Extract code without the directive line
     const codeLines = source.split('\n');
@@ -87,6 +91,7 @@ export function parseNotebook(notebookJson: any, notebookPath: string): Notebook
       inline: isInline,
       expanded: isExpanded,
       visualization: isVisualization,
+      codeAside: isCodeAside,
     };
   });
 
