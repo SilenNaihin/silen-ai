@@ -13,18 +13,36 @@ function getRenderer(animation: AnimationConfig): (progress: number) => ReactNod
   }
 
   if (animation.image) {
-    const src = typeof animation.image === 'string' ? animation.image : animation.image.src;
-    const alt = typeof animation.image === 'string' ? '' : (animation.image.alt || '');
+    const imageConfig = typeof animation.image === 'string'
+      ? { src: animation.image }
+      : animation.image;
+    const { src, alt = '', caption, href } = imageConfig;
 
     // Return a static image renderer (ignores progress)
     return () => (
-      <div className="w-full h-full flex items-center justify-center p-4">
+      <figure className="w-full h-full flex flex-col items-center justify-center p-4">
         <img
           src={src}
           alt={alt}
-          className="max-w-full max-h-full object-contain rounded-lg shadow-sm"
+          className="max-w-full max-h-[calc(100%-2rem)] object-contain rounded-lg border border-neutral-200"
         />
-      </div>
+        {caption && (
+          <figcaption className="mt-2 text-sm text-neutral-500 text-center">
+            {href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-neutral-700 underline"
+              >
+                {caption}
+              </a>
+            ) : (
+              caption
+            )}
+          </figcaption>
+        )}
+      </figure>
     );
   }
 
@@ -55,15 +73,24 @@ export interface AnimationConfig {
   /**
    * Static image to display instead of an animation.
    * Use this when you want to show an image in the left panel.
-   * Can be a URL string or an object with src and optional alt text.
+   * Can be a URL string or an object with src, alt, caption, and optional link.
    *
    * @example
    * ```tsx
+   * // Simple path
    * { image: '/images/diagram.png', startElementId: 'section-1' }
+   *
+   * // With alt text
    * { image: { src: '/images/diagram.png', alt: 'System diagram' }, startElementId: 'section-1' }
+   *
+   * // With caption
+   * { image: { src: '/images/chart.png', alt: 'Results', caption: 'Figure 1: Performance results' }, startElementId: 'results' }
+   *
+   * // With linked caption
+   * { image: { src: '/images/paper.png', caption: 'From Smith et al.', href: 'https://paper.url' }, startElementId: 'citation' }
    * ```
    */
-  image?: string | { src: string; alt?: string };
+  image?: string | { src: string; alt?: string; caption?: string; href?: string };
 
   /**
    * Element ID that triggers this animation to start.
