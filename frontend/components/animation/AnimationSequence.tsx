@@ -4,6 +4,35 @@ import { ReactNode, useEffect, useState, useCallback, createContext, useContext,
 import { createPortal } from 'react-dom';
 
 /**
+ * Helper to get the render function from an AnimationConfig.
+ * Handles both `render` function and `image` shorthand.
+ */
+function getRenderer(animation: AnimationConfig): (progress: number) => ReactNode {
+  if (animation.render) {
+    return animation.render;
+  }
+
+  if (animation.image) {
+    const src = typeof animation.image === 'string' ? animation.image : animation.image.src;
+    const alt = typeof animation.image === 'string' ? '' : (animation.image.alt || '');
+
+    // Return a static image renderer (ignores progress)
+    return () => (
+      <div className="w-full h-full flex items-center justify-center p-4">
+        <img
+          src={src}
+          alt={alt}
+          className="max-w-full max-h-full object-contain rounded-lg shadow-sm"
+        />
+      </div>
+    );
+  }
+
+  // Fallback: empty render
+  return () => null;
+}
+
+/**
  * A milestone within an animation that pins progress to a specific element
  */
 export interface AnimationMilestone {
@@ -18,9 +47,23 @@ export interface AnimationMilestone {
  */
 export interface AnimationConfig {
   /**
-   * Render function that receives normalized progress (0-1) for this animation
+   * Render function that receives normalized progress (0-1) for this animation.
+   * Either `render` or `image` must be provided.
    */
-  render: (progress: number) => ReactNode;
+  render?: (progress: number) => ReactNode;
+
+  /**
+   * Static image to display instead of an animation.
+   * Use this when you want to show an image in the left panel.
+   * Can be a URL string or an object with src and optional alt text.
+   *
+   * @example
+   * ```tsx
+   * { image: '/images/diagram.png', startElementId: 'section-1' }
+   * { image: { src: '/images/diagram.png', alt: 'System diagram' }, startElementId: 'section-1' }
+   * ```
+   */
+  image?: string | { src: string; alt?: string };
 
   /**
    * Element ID that triggers this animation to start.
@@ -183,7 +226,7 @@ export function MobileInlineAnimation({
   return (
     <div className={`my-6 w-full ${className}`}>
       <div className="aspect-[4/3] relative">
-        {animation.render(1)} {/* Render at 100% progress */}
+        {getRenderer(animation)(1)} {/* Render at 100% progress */}
       </div>
     </div>
   );
@@ -398,7 +441,7 @@ export function AnimationSequence({
               key={`mobile-${animation.startElementId}`}
               className="w-full max-w-md mx-auto aspect-video"
             >
-              {animation.render(1)}
+              {getRenderer(animation)(1)}
             </div>,
             container
           );
@@ -460,7 +503,7 @@ export function AnimationSequence({
               transition: 'opacity 0.1s ease-out',
             }}
           >
-            {animation.render(normalizedProgress)}
+            {getRenderer(animation)(normalizedProgress)}
           </div>
         );
       })}
