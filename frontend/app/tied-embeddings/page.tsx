@@ -16,7 +16,6 @@ import { Math, FormulaBox } from '@/components/article/Math';
 import {
   IntroAnimation,
   TwoMatricesAnimation,
-  DirectPathMatrixAnimation,
   BigramDirectionalityAnimation,
   SymmetryConstraintAnimation,
   SGDCantFixAnimation,
@@ -61,7 +60,12 @@ export default function TiedEmbeddingsArticle() {
                   overlap: 0.1,
                 },
                 {
-                  render: (p) => <DirectPathMatrixAnimation progress={p} />,
+                  image: {
+                    src: '/images/high-level-transformer.png',
+                    alt: 'High-level diagram of a transformer showing the direct path from input embeddings through residual stream to output logits',
+                    caption:
+                      'High-level transformer architecture showing the direct path',
+                  },
                   startElementId: 'direct-path',
                   overlap: 0.15,
                 },
@@ -122,10 +126,10 @@ function TiedEmbeddingsContent() {
       <ArticleSection>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
-            Tied embeddings are one such tradeoff. It comes from a simple
-            observation &quot;hey bro. we have a 617 million parameter embedding
-            matrix on both sides of our nn. why not just make them the same
-            matrix?&quot;
+            Tied embeddings are one such tradeoff. Introduced by Press & Wolf
+            (2017) [1], it comes from a simple observation: &quot;hey bro. we
+            have a 617 million parameter embedding matrix on both sides of our
+            nn. why not just make them the same matrix?&quot;
           </p>
           <p>
             In other words: since the embedding matrix encodes semantic meaning
@@ -133,8 +137,8 @@ function TiedEmbeddingsContent() {
             output predictions.
           </p>
           <p>
-            And yes, the GPT-3 size embedding matrix is 617 million parameters
-            <Math className="ml-1">{'(50,257 tokens) × (12,288 dims)'}</Math>.
+            And yes, the GPT-3 size embedding matrix is 617 million parameters{' '}
+            <Math>{'(50,257 tokens) × (12,288 dims)'}</Math>.
           </p>
           <p>
             But there's a fundamental mathematical reason why tied embeddings
@@ -169,11 +173,6 @@ function TiedEmbeddingsContent() {
             <Math>{'W_U = W_E^T'}</Math>. So elegant. Fewer parameters.
             Symmetry.
           </p>
-        </div>
-      </ArticleSection>
-
-      <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
           <p id="setup-vocab">
             Let's make this concrete with a tiny vocabulary:
           </p>
@@ -234,13 +233,13 @@ function TiedEmbeddingsContent() {
           level={2}
           className="text-2xl font-bold mb-2 text-black"
         >
-          The Direct Path
+          The residual stream
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
             In a transformer, information flows through attention and MLP
-            layers. But because of <strong>residual connections</strong>,
-            there's always a direct linear path from input to output:
+            layers. But <strong>residual connections</strong> mean that there's
+            always a direct linear path from input to output:
           </p>
           <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-3 font-mono text-sm my-3">
             token (one-hot) → W_E → [residual stream] → W_U → logits
@@ -252,17 +251,6 @@ function TiedEmbeddingsContent() {
           <FormulaBox>
             {'\\text{logits} = \\text{one\\_hot} \\cdot W_E \\cdot W_U'}
           </FormulaBox>
-          {/* Transformer diagram */}
-          <figure className="my-6">
-            <img
-              src="/images/high-level-transformer.png"
-              alt="High-level diagram of a transformer showing the direct path from input embeddings through residual stream to output logits"
-              className="w-full max-w-lg mx-auto rounded-lg border border-neutral-200"
-            />
-            <figcaption className="text-center text-sm text-neutral-500 mt-2">
-              High-level transformer architecture showing the direct path
-            </figcaption>
-          </figure>
         </div>
       </ArticleSection>
 
@@ -291,18 +279,21 @@ function TiedEmbeddingsContent() {
           level={2}
           className="text-2xl font-bold mb-2 text-black"
         >
-          What Should This Path Learn?
+          What the residual stream learns
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
-            If a model had <strong>no attention or MLP layers</strong>, the only
-            thing it could learn is: "Given the current token, what's the most
-            likely next token?"
+            If a model had no attention or MLP layers, the only thing it could
+            learn is: "Given the current token, what's the most likely next
+            token?"
           </p>
           <p>
-            This is exactly <strong>bigram statistics</strong>: conditional
-            probabilities P(next_token | current_token). A bigram is any two
-            consecutive tokens in text.
+            This is called <strong>bigram statistics</strong>. It's the
+            conditional probabilities{' '}
+            <Math>
+              {'P(\\text{next\\_token} \\mid \\text{current\\_token})'}
+            </Math>
+            . A bigram is any two consecutive tokens in text.
           </p>
         </div>
       </ArticleSection>
@@ -340,7 +331,7 @@ function TiedEmbeddingsContent() {
           level={2}
           className="text-2xl font-bold mb-2 text-black"
         >
-          The Problem: Forced Symmetry
+          The problem: forced symmetry
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
@@ -389,7 +380,7 @@ function TiedEmbeddingsContent() {
           className="text-2xl font-bold mb-2 text-black"
           tocText="Why is W_E·W_E^T Always Symmetric?"
         >
-          Why is <Math>{'W_E \\cdot W_E^T'}</Math> Always Symmetric?
+          Why is <Math>{'W_E \\cdot W_E^T'}</Math> always symmetric?
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
@@ -423,13 +414,13 @@ function TiedEmbeddingsContent() {
       </ArticleSection>
 
       {/* ========== SGD CANT FIX ========== */}
-      <ArticleSection>
+      {/* <ArticleSection>
         <TOCHeading
           id="sgd-limitation"
           level={2}
           className="text-2xl font-bold mb-2 text-black"
         >
-          Why SGD Can't Fix This
+          Why SGD can't fix this
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
@@ -450,16 +441,16 @@ function TiedEmbeddingsContent() {
             </p>
           </div>
         </div>
-      </ArticleSection>
+      </ArticleSection> */}
 
-      <ArticleSection>
+      {/* <ArticleSection>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p id="random-matrices">
             Let's verify with random matrices. Every single one produces a
             symmetric result:
           </p>
         </div>
-      </ArticleSection>
+      </ArticleSection> */}
 
       {/* Interactive symmetry explorer */}
       <ArticleSection>
@@ -479,12 +470,12 @@ function TiedEmbeddingsContent() {
           level={2}
           className="text-2xl font-bold mb-2 text-black"
         >
-          What About Untied Embeddings?
+          Untied embeddings don't suffer from this?
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
             With <strong>untied embeddings</strong>, <Math>{'W_U'}</Math> is a
-            separate learnable matrix. Now the direct path is:
+            separate learnable matrix. Now the direct path is
           </p>
           <FormulaBox>{'W_E \\cdot W_U'}</FormulaBox>
           <p>
@@ -492,11 +483,6 @@ function TiedEmbeddingsContent() {
             This product can be <strong>any matrix</strong>, including
             asymmetric ones.
           </p>
-        </div>
-      </ArticleSection>
-
-      <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
           <p id="untied-matrix">
             With untied embeddings, we can solve for a <Math>{'W_U'}</Math> that
             approximates the bigram probabilities:
@@ -527,17 +513,18 @@ function TiedEmbeddingsContent() {
           level={2}
           className="text-2xl font-bold mb-2 text-black"
         >
-          How Small Models Cope
+          But bro. It's not just the residual stream
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
+          <p>This is true.</p>
           <p>
-            If tied embeddings have this limitation, why do smaller models still
-            use them?
+            Smaller models still use them because their lesser expressivity
+            means that the nonlinearity added through attention and MLP layers
+            allows them to not bump against the asymmetry constraint.
           </p>
           <p>
-            The answer: <strong>MLP₀ can break the symmetry</strong>. Instead of
-            the direct path being just <Math>{'W_E \\cdot W_E^T'}</Math>, it
-            becomes:
+            Or by directly adding a direct MLP layer before the residual stream
+            which can break the symmetry:
           </p>
           <FormulaBox>
             {'W_E \\rightarrow \\text{MLP}_0 \\rightarrow W_E^T'}
@@ -557,22 +544,17 @@ function TiedEmbeddingsContent() {
         </div>
       </ArticleSection>
 
-      <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
-          <p id="param-comparison">
-            But this workaround has a cost. MLP capacity that could be used for
-            reasoning or knowledge is instead spent "undoing" the embedding
-            constraint:
-          </p>
-        </div>
-      </ArticleSection>
-
       {/* Parameter calculator */}
       <ArticleSection>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>Explore the parameter savings from tied embeddings:</p>
           <ParameterCalculator className="my-4" />
         </div>
+        <p>
+          Remember, the entirety of GPT-3 is ~175 billion parameters. 617
+          million embeddings parameters is a drop in the bucket if it means more
+          expressivity.
+        </p>
       </ArticleSection>
 
       {/* ========== SUMMARY ========== */}
@@ -582,7 +564,7 @@ function TiedEmbeddingsContent() {
           level={2}
           className="text-2xl font-bold mb-2 text-black"
         >
-          When to Tie, When Not to Tie
+          To tie or not to tie
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <div className="overflow-x-auto my-4">
@@ -637,54 +619,126 @@ function TiedEmbeddingsContent() {
 
       <ArticleSection>
         <div className="leading-relaxed space-y-3 text-neutral-900">
-          <h3 className="font-semibold text-lg">When Tied Embeddings Work</h3>
+          <p>
+            Tied embeddings are a practical tradeoff, not a principled design
+            choice. They save parameters and memory, which matters for smaller
+            models where early layers can compensate for the symmetry
+            constraint. But for large models chasing maximum performance, the
+            math is clear: language is asymmetric, and untied embeddings can
+            represent that.
+          </p>
           <ul className="list-disc list-inside ml-4 space-y-1">
             <li>
-              <strong>Small models</strong> (&lt;8B parameters): MLP₀ can
-              compensate
+              <strong>Tied</strong>: GPT-2, Gemma, original Transformer
             </li>
             <li>
-              <strong>Training efficiency</strong>: Fewer parameters = faster
-              training
+              <strong>Untied</strong>: LLaMA 1/2/3, Mistral
             </li>
             <li>
-              <strong>Memory constrained</strong>: Sharing weights reduces
-              footprint
-            </li>
-          </ul>
-
-          <h3 className="font-semibold text-lg mt-4">
-            When to Use Untied Embeddings
-          </h3>
-          <ul className="list-disc list-inside ml-4 space-y-1">
-            <li>
-              <strong>Large models</strong>: The direct path becomes more
-              important
-            </li>
-            <li>
-              <strong>Maximum performance</strong>: Untied gives more
-              expressivity
-            </li>
-            <li>
-              <strong>SOTA models</strong>: Most large LLMs (GPT-4, Claude,
-              etc.) use untied
+              <strong>Unknown</strong>: GPT-3/4, Claude (not publicly disclosed)
             </li>
           </ul>
         </div>
       </ArticleSection>
 
+      {/* ========== REFERENCES ========== */}
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
-          <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 my-4">
-            <h4 className="font-semibold mb-2">The Bottom Line</h4>
-            <p className="text-sm text-neutral-700">
-              Tied embeddings are a <strong>practical tradeoff</strong>, not a
-              principled design choice. They work because small models don't
-              rely heavily on the direct path, and MLP₀ can partially
-              compensate. But mathematically, tying embeddings forces the direct
-              path to be symmetric when language is fundamentally asymmetric.
-            </p>
-          </div>
+        <TOCHeading
+          id="references"
+          level={2}
+          className="text-2xl font-bold mb-2 text-black"
+        >
+          References
+        </TOCHeading>
+        <div className="leading-relaxed space-y-3 text-neutral-700 text-sm">
+          <p>
+            [1] Press, O., & Wolf, L. (2017). "Using the Output Embedding to
+            Improve Language Models." <em>EACL 2017</em>.{' '}
+            <a
+              href="https://arxiv.org/abs/1608.05859"
+              className="text-neutral-900 underline hover:text-neutral-600"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              arXiv:1608.05859
+            </a>
+            <br />
+            <span className="text-neutral-500">
+              Introduced tied embeddings, showing parameter reduction with
+              minimal performance loss.
+            </span>
+          </p>
+          <p>
+            [2] Inan, H., Khosravi, K., & Socher, R. (2017). "Tying Word Vectors
+            and Word Classifiers: A Loss Framework for Language Modeling."{' '}
+            <em>ICLR 2017</em>.{' '}
+            <a
+              href="https://arxiv.org/abs/1611.01462"
+              className="text-neutral-900 underline hover:text-neutral-600"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              arXiv:1611.01462
+            </a>
+            <br />
+            <span className="text-neutral-500">
+              Concurrent work providing theoretical justification for weight
+              tying.
+            </span>
+          </p>
+          <p>
+            [3] Vaswani, A., et al. (2017). "Attention Is All You Need."{' '}
+            <em>NeurIPS 2017</em>.{' '}
+            <a
+              href="https://arxiv.org/abs/1706.03762"
+              className="text-neutral-900 underline hover:text-neutral-600"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              arXiv:1706.03762
+            </a>
+            <br />
+            <span className="text-neutral-500">
+              Original Transformer used tied embeddings between input, output,
+              and pre-softmax layers.
+            </span>
+          </p>
+          <p>
+            [4] Yang, Z., Dai, Z., Salakhutdinov, R., & Cohen, W. (2018).
+            "Breaking the Softmax Bottleneck: A High-Rank RNN Language Model."{' '}
+            <em>ICLR 2018</em>.{' '}
+            <a
+              href="https://arxiv.org/abs/1711.03953"
+              className="text-neutral-900 underline hover:text-neutral-600"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              arXiv:1711.03953
+            </a>
+            <br />
+            <span className="text-neutral-500">
+              Shows expressiveness limits from low-rank embeddings—relevant to
+              why untying helps.
+            </span>
+          </p>
+          <p>
+            [5] Geva, M., Schuster, R., Berant, J., & Levy, O. (2021).
+            "Transformer Feed-Forward Layers Are Key-Value Memories."{' '}
+            <em>EMNLP 2021</em>.{' '}
+            <a
+              href="https://arxiv.org/abs/2012.14913"
+              className="text-neutral-900 underline hover:text-neutral-600"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              arXiv:2012.14913
+            </a>
+            <br />
+            <span className="text-neutral-500">
+              Shows early layers capture surface patterns, suggesting how models
+              compensate for tied embeddings.
+            </span>
+          </p>
         </div>
       </ArticleSection>
     </>
