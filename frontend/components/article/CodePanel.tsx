@@ -29,6 +29,8 @@ interface CodePanelProps {
   codeOnly?: boolean;
   /** Show only output (no code) - used for code-aside inline */
   outputOnly?: boolean;
+  /** Enable hover effects (only for sidebar cells, not inline) */
+  sidebar?: boolean;
 }
 
 /**
@@ -147,7 +149,10 @@ export function CodePanel({
   visualization = false,
   codeOnly = false,
   outputOnly = false,
+  sidebar = false,
 }: CodePanelProps) {
+  // Hover classes only for sidebar cells
+  const hoverClasses = sidebar ? 'hover:shadow-lg hover:border-neutral-300 transition-shadow' : '';
   const [internalCollapsed, setInternalCollapsed] = useState(collapsible && defaultCollapsed);
 
   // Support both controlled and uncontrolled modes
@@ -232,7 +237,7 @@ export function CodePanel({
     }
 
     return (
-      <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white hover:shadow-lg hover:border-neutral-300 transition-shadow ${className}`}>
+      <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white ${className}`}>
         {outputImage && (
           <img
             src={outputImage}
@@ -254,7 +259,7 @@ export function CodePanel({
     // Preview mode: show first N lines collapsed
     if (previewLines > 0) {
       return (
-        <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white hover:shadow-lg hover:border-neutral-300 transition-shadow ${className}`}>
+        <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white ${hoverClasses} ${className}`}>
           {/* Code preview with action buttons */}
           <div className="relative">
             <div className="absolute top-2 right-2 flex gap-1 z-10">
@@ -318,10 +323,11 @@ export function CodePanel({
     }
 
     // Simple collapsed bar
+    const barHoverClass = sidebar ? 'hover:bg-neutral-50' : '';
     return (
       <button
         onClick={() => setIsCollapsed(false)}
-        className={`w-full flex items-center justify-between px-4 py-3 border border-neutral-200 rounded-lg bg-white hover:bg-neutral-50 transition-colors ${className}`}
+        className={`w-full flex items-center justify-between px-4 py-3 border border-neutral-200 rounded-lg bg-white transition-colors ${barHoverClass} ${className}`}
       >
         <div className="flex items-center gap-2 text-neutral-600">
           <FiCode className="w-4 h-4" />
@@ -334,7 +340,7 @@ export function CodePanel({
 
   return (
     <div
-      className={`relative border border-neutral-200 rounded-lg overflow-hidden bg-white hover:shadow-lg hover:border-neutral-300 transition-shadow ${className}`}
+      className={`relative border border-neutral-200 rounded-lg overflow-hidden bg-white ${hoverClasses} ${className}`}
     >
       {/* Action buttons in top right */}
       <div className="absolute top-2 right-2 flex gap-1 z-10">

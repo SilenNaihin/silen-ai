@@ -25,6 +25,8 @@ interface NotebookCellProps {
   codeOnly?: boolean;
   /** Show only output (no code) - for code-aside inline */
   outputOnly?: boolean;
+  /** Enable hover effects (only for sidebar cells) */
+  sidebar?: boolean;
 }
 
 /**
@@ -46,6 +48,7 @@ export function NotebookCell({
   githubUrl: githubUrlProp,
   codeOnly = false,
   outputOnly = false,
+  sidebar = false,
 }: NotebookCellProps) {
   const { githubUrl: contextGithubUrl } = useNotebookContext();
   const githubUrl = githubUrlProp ?? contextGithubUrl;
@@ -94,6 +97,7 @@ export function NotebookCell({
       visualization={cell.visualization}
       codeOnly={codeOnly}
       outputOnly={outputOnly}
+      sidebar={sidebar}
     />
   );
 }

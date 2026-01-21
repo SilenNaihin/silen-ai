@@ -101,6 +101,7 @@ export function ArticleSection({
 
       if (isMobile) {
         // Mobile: uncontrolled, starts collapsed
+        // Note: mobile sidebar cells still get sidebar={true} for hover effects
         return (
           <NotebookCell
             cell={cell}
@@ -110,6 +111,7 @@ export function ArticleSection({
             defaultCollapsed={mobileCollapsed}
             previewLines={3}
             codeOnly={isCodeAside}
+            sidebar={true}
           />
         );
       }
@@ -127,6 +129,7 @@ export function ArticleSection({
           onCollapsedChange={setDesktopCollapsed}
           previewLines={3}
           codeOnly={isCodeAside}
+          sidebar={true}
         />
       );
     }
