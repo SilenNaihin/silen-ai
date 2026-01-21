@@ -232,7 +232,7 @@ export function CodePanel({
     }
 
     return (
-      <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white ${className}`}>
+      <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white hover:shadow-lg hover:border-neutral-300 transition-shadow ${className}`}>
         {outputImage && (
           <img
             src={outputImage}
@@ -254,7 +254,7 @@ export function CodePanel({
     // Preview mode: show first N lines collapsed
     if (previewLines > 0) {
       return (
-        <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white ${className}`}>
+        <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white hover:shadow-lg hover:border-neutral-300 transition-shadow ${className}`}>
           {/* Code preview with action buttons */}
           <div className="relative">
             <div className="absolute top-2 right-2 flex gap-1 z-10">
@@ -334,7 +334,7 @@ export function CodePanel({
 
   return (
     <div
-      className={`relative border border-neutral-200 rounded-lg overflow-hidden bg-white ${className}`}
+      className={`relative border border-neutral-200 rounded-lg overflow-hidden bg-white hover:shadow-lg hover:border-neutral-300 transition-shadow ${className}`}
     >
       {/* Action buttons in top right */}
       <div className="absolute top-2 right-2 flex gap-1 z-10">
