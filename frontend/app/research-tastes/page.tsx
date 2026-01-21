@@ -542,7 +542,7 @@ export default function ResearchTastesArticle() {
                 I&apos;m working on the{' '}
                 <a
                   href="https://www.genesismission.ai/"
-                 
+
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -551,6 +551,14 @@ export default function ResearchTastesArticle() {
                 to help make verification in science happen at a larger scale.
               </p>
             </Prose>
+
+            <MutedText>
+              <strong>→ Connection:</strong> Verifiability gates what you can
+              train on, but it also gates what counts as a genuine discovery.
+              This leads directly to the next bottleneck: can models generate
+              outputs that are genuinely novel, not just recombinations? And how
+              would we even know?
+            </MutedText>
           </ArticleSection>
 
           {/* Bottleneck 2: OOD Generation */}
@@ -879,6 +887,15 @@ export default function ResearchTastesArticle() {
                 current thoughts.
               </p>
             </Prose>
+
+            <MutedText>
+              <strong>→ Connection:</strong> When OOD generation fails—when a
+              model produces something that looks novel but is actually
+              memorized, or hallucinates confidently—how do we diagnose the
+              problem? This is where interpretability becomes essential: not
+              just for safety, but for understanding what&apos;s actually
+              happening inside the model.
+            </MutedText>
           </ArticleSection>
 
           {/* Bottleneck 3: Interpretability */}
@@ -1095,7 +1112,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://transformer-circuits.pub/2022/toy_model/"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1106,7 +1123,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://transformer-circuits.pub/2024/scaling-monosemanticity/"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1117,7 +1134,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://www.anthropic.com/research/tracing-thoughts-language-model"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1128,7 +1145,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1138,6 +1155,15 @@ export default function ResearchTastesArticle() {
                 </li>
               </UnorderedList>
             </InsightBox>
+
+            <MutedText>
+              <strong>→ Connection:</strong> Almost all interpretability work
+              has been done on transformers. But what if the architecture itself
+              shapes what&apos;s interpretable? Different architectures might
+              organize computation differently—and some might be more naturally
+              transparent than others. This leads to the question of what
+              inductive biases we&apos;re missing.
+            </MutedText>
           </ArticleSection>
 
           {/* Bottleneck 4: Alternate Architectures */}
@@ -1409,7 +1435,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2312.00752"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1420,7 +1446,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2403.19887"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1431,7 +1457,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2402.19427"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1442,7 +1468,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2501.00663"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1452,6 +1478,14 @@ export default function ResearchTastesArticle() {
                 </li>
               </UnorderedList>
             </InsightBox>
+
+            <MutedText>
+              <strong>→ Connection:</strong> Architectures determine what kinds
+              of memory and learning are possible. The autoregressive paradigm
+              discards activations between completions. Could a different
+              architecture make continual learning trivial? Or is the right
+              answer just better scaffolding around existing architectures?
+            </MutedText>
           </ArticleSection>
 
           {/* Bottleneck 5: Continual Learning */}
@@ -1673,7 +1707,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2405.09673"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1684,7 +1718,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2212.04089"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1695,7 +1729,7 @@ export default function ResearchTastesArticle() {
                 <li>
                   <a
                     href="https://arxiv.org/abs/2402.01364"
-                   
+
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1705,6 +1739,14 @@ export default function ResearchTastesArticle() {
                 </li>
               </UnorderedList>
             </InsightBox>
+
+            <MutedText>
+              <strong>→ Connection:</strong> This brings us full circle.
+              Continual learning asks whether agents can accumulate knowledge
+              over time—but how do you verify that the new knowledge is correct
+              and the old knowledge wasn&apos;t corrupted? We&apos;re back to
+              verifiability as the fundamental constraint.
+            </MutedText>
           </ArticleSection>
 
           {/* Section: Synthesis */}
@@ -1888,7 +1930,7 @@ export default function ResearchTastesArticle() {
           {/* Footer */}
           <div className="mt-16 pt-8 border-t border-neutral-200">
             <MutedText>
-              This article reflects my current thinking as of January 2025.
+              This article reflects my current thinking as of January 2026.
               These are hypotheses, not conclusions. If you&apos;re working on
               any of these problems, I&apos;d love to talk. Reach out on{' '}
               <a
