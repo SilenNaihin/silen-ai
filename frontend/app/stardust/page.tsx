@@ -1287,7 +1287,7 @@ function TrainingContent() {
           <p>
             Below is an interactive visualization of the full training loop. You
             can input text, watch it get tokenized, see data flow through the
-            network, and run predictions.
+            network, and run predictions. 
           </p>
           <p>
             The task: <strong>sentiment classification</strong>. Given a

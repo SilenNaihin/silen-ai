@@ -128,7 +128,7 @@ function TiedEmbeddingsContent() {
           <p>
             Tied embeddings are one such tradeoff. Introduced by "Using the Output Embedding to Improve Language Models" [1], it comes from a simple observation: &quot;we
             have a 617 million parameter embedding matrix<sup>*</sup> on both sides of our
-            nn. why not just make them the same matrix?&quot;<sup>*</sup> (for GPT 3)
+            nn. why not just make them the same matrix?&quot; <sup>*</sup>(in GPT 3)
           </p>
           <p>
             In other words: since the embedding matrix encodes semantic meaning

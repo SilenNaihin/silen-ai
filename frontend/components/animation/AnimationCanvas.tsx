@@ -1,21 +1,29 @@
 'use client';
 
-import { useRef, useEffect, ReactNode } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 
 interface AnimationCanvasProps {
   children: (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => void;
   progress: number;
   className?: string;
+  /** When true, continuously re-renders for time-based animations */
+  animating?: boolean;
 }
 
 /**
  * A canvas wrapper that handles resize and provides rendering context
- * Re-renders when progress changes
+ * Re-renders when progress changes, or continuously when animating=true
  */
-export function AnimationCanvas({ children, progress, className = '' }: AnimationCanvasProps) {
+export function AnimationCanvas({
+  children,
+  progress,
+  className = '',
+  animating = false
+}: AnimationCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef<number | null>(null);
 
-  useEffect(() => {
+  const render = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -36,31 +44,49 @@ export function AnimationCanvas({ children, progress, className = '' }: Animatio
 
     // Call render function
     children(ctx, canvas);
-  }, [progress, children]);
+  }, [children]);
 
+  // Progress-based rendering
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!animating) {
+      render();
+    }
+  }, [progress, render, animating]);
 
+  // Continuous animation loop
+  useEffect(() => {
+    if (!animating) {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      return;
+    }
+
+    const animate = () => {
+      render();
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [animating, render]);
+
+  // Handle resize
+  useEffect(() => {
     const handleResize = () => {
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, rect.width, rect.height);
-
-      children(ctx, canvas);
+      render();
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [children]);
+  }, [render]);
 
   return <canvas ref={canvasRef} className={className} />;
 }

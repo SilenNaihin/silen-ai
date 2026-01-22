@@ -108,6 +108,8 @@ Scroll-synced animations in the left sticky panel:
 
 ## Git Commit Rules
 
+**IMPORTANT:** Before completing any task, run `/commit` to commit your changes.
+
 Keep commits atomic—only commit files you touched, listing each path explicitly:
 
 ```bash
