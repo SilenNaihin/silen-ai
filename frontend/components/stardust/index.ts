@@ -29,4 +29,5 @@ export { GradientFlowInteractive } from './GradientFlowInteractive';
 export { ContextLossAnimation } from './ContextLossAnimation';
 export { ChainRuleInteractive } from './ChainRuleInteractive';
 export { StardustToSiliconAnimation } from './StardustToSiliconAnimation';
+export { SequentialBottleneckAnimation } from './SequentialBottleneckAnimation';
 

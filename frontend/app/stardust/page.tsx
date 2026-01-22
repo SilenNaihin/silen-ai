@@ -55,6 +55,7 @@ import { LSTMBuildupInteractive } from '@/components/stardust/LSTMBuildupInterac
 import { GradientFlowInteractive } from '@/components/stardust/GradientFlowInteractive';
 import { ChainRuleInteractive } from '@/components/stardust/ChainRuleInteractive';
 import { StardustToSiliconAnimation } from '@/components/stardust/StardustToSiliconAnimation';
+import { SequentialBottleneckAnimation } from '@/components/stardust/SequentialBottleneckAnimation';
 
 const TABS = [
   { id: 'foundations', label: 'Foundations' },
@@ -300,6 +301,16 @@ export default function StardustArticle() {
                       {
                         render: (p) => <ActivationFunctionsAnimation progress={p} />,
                         startElementId: 'activation-functions',
+                        overlap: 0.1,
+                      },
+                      // Sequential bottleneck - transformer teaser
+                      {
+                        render: (p) => <SequentialBottleneckAnimation progress={p} />,
+                        startElementId: 'problems-remaining',
+                        milestones: [
+                          { elementId: 'sequential-processing', progress: 0.3 },
+                          { elementId: 'whats-next', progress: 0.6 },
+                        ],
                         overlap: 0.1,
                       },
                     ]}
@@ -2739,16 +2750,16 @@ function ArchitecturesContent() {
         </TOCHeading>
         <Prose>
           <p id="sequence-intro">
-            The networks we&apos;ve built so far have a fundamental limitation:
-            they process inputs as isolated snapshots. Feed in &quot;The cat sat
-            on the mat&quot; and each word is processed independently, with no
-            notion that &quot;cat&quot; comes before &quot;sat&quot;.
+            &quot;The dog bit the man&quot; and &quot;The man bit the dog.&quot;
+            Same words. Opposite meanings. You know instantly which is news and
+            which is routine. But feed both sentences to our feedforward network
+            and it sees identical inputs. Word order? Invisible.
           </p>
           <p>
-            But language is inherently sequential. The meaning of &quot;bank&quot;
-            depends on whether we&apos;re talking about rivers or money. The word
-            &quot;it&quot; refers back to something mentioned earlier. To truly
-            understand language, we need networks that remember.
+            It gets worse. &quot;The trophy didn&apos;t fit in the suitcase
+            because it was too big.&quot; What was too big? You know it&apos;s
+            the trophy. But the network processes &quot;it&quot; with no memory
+            of what came before. Every word is an island.
           </p>
         </Prose>
       </ArticleSection>
@@ -2767,7 +2778,7 @@ function ArchitecturesContent() {
             Think about how you read this sentence. You don&apos;t process each
             word in isolation. You carry forward context: who the subject is,
             what action is happening, what might come next. Your brain maintains
-            a running &quot;state&quot; that updates with each word.
+            a running state that updates with each word.
           </p>
           <p>
             Can we give neural networks the same ability?
@@ -2869,6 +2880,26 @@ function ArchitecturesContent() {
             incredibly data-efficient. From one sentence of N words, we get N-1
             training examples. The network learns to predict what comes next at
             every position.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Prose>
+          <p id="output-projection">
+            At each timestep, we project the hidden state to a probability
+            distribution over the vocabulary:
+          </p>
+        </Prose>
+        <FormulaBox label="Output and Loss at Each Step">
+          {'y_t = \\text{softmax}(W_{hy} \\cdot h_t + b_y) \\quad\\quad L_t = -\\log y_t[\\text{target}]'}
+        </FormulaBox>
+        <Prose>
+          <p>
+            The total loss is the sum of losses at every position:{' '}
+            <Math>{'L = \\sum_t L_t'}</Math>. This is key: we get a gradient
+            signal at every timestep, not just at the end. More signal means
+            faster learning.
           </p>
         </Prose>
         <InsightBox title="Self-Supervised Learning">
@@ -3057,39 +3088,36 @@ function ArchitecturesContent() {
         </Prose>
       </ArticleSection>
 
-      {/* ========== SECTION 7: REGULARIZATION REVISITED ========== */}
+      {/* ========== SECTION 7: PATCHES THAT DON'T SOLVE MEMORY ========== */}
       <ArticleSection>
-        <TOCHeading id="regularization-rnn" level={2}>
-          Regularization Revisited
+        <TOCHeading id="patches-not-solutions" level={2}>
+          Patches That Don&apos;t Solve Memory
         </TOCHeading>
         <Prose>
           <p id="weight-decay-rnn">
-            Remember weight decay and dropout from the Training tab? They apply
-            here too. Weight decay prevents weights from growing too large,
-            which helps with both exploding gradients and overfitting.
+            Before we look at a real solution, let&apos;s address two common
+            attempts that help but don&apos;t fix the fundamental problem.
+          </p>
+          <p>
+            <strong>Gradient clipping</strong> prevents exploding gradients by
+            capping the norm. <strong>Weight decay</strong> keeps weights from
+            growing too large. Both are standard practice. But neither addresses
+            vanishing gradients.
           </p>
           <p id="dropout-rnn">
-            But standard dropout has a problem in RNNs: applying different
-            dropout masks at each timestep destroys the temporal structure.
-            The hidden state becomes noisy garbage.
+            <strong>Dropout</strong> helps with overfitting, but standard
+            dropout breaks RNNs. Applying different masks at each timestep
+            destroys temporal coherence. The fix is{' '}
+            <strong>variational dropout</strong>: use the same mask across all
+            timesteps.
           </p>
         </Prose>
-        <InsightBox title="Variational Dropout">
-          <p className="mb-2">
-            The solution is <strong>variational dropout</strong>: use the{' '}
-            <em>same</em> dropout mask across all timesteps. This preserves
-            temporal coherence while still regularizing.
-          </p>
-          <p className="text-sm text-neutral-600">
-            We drop the same neurons at t=1, t=2, t=3... rather than randomly
-            choosing different neurons each time.
-          </p>
-        </InsightBox>
         <Prose>
           <p>
-            These techniques help, but they don&apos;t solve the fundamental
-            problem: vanishing gradients still prevent learning long-range
-            dependencies. We need a better architecture.
+            These techniques are useful. They&apos;re standard in production
+            RNNs. But they&apos;re band-aids. The fundamental problem remains:
+            information still decays exponentially over long sequences. We need
+            a new architecture.
           </p>
         </Prose>
       </ArticleSection>
@@ -3119,17 +3147,24 @@ function ArchitecturesContent() {
             through the cell state without being repeatedly multiplied by small
             numbers.
           </p>
+          <p id="gates-need-activations">
+            But how do we control this conveyor belt? We need <em>gates</em>.
+            Gates should output values between 0 and 1 (0 = block everything, 1
+            = let everything through). That means <strong>sigmoid</strong>.
+            Values being gated can be positive or negative, so we bound them
+            with <strong>tanh</strong> (outputs [-1, 1]).
+          </p>
         </Prose>
       </ArticleSection>
 
       <ArticleSection>
         <Prose>
           <p id="forget-gate">
-            But we need control. The <strong>forget gate</strong> decides what
-            information to throw away. It looks at the previous hidden state and
-            current input, then outputs a number between 0 and 1 for each
-            position in the cell state. 0 means &quot;forget this completely,&quot;
-            1 means &quot;keep this entirely.&quot;
+            The <strong>forget gate</strong> decides what information to throw
+            away. It looks at the previous hidden state and current input, then
+            outputs a number between 0 and 1 for each position in the cell
+            state. 0 means &quot;forget this completely,&quot; 1 means
+            &quot;keep this entirely.&quot;
           </p>
         </Prose>
         <FormulaBox label="Forget Gate">
@@ -3235,6 +3270,18 @@ function ArchitecturesContent() {
             optimization.
           </p>
         </Prose>
+        <InsightBox title="A Simpler Alternative: The GRU">
+          <p className="mb-2">
+            The <strong>Gated Recurrent Unit</strong> (Cho et al., 2014)
+            simplifies the LSTM. It combines the forget and input gates into a
+            single &quot;update gate&quot; and merges the cell state with the
+            hidden state.
+          </p>
+          <p className="text-sm text-neutral-600">
+            Fewer parameters, often similar performance. GRUs are popular when
+            speed matters and sequences are not extremely long.
+          </p>
+        </InsightBox>
       </ArticleSection>
 
       {/* ========== SECTION 10: LSTM OPTIMIZATIONS ========== */}
@@ -3279,7 +3326,58 @@ function ArchitecturesContent() {
         </InsightBox>
       </ArticleSection>
 
-      {/* ========== SECTION 11: PROBLEMS REMAINING ========== */}
+      {/* ========== SECTION 11: BIDIRECTIONAL RNNs ========== */}
+      <ArticleSection>
+        <TOCHeading id="bidirectional-rnns" level={2}>
+          Seeing the Future: Bidirectional RNNs
+        </TOCHeading>
+        <Prose>
+          <p id="future-context-problem">
+            &quot;The bank by the river was steep.&quot; When you read
+            &quot;bank&quot;, you don&apos;t yet know if it means a financial
+            institution or a riverbank. But by the time you reach
+            &quot;river&quot;, the ambiguity resolves. The future context
+            disambiguates the past.
+          </p>
+          <p>
+            Standard RNNs only see the past. At each timestep, the hidden state
+            encodes everything before, nothing after. This limits tasks like
+            named entity recognition, where the category of a word often depends
+            on what comes next.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Prose>
+          <p id="bidirectional-solution">
+            The solution: run two RNNs. One goes forward through the sequence,
+            one goes backward. At each timestep, concatenate both hidden states.
+            Now each position has context from both directions.
+          </p>
+        </Prose>
+        <FormulaBox label="Bidirectional Hidden State">
+          {'h_t = [\\overrightarrow{h_t} ; \\overleftarrow{h_t}]'}
+        </FormulaBox>
+        <Prose>
+          <p>
+            The cost: you need the entire sequence before producing any output.
+            No streaming. No real-time generation. But for tasks where you have
+            the full input upfront (classification, translation, question
+            answering), bidirectional models are often stronger.
+          </p>
+        </Prose>
+        <InsightBox title="ELMo (2018)">
+          <p>
+            Peters et al.&apos;s ELMo used deep bidirectional LSTMs to create
+            contextualized word embeddings. The same word got different
+            representations depending on its sentence context. This was a major
+            step toward modern language understanding.
+          </p>
+        </InsightBox>
+      </ArticleSection>
+
+      {/* ========== SECTION 12: PROBLEMS REMAINING ========== */}
       <ArticleSection>
         <TOCHeading id="problems-remaining" level={2}>
           What&apos;s Still Missing
