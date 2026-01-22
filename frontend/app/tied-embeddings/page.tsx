@@ -104,7 +104,7 @@ export default function TiedEmbeddingsArticle() {
             The pragmatic tradeoff of tied embeddings
           </h1>
           <p className="text-lg text-neutral-600 mb-8">
-            In deep learning, we constantly trade compute for accuracy.
+            In deep learning, we commonly trade compute for accuracy.
             Quantization sacrifices precision for speed. Distillation trades
             model size for latency. Weight sharing reduces parameters at the
             cost of expressivity.
@@ -126,23 +126,18 @@ function TiedEmbeddingsContent() {
       <ArticleSection>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
-            Tied embeddings are one such tradeoff. Introduced by Press & Wolf
-            (2017) [1], it comes from a simple observation: &quot;hey bro. we
-            have a 617 million parameter embedding matrix on both sides of our
-            nn. why not just make them the same matrix?&quot;
+            Tied embeddings are one such tradeoff. Introduced by "Using the Output Embedding to Improve Language Models" [1], it comes from a simple observation: &quot;we
+            have a 617 million parameter embedding matrix<sup>*</sup> on both sides of our
+            nn. why not just make them the same matrix?&quot;<sup>*</sup> (for GPT 3)
           </p>
           <p>
             In other words: since the embedding matrix encodes semantic meaning
             in words, it serves roughly the same purpose for both input and
-            output predictions.
-          </p>
-          <p>
-            And yes, the GPT-3 size embedding matrix is 617 million parameters{' '}
-            <Math>{'(50,257 tokens) × (12,288 dims)'}</Math>.
+            output predictions. Bro.
           </p>
           <p>
             But there's a fundamental mathematical reason why tied embeddings
-            don't work at scale. Linear algebra exists.
+            don't work at scale. It's just linear algebra.
           </p>
         </div>
       </ArticleSection>
