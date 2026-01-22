@@ -100,15 +100,20 @@ function TabsProviderInner({
 
   const [activeTab, setActiveTabState] = useState(getInitialTab);
 
-  // Sync with URL on mount and when URL changes
+  // Sync with URL on mount only (not on every URL change to avoid jitter)
+  // The setActiveTab callback handles URL updates, so we only need this for initial load
+  // and browser back/forward navigation
   useEffect(() => {
     if (queryParam) {
       const urlTab = searchParams.get(queryParam);
-      if (urlTab && tabs.some(t => t.id === urlTab) && urlTab !== activeTab) {
-        setActiveTabState(urlTab);
+      if (urlTab && tabs.some(t => t.id === urlTab)) {
+        // Use functional update to avoid unnecessary re-renders
+        setActiveTabState(prev => prev === urlTab ? prev : urlTab);
       }
     }
-  }, [searchParams, queryParam, tabs, activeTab]);
+    // Only run when searchParams changes externally (browser navigation)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const setActiveTab = useCallback(
     (id: string) => {
@@ -190,7 +195,7 @@ export function TabButtons({ className = '', variant = 'default' }: TabButtonsPr
                 layoutId="tab-underline"
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-black"
                 initial={false}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 40 }}
               />
             )}
           </button>
