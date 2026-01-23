@@ -164,7 +164,7 @@ function TiedEmbeddingsContent() {
             <Math>{'W_U = W_E^T'}</Math>. It the ML brain because it appears to be an elegant way to reduce parameters and add symmetry.
           </p>
           <p id="setup-vocab">
-            Let's make this concrete with a tiny vocabulary:
+            Let's make this concrete with a toy example vocabulary:
           </p>
         </div>
       </ArticleSection>
@@ -182,7 +182,7 @@ function TiedEmbeddingsContent() {
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p id="embedding-matrix">
             The embedding matrix <Math>{'W_E'}</Math> has shape (vocab_size,
-            embedding_dim). Each row is the learned embedding for one token:
+            embedding_dim). Each row is the learned embedding for one token (these are made up):
           </p>
         </div>
       </ArticleSection>
@@ -236,7 +236,7 @@ function TiedEmbeddingsContent() {
           </div>
           <p>
             Even in a deep model, this path exists. If we ignore all the
-            attention/MLP layers, the model computes:
+            attention/MLP layers, the model is simply computing:
           </p>
           <FormulaBox>
             {'\\text{logits} = \\text{one\\_hot} \\cdot W_E \\cdot W_U'}
@@ -244,23 +244,13 @@ function TiedEmbeddingsContent() {
         </div>
       </ArticleSection>
 
-      <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
-          <p id="direct-path-matrix">
-            The matrix <Math>{'W_E \\cdot W_U'}</Math> is a vocab_size ×
-            vocab_size matrix. Entry [i, j] tells us: given input token i,
-            what's the logit for output token j?
-          </p>
-        </div>
-      </ArticleSection>
-
-      <ArticleSection>
+      {/* <ArticleSection>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p id="direct-path-meaning">
             Let's interpret what this matrix means for our vocabulary:
           </p>
         </div>
-      </ArticleSection>
+      </ArticleSection> */}
 
       {/* ========== BIGRAMS ========== */}
       <ArticleSection>
@@ -272,9 +262,13 @@ function TiedEmbeddingsContent() {
           What the residual stream learns
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
+          <p id="direct-path-matrix">
+            The matrix <Math>{'W_E \\cdot W_U'}</Math> is a vocab_size ×
+            vocab_size matrix. Entry [i, j] tells us: given input token i,
+            what's the logit for output token j?
+          </p>
           <p>
-            If a model had no attention or MLP layers, the only thing it could
-            learn is: "Given the current token, what's the most likely next
+            "Given the current token, what's the most likely next
             token?"
           </p>
           <p>
