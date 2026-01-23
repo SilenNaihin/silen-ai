@@ -1176,6 +1176,381 @@ export default function VerifiabilityArticle() {
                 parts.
               </p>
             </Prose>
+
+            <TOCHeading id="knowledge-lenses" level={3}>
+              Knowledge Generation Lenses
+            </TOCHeading>
+            <Prose>
+              <p>
+                AI research draws from many intellectual traditions. Each
+                tradition has its own methods and verification standards. Some
+                lenses produce highly verifiable claims. Others produce claims
+                that are meaningful but hard to verify.
+              </p>
+              <p>
+                This table maps 13 research lenses to their verifiability
+                characteristics. Use it to understand why some research
+                directions iterate faster than others.
+              </p>
+            </Prose>
+
+            <ComparisonTable
+              headers={[
+                'Research Lens',
+                'Core Question',
+                'Verification Method',
+                'Speed',
+                'Certainty',
+                'Example Claims',
+              ]}
+              rows={[
+                [
+                  'Computational Efficiency',
+                  'Can we do the same thing cheaper?',
+                  'Runtime benchmarks, FLOPs counts',
+                  'Minutes',
+                  'High',
+                  '"Flash Attention is 2x faster" (highly verifiable)',
+                ],
+                [
+                  'Algorithmic Framing (CS Theory)',
+                  'What bounds and guarantees apply?',
+                  'Mathematical proofs, complexity analysis',
+                  'Hours-days',
+                  'Very High',
+                  '"PAC bound of O(1/sqrt(n))" (verifiable if formalized)',
+                ],
+                [
+                  'Training Stability',
+                  'Does the signal flow correctly?',
+                  'Loss curves, gradient norms, NaN checks',
+                  'Hours',
+                  'High',
+                  '"LayerNorm prevents gradient explosion" (verifiable)',
+                ],
+                [
+                  'Hardware-Aware Design',
+                  'Does it use the hardware well?',
+                  'Profiling, memory bandwidth, utilization',
+                  'Hours',
+                  'High',
+                  '"Ring Attention scales linearly" (verifiable)',
+                ],
+                [
+                  'Compute Regimes & Scaling',
+                  'What happens at scale?',
+                  'Scaling curves, compute sweeps',
+                  'Days-weeks',
+                  'Medium',
+                  '"Chinchilla optimal is 20 tokens/param" (moderately verifiable)',
+                ],
+                [
+                  'Representational Capacity',
+                  'What can this architecture express?',
+                  'Expressivity proofs, ablations',
+                  'Days',
+                  'Medium',
+                  '"Attention can represent any function" (partially verifiable)',
+                ],
+                [
+                  'Data as First-Class Object',
+                  'How does data shape learning?',
+                  'Ablations on data, distribution analysis',
+                  'Days-weeks',
+                  'Medium',
+                  '"Curriculum helps" (moderately verifiable, dataset-dependent)',
+                ],
+                [
+                  'Probabilistic Inference',
+                  'Is learning approximate inference?',
+                  'ELBO bounds, calibration metrics',
+                  'Hours-days',
+                  'Medium',
+                  '"VAE posterior is calibrated" (verifiable within assumptions)',
+                ],
+                [
+                  'Strategic Interaction (Game Theory)',
+                  'What emerges from multi-agent dynamics?',
+                  'Nash equilibrium analysis, win rates',
+                  'Days-weeks',
+                  'Medium',
+                  '"Self-play improves" (verifiable in games, hard elsewhere)',
+                ],
+                [
+                  'Physical Principles',
+                  'What laws govern learning?',
+                  'Energy measurements, equilibrium analysis',
+                  'Days-weeks',
+                  'Low-Medium',
+                  '"Diffusion reverses entropy" (conceptual, hard to falsify)',
+                ],
+                [
+                  'Meta-Learning & Automation',
+                  'Can we automate ML itself?',
+                  'Few-shot performance, adaptation speed',
+                  'Days-weeks',
+                  'Low-Medium',
+                  '"MAML enables fast adaptation" (verifiable on benchmarks)',
+                ],
+                [
+                  'Cognitive Substrate (Brain)',
+                  'What does the brain teach us?',
+                  'Behavioral similarity, neural correlates',
+                  'Weeks-months',
+                  'Low',
+                  '"Attention mirrors human focus" (suggestive, not verifiable)',
+                ],
+                [
+                  'Biological Optimization (Evolution)',
+                  'What did evolution discover?',
+                  'Diversity metrics, fitness landscapes',
+                  'Weeks',
+                  'Low',
+                  '"Evolution finds robust solutions" (hard to verify claims)',
+                ],
+                [
+                  'Philosophical Foundations',
+                  'What does learning mean?',
+                  'Conceptual analysis, thought experiments',
+                  'N/A',
+                  'Very Low',
+                  '"Compression is generalization" (unfalsifiable as stated)',
+                ],
+              ]}
+            />
+
+            <Prose>
+              <p>
+                Notice the pattern. Lenses that produce quantitative,
+                reproducible measurements verify fast. Lenses that produce
+                conceptual insights or analogies verify slowly or not at all.
+              </p>
+              <p>
+                This does not mean philosophical or biological lenses are
+                worthless. Attention mechanisms came from cognitive science.
+                Diffusion came from physics. But the insights from these lenses
+                become valuable only when translated into verifiable claims.
+                &quot;Attention mirrors human focus&quot; is unverifiable.
+                &quot;Attention achieves 95% on machine translation&quot; is
+                verifiable.
+              </p>
+            </Prose>
+
+            <InsightBox title="Why Some Research Moves Faster">
+              <p>
+                The lenses at the top of this table dominate current ML
+                research. Efficiency papers iterate in days. Scaling papers take
+                weeks but produce clear conclusions. Philosophy papers take
+                years to resolve debates.
+              </p>
+              <p className="mt-2">
+                If you want fast iteration, work in verifiable lenses. If you
+                want to shape the field&apos;s direction, work in conceptual
+                lenses. But be prepared for slower, more contested progress.
+              </p>
+            </InsightBox>
+
+            <TOCHeading id="claim-strength" level={3}>
+              Claim Strength and Verifiability
+            </TOCHeading>
+            <Prose>
+              <p>
+                Not all claims are created equal. The strength of a claim
+                determines how much evidence you need and how verifiable that
+                evidence must be.
+              </p>
+            </Prose>
+
+            <ComparisonTable
+              headers={[
+                'Claim Type',
+                'What It Says',
+                'Evidence Required',
+                'Verifiability',
+                'Example',
+              ]}
+              rows={[
+                [
+                  'Existence Proof',
+                  '"At least one case of X exists"',
+                  'One clear example',
+                  'High',
+                  '"We found a neuron that detects Golden Gate Bridge"',
+                ],
+                [
+                  'Narrow Claim',
+                  '"X works in specific conditions Y"',
+                  'Controlled experiments',
+                  'High',
+                  '"LoRA works for language models under 10B parameters"',
+                ],
+                [
+                  'Hedged Claim',
+                  '"There is suggestive evidence for X"',
+                  'Multiple weak signals',
+                  'Medium',
+                  '"Results suggest attention may be interpretable"',
+                ],
+                [
+                  'Systematic Claim',
+                  '"X generally happens across contexts"',
+                  'Many diverse examples',
+                  'Medium',
+                  '"Induction heads appear in all transformer models"',
+                ],
+                [
+                  'Universal Claim',
+                  '"X is always true"',
+                  'Exhaustive proof or very strong evidence',
+                  'Low',
+                  '"All neural networks learn hierarchical features"',
+                ],
+                [
+                  'Guarantee',
+                  '"X is mathematically certain"',
+                  'Formal proof',
+                  'Very High (if proven)',
+                  '"This algorithm converges in O(n) steps" (rare in DL)',
+                ],
+              ]}
+            />
+
+            <Prose>
+              <p>
+                Existence proofs and narrow claims are easiest to verify.
+                Universal claims are hardest. Most ML papers make systematic
+                claims with hedged language. This is appropriate given the
+                inherent uncertainty.
+              </p>
+              <p>
+                The trap is making universal claims with existence-proof
+                evidence. &quot;We found one example where X happens&quot; does
+                not support &quot;X always happens.&quot; Watch for this in your
+                own work and in papers you read.
+              </p>
+            </Prose>
+
+            <TOCHeading id="canonical-examples" level={3}>
+              Case Studies: Verifiability in Practice
+            </TOCHeading>
+            <Prose>
+              <p>
+                How do real research contributions fall on the verifiability
+                spectrum? Here are canonical examples from different lenses.
+              </p>
+            </Prose>
+
+            <ComparisonTable
+              headers={[
+                'Contribution',
+                'Lens',
+                'Core Claim',
+                'How Verified',
+                'Verifiability',
+              ]}
+              rows={[
+                [
+                  'Flash Attention',
+                  'Hardware-Aware',
+                  '2-4x speedup via IO-aware tiling',
+                  'Wall-clock benchmarks',
+                  'Very High',
+                ],
+                [
+                  'Chinchilla',
+                  'Scaling',
+                  'Optimal ratio is 20 tokens per parameter',
+                  'Scaling curves across compute budgets',
+                  'High',
+                ],
+                [
+                  'LoRA',
+                  'Efficiency',
+                  'Low-rank adapters match full finetuning',
+                  'Benchmark comparisons, ablations',
+                  'High',
+                ],
+                [
+                  'Induction Heads',
+                  'Mechanistic',
+                  'Specific circuit causes in-context learning',
+                  'Causal interventions, ablations',
+                  'Medium-High',
+                ],
+                [
+                  'Scaling Laws',
+                  'Scaling',
+                  'Loss scales as power law in compute',
+                  'Curve fitting across scales',
+                  'Medium-High',
+                ],
+                [
+                  'Chain-of-Thought',
+                  'Emergent',
+                  'Reasoning improves with explicit steps',
+                  'Benchmark improvements',
+                  'Medium',
+                ],
+                [
+                  'Grokking',
+                  'Meta-Learning',
+                  'Generalization can be delayed',
+                  'Training curves on specific tasks',
+                  'Medium',
+                ],
+                [
+                  'Diffusion Models',
+                  'Physical',
+                  'Reversing noise process generates images',
+                  'Sample quality metrics (FID)',
+                  'Medium',
+                ],
+                [
+                  'RLHF',
+                  'Game Theory',
+                  'Human preferences improve alignment',
+                  'Human evaluations, benchmarks',
+                  'Low-Medium',
+                ],
+                [
+                  'Constitutional AI',
+                  'Meta-Learning',
+                  'Self-critique improves behavior',
+                  'Red-teaming, behavioral evals',
+                  'Low',
+                ],
+                [
+                  'Sparse Coding (V1)',
+                  'Brain',
+                  'Visual cortex uses sparse representations',
+                  'Neural similarity, behavioral tests',
+                  'Low',
+                ],
+                [
+                  'Learning as Compression',
+                  'Philosophy',
+                  'Generalization equals compression',
+                  'Conceptual arguments, indirect evidence',
+                  'Very Low',
+                ],
+              ]}
+            />
+
+            <Prose>
+              <p>
+                The most cited papers often sit in the medium range. They are
+                verifiable enough to be credible but conceptual enough to be
+                interesting. Pure efficiency papers are easy to verify but may
+                feel incremental. Pure philosophy papers are hard to verify and
+                take years to evaluate.
+              </p>
+              <p>
+                The sweet spot is a conceptual insight translated into
+                verifiable form. Attention came from cognitive science but
+                succeeded because its performance was measurable. Diffusion came
+                from physics but succeeded because FID scores dropped.
+              </p>
+            </Prose>
           </ArticleSection>
 
           {/* Section 5: Making Things More Verifiable */}
