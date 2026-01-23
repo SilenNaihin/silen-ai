@@ -148,21 +148,20 @@ function TiedEmbeddingsContent() {
           Two sides of the same coin
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
-          <p>Transformers have two matrices that deal with tokens:</p>
+          <p>Transformers have two matrices that deal with tokens, an</p>
           <ul className="list-disc list-inside ml-4 space-y-1">
             <li>
-              <strong>Embedding matrix</strong> <Math>{'W_E'}</Math>: converts
-              tokens to vectors (input)
+              <strong>embedding matrix</strong> <Math>{'W_E'}</Math>: converts
+              tokens to vectors (input), and an
             </li>
             <li>
-              <strong>Unembedding matrix</strong> <Math>{'W_U'}</Math>: converts
-              residual stream to logits (output)
+              <strong>unembedding matrix</strong> <Math>{'W_U'}</Math>: converts
+              residual stream to logits (output).
             </li>
           </ul>
           <p>
             With tied embeddings, we use the same weights:{' '}
-            <Math>{'W_U = W_E^T'}</Math>. So elegant. Fewer parameters.
-            Symmetry.
+            <Math>{'W_U = W_E^T'}</Math>. It the ML brain because it appears to be an elegant way to reduce parameters and add symmetry.
           </p>
           <p id="setup-vocab">
             Let's make this concrete with a tiny vocabulary:
