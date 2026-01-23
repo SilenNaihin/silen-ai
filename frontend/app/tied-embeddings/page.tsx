@@ -133,11 +133,7 @@ function TiedEmbeddingsContent() {
           <p>
             In other words: since the embedding matrix encodes semantic meaning
             in words, it serves roughly the same purpose for both input and
-            output predictions. Bro.
-          </p>
-          <p>
-            But there's a fundamental mathematical reason why tied embeddings
-            don't work at scale. It's just linear algebra.
+            output predictions. 
           </p>
         </div>
       </ArticleSection>
