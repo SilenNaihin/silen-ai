@@ -331,24 +331,13 @@ function TiedEmbeddingsContent() {
       </ArticleSection>
 
       <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
-          <p id="tied-visualization">
-            Visualizing the tied result. Notice the symmetry across the
-            diagonal:
-          </p>
+        <div id="tied-visualization" className="leading-relaxed space-y-3 text-neutral-900">
+          
         </div>
       </ArticleSection>
 
       {/* ========== WHY SYMMETRIC ========== */}
       <ArticleSection>
-        <TOCHeading
-          id="why-symmetric"
-          level={2}
-          className="text-2xl font-bold mb-2 text-black"
-          tocText="Why is W_E·W_E^T Always Symmetric?"
-        >
-          Why is <Math>{'W_E \\cdot W_E^T'}</Math> always symmetric?
-        </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
             This follows from basic linear algebra. The (i, j) entry of{' '}
