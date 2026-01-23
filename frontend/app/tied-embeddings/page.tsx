@@ -323,26 +323,9 @@ function TiedEmbeddingsContent() {
             <Math>{'W_U = W_E^T'}</Math>, so the direct path matrix becomes:
           </p>
           <FormulaBox>{'W_E \\cdot W_U = W_E \\cdot W_E^T'}</FormulaBox>
-          <p>
+          <p id="tied-result">
             And <Math>{'W_E \\cdot W_E^T'}</Math> is{' '}
             <strong>always symmetric</strong>. Let's see why.
-          </p>
-        </div>
-      </ArticleSection>
-
-      <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
-          <p id="tied-result">
-            Computing <Math>{'W_E \\cdot W_E^T'}</Math> with our embedding
-            matrix:
-          </p>
-        </div>
-      </ArticleSection>
-
-      <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
-          <p id="symmetry-check">
-            Let's verify: is <Math>{'W_E \\cdot W_E^T'}</Math> symmetric?
           </p>
         </div>
       </ArticleSection>
