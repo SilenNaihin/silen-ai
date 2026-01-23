@@ -29,6 +29,7 @@ import {
   SymmetryExplorer,
   EmbeddingVsLogitBox,
 } from '@/components/tied-embeddings/TiedEmbeddingsInteractive';
+import { Prose } from '@/components/article/Callouts';
 
 const NOTEBOOK_GITHUB_URL =
   'https://github.com/SilenNaihin/silen-ai/blob/main/projects/general/tied_embeddings.ipynb';
@@ -368,13 +369,7 @@ function TiedEmbeddingsContent() {
 
       {/* ========== UNTIED SOLUTION ========== */}
       <ArticleSection>
-        <TOCHeading
-          id="untied-solution"
-          level={2}
-          className="text-2xl font-bold mb-2 text-black"
-        >
-          Untied embeddings don't suffer from this?
-        </TOCHeading>
+
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
             With <strong>untied embeddings</strong>, <Math>{'W_U'}</Math> is a
@@ -401,13 +396,13 @@ function TiedEmbeddingsContent() {
         </div>
       </ArticleSection>
 
-      <ArticleSection>
+      {/* <ArticleSection>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p id="can-represent-asymmetric">
             The key comparison. Can we represent "New→York ≠ York→New"?
           </p>
         </div>
-      </ArticleSection>
+      </ArticleSection> */}
 
       {/* ========== MLP WORKAROUND ========== */}
       <ArticleSection>
@@ -416,18 +411,16 @@ function TiedEmbeddingsContent() {
           level={2}
           className="text-2xl font-bold mb-2 text-black"
         >
-          But bro. It's not just the residual stream
+          Why it still might make sense to tie embeddings
         </TOCHeading>
         <div className="leading-relaxed space-y-3 text-neutral-900">
-          <p>This is true.</p>
           <p>
-            Smaller models still use them because their lesser expressivity
-            means that the nonlinearity added through attention and MLP layers
-            allows them to not bump against the asymmetry constraint.
+            Smaller models still use them because the lack of expressivity
+            means that the nonlinearity added through attention and MLP layers is enough to not bump against the asymmetry constraints.
           </p>
           <p>
-            Or by directly adding a direct MLP layer before the residual stream
-            which can break the symmetry:
+            Some smaller models also do this by directly adding a MLP layer before the residual stream
+            which breaks the symmetry as well.
           </p>
           <FormulaBox>
             {'W_E \\rightarrow \\text{MLP}_0 \\rightarrow W_E^T'}
@@ -436,11 +429,6 @@ function TiedEmbeddingsContent() {
             MLP₀ learns a transformation M, making the effective path{' '}
             <Math>{'W_E \\cdot M \\cdot W_E^T'}</Math>, which CAN be asymmetric.
           </p>
-        </div>
-      </ArticleSection>
-
-      <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
           <p id="mlp-breaks-symmetry">
             Let's see how adding an MLP transformation breaks the symmetry:
           </p>
@@ -453,11 +441,14 @@ function TiedEmbeddingsContent() {
           <p>Explore the parameter savings from tied embeddings:</p>
           <ParameterCalculator className="my-4" />
         </div>
+        <Prose>
         <p>
-          Remember, the entirety of GPT-3 is ~175 billion parameters. 617
-          million embeddings parameters is a drop in the bucket if it means more
-          expressivity.
+          For larger models these days, this isn't a worthy tradeoff.
         </p>
+        <p>Remember, the entirety of GPT-3 is ~175 billion parameters. 617
+          million embeddings parameters is a drop in the bucket if it means more
+          expressivity.</p>
+          </Prose>
       </ArticleSection>
 
       {/* ========== SUMMARY ========== */}
