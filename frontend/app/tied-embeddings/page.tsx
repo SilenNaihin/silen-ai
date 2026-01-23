@@ -127,7 +127,9 @@ function TiedEmbeddingsContent() {
       <ArticleSection>
         <div className="leading-relaxed space-y-3 text-neutral-900">
           <p>
-            Tied embeddings are one such tradeoff. Introduced by "Using the Output Embedding to Improve Language Models" [1], it comes from a simple observation: &quot;we
+            Tied embeddings are one such tradeoff. 
+            
+            </p><p>It comes from a simple observation: &quot;we
             have a 617 million parameter embedding matrix<sup>*</sup> on both sides of our
             nn. why not just make them the same matrix?&quot; <sup>*</sup>(in GPT 3)
           </p>
