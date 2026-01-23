@@ -356,67 +356,14 @@ function TiedEmbeddingsContent() {
             {'(W_E \\cdot W_E^T)_{ij} = (W_E \\cdot W_E^T)_{ji}'}
           </FormulaBox>
           <p>
-            <strong>
               No matter what values <Math>{'W_E'}</Math> has,{' '}
               <Math>{'W_E \\cdot W_E^T'}</Math> is always symmetric.
-            </strong>
-          </p>
-        </div>
-      </ArticleSection>
-
-      {/* Aside: What embeddings encode */}
-      <ArticleSection>
-        <EmbeddingVsLogitBox className="my-4" />
-      </ArticleSection>
-
-      {/* ========== SGD CANT FIX ========== */}
-      {/* <ArticleSection>
-        <TOCHeading
-          id="sgd-limitation"
-          level={2}
-          className="text-2xl font-bold mb-2 text-black"
-        >
-          Why SGD can't fix this
-        </TOCHeading>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
-          <p>
-            You might wonder: "SGD is powerful. Can't it find embeddings such
-            that <Math>{'W_E \\cdot W_E^T'}</Math> approximates the bigram
-            probabilities?"
-          </p>
-          <p>
-            The answer is <strong>no</strong>. This isn't an optimization issue
-            or a matter of training longer. The constraint is mathematical:
-          </p>
-          <div className="bg-neutral-100 border border-neutral-300 rounded-lg p-3 my-3">
-            <p className="text-neutral-800 text-sm">
-              <strong>The set of symmetric matrices is a subspace.</strong> No
-              matter how SGD adjusts <Math>{'W_E'}</Math>, the product{' '}
-              <Math>{'W_E \\cdot W_E^T'}</Math> will always land in this
-              subspace. It can never reach an asymmetric target.
-            </p>
-          </div>
-        </div>
-      </ArticleSection> */}
-
-      {/* <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
-          <p id="random-matrices">
-            Let's verify with random matrices. Every single one produces a
-            symmetric result:
-          </p>
-        </div>
-      </ArticleSection> */}
-
-      {/* Interactive symmetry explorer */}
-      <ArticleSection>
-        <div className="leading-relaxed space-y-3 text-neutral-900">
-          <p>
-            Try it yourself. No matter what values you enter, the result is
-            symmetric:
           </p>
           <SymmetryExplorer className="my-4" />
+          <p>This is bad. We lose expressivity because these serve fundamentally different purposes. Tying them forces a single representation to do both jobs.</p>
         </div>
+        {/* Aside: What embeddings encode */}
+        <EmbeddingVsLogitBox className="my-4" />
       </ArticleSection>
 
       {/* ========== UNTIED SOLUTION ========== */}

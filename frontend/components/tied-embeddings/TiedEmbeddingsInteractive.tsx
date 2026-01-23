@@ -302,11 +302,6 @@ export function EmbeddingVsLogitBox({ className = '' }: { className?: string }) 
           </ul>
         </div>
       </div>
-
-      <div className="mt-3 pt-3 border-t border-neutral-200 text-xs text-neutral-600">
-        <strong>Key insight:</strong> These serve fundamentally different purposes. Tying them
-        forces a single representation to do both jobs.
-      </div>
     </div>
   );
 }
