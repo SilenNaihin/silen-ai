@@ -146,6 +146,13 @@ DataFlow.Step = function DataFlowStep({ children, label }: DataFlowStepProps) {
  *     ['Where applied', 'Before projection', 'After projection'],
  *   ]}
  * />
+ *
+ * @example Full width table that extends into margins
+ * <ComparisonTable
+ *   fullWidth
+ *   headers={['Col 1', 'Col 2', 'Col 3', 'Col 4']}
+ *   rows={[...]}
+ * />
  */
 interface TableCell {
   value: string;
@@ -156,12 +163,18 @@ interface TableCell {
 interface ComparisonTableProps {
   headers: string[];
   rows: (string | TableCell)[][];
+  /**
+   * When true, table extends beyond normal content width into both margins.
+   * Useful for tables with many columns that need more horizontal space.
+   */
+  fullWidth?: boolean;
   className?: string;
 }
 
 export function ComparisonTable({
   headers,
   rows,
+  fullWidth = false,
   className = '',
 }: ComparisonTableProps) {
   const renderCell = (cell: string | TableCell) => {
@@ -192,8 +205,12 @@ export function ComparisonTable({
     );
   };
 
+  const fullWidthClasses = fullWidth
+    ? 'xl:-mx-32 xl:px-8 2xl:-mx-48 2xl:px-12'
+    : '';
+
   return (
-    <div className={`my-6 overflow-x-auto ${className}`}>
+    <div className={`my-6 overflow-x-auto ${fullWidthClasses} ${className}`}>
       <table className="min-w-full text-sm">
         <thead>
           <tr className="border-b border-neutral-200">
