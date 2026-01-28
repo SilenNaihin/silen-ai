@@ -102,7 +102,379 @@ export default function VerifiabilityArticle() {
             />
           </ArticleSection>
 
-          {/* Section 2: Dimensions of Verifiability */}
+          {/* Section 2: The Hierarchy of Knowledge */}
+          <TOCHeading id="knowledge-hierarchy" level={2}>
+            The Hierarchy of Knowledge
+          </TOCHeading>
+          <ArticleSection>
+            <Prose>
+              <p>
+                Before we can understand what verification means, we need to
+                understand what knowledge means. And there is a debate here that
+                is more philosophical than scientific.
+              </p>
+              <p>
+                The question is simple: when an AI generates output, is it
+                creating something genuinely new? Or is it interpolating within
+                a learned space? The answer matters because it determines what
+                verification can even tell us.
+              </p>
+            </Prose>
+
+            <TOCHeading id="interpolation-extrapolation" level={3}>
+              Interpolation vs Extrapolation
+            </TOCHeading>
+            <Prose>
+              <p>
+                Neural networks are function approximators. During training,
+                they map out a high-dimensional space of inputs to outputs. When
+                generating new outputs, they fill gaps in this space. The
+                question is whether this gap-filling constitutes genuine novelty.
+              </p>
+              <p>
+                Consider what &quot;out of distribution&quot; really means. A
+                model trained on English text generates a sentence it has never
+                seen before. Is this novel? The sentence is new in the literal
+                sense. But it lives entirely within the manifold of English
+                sentences the model learned. It is interpolation within a
+                learned distribution, not extrapolation beyond it.
+              </p>
+              <p>
+                This is the gap-filling view: models fill gaps in the
+                multi-dimensional space they mapped during training. The outputs
+                are new combinations of learned patterns. They are not truly
+                &quot;out of distribution&quot; in the sense of being
+                fundamentally novel. They do not push the frontiers of knowledge
+                forward. They explore territory that was implicitly defined
+                during training.
+              </p>
+              <p>
+                I think most if not all knowledge is interpolation. The space of
+                first-order combinations is vast. What we call &quot;novel
+                discoveries&quot; are usually creative recombinations within a
+                space that was always there, waiting to be explored.
+              </p>
+            </Prose>
+
+            <TOCHeading id="spectrum-novelty" level={3}>
+              The Spectrum of Novelty
+            </TOCHeading>
+            <Prose>
+              <p>
+                Consider the spectrum from obvious interpolation to apparent
+                extrapolation.
+              </p>
+              <p>
+                <strong>The simplest possible novel change:</strong> a comma in
+                a poem that moves to a different location. That exact poem has
+                never existed before. It is technically new. But it is obviously
+                interpolation. The space of &quot;poems with commas in different
+                places&quot; is trivially covered by the space of
+                &quot;poems.&quot;
+              </p>
+              <p>
+                <strong>On the opposite end:</strong> the number zero. For
+                millennia, zero was used as a placeholder in positional number
+                systems. The Babylonians used it. The Mayans used it. But it was
+                not considered a &quot;number&quot; in its own right.
+              </p>
+              <p>
+                Why? Because numbers represented quantities. You could have
+                three sheep or seven coins. What would it mean to have zero
+                sheep? The concept of &quot;nothing as a quantity&quot; was
+                philosophically incoherent within existing frameworks.
+                Brahmagupta in 7th century India formalized zero as a number
+                with its own arithmetic properties. This was not just adding a
+                new number to the list. It expanded the conceptual surface area
+                of mathematics itself. Division, negative numbers, algebra,
+                calculus, all became possible. Zero did not fill a gap in
+                existing knowledge. It created new territory.
+              </p>
+              <p>
+                <strong>Similarly:</strong> complex numbers. When mathematicians
+                first encountered √(-1), they called the results
+                &quot;imaginary&quot; and discarded them as meaningless hacks.
+                The numbers were invented to solve cubic equations, then thrown
+                away as absurd. It took centuries to realize that complex
+                numbers were not a hack but a genuine extension of the number
+                system with profound utility in physics, engineering, and
+                mathematics. They expanded the universality of mathematical
+                language.
+              </p>
+              <p>
+                This is the class of discoveries that Bryan Johnson calls{' '}
+                <a
+                  href="https://medium.com/future-literacy/zeroth-principles-thinking-9376d0b7e7f5"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  zeroth principles thinking
+                </a>
+                . Not deriving conclusions from existing axioms, but creating
+                new axioms that expand what can be derived. These discoveries
+                increase the surface area of knowledge for humanity to build
+                upon.
+              </p>
+            </Prose>
+
+            <Aside title="Special Relativity: Interpolation or Extrapolation?">
+              <p>
+                Consider special relativity. Einstein combined insights from
+                Maxwell&apos;s equations, the Michelson-Morley experiment,
+                Lorentz transformations, Galilean invariance, and his own
+                thought experiments about observers moving at the speed of
+                light.
+              </p>
+              <p className="mt-2">
+                This synthesis drew on perhaps ten different fields of math,
+                physics, and philosophy. An incredibly brilliant human combined
+                them in a way no one had before. Revolutionary? Absolutely. But
+                was it extrapolation or interpolation?
+              </p>
+              <p className="mt-2">
+                I think it was interpolation. All the ingredients existed. The
+                mathematical framework was there. The experimental anomalies
+                were known. Einstein found a consistent way to connect them.
+                Given the same ingredients and enough time, you could reproduce
+                the theory of special relativity. The space of &quot;consistent
+                theories that explain these phenomena&quot; contained relativity
+                even before Einstein found it.
+              </p>
+              <p className="mt-2">
+                To be clear: I say &quot;you&quot; could reproduce it, not
+                &quot;I&quot; could. The difficulty is immense. But the
+                possibility space was defined by the ingredients.
+              </p>
+            </Aside>
+
+            <TOCHeading id="leap-factor" level={3}>
+              The Leap Factor
+            </TOCHeading>
+            <Prose>
+              <p>
+                Not all interpolations are equal. There is a &quot;leap
+                factor&quot; that measures how far you jump from existing
+                knowledge.
+              </p>
+              <p>
+                The leap factor of deriving the next step of a mathematical
+                proof using the chain rule is small. The definitions are clear.
+                The inference is mechanical. Anyone who knows calculus can
+                verify it.
+              </p>
+              <p>
+                The leap factor of going from observing stars to hypothesizing
+                about galaxies is large. Ancient humans saw points of light.
+                Imagining that some of those points were entire island universes
+                containing billions of suns required a conceptual leap that most
+                people never made.
+              </p>
+              <p>
+                Verifiability interacts with the leap factor. Small leaps are
+                easy to verify. Large leaps are hard. And this creates an
+                asymmetry.
+              </p>
+              <p>
+                But leap factor alone does not determine value. You also need
+                explanatory power.
+              </p>
+            </Prose>
+
+            <TOCHeading id="explanatory-power" level={3}>
+              Hard to Vary: The Deutsch Criterion
+            </TOCHeading>
+            <Prose>
+              <p>
+                David Deutsch argues that good explanations are &quot;hard to
+                vary.&quot; You cannot change the details without destroying the
+                explanation. The parts fit together tightly, and any
+                modification breaks the whole.
+              </p>
+              <p>
+                Consider the galaxy hypothesis. If you claim those points of
+                light are distant island universes, you make specific
+                predictions. They should have structure. They should contain
+                stars. They should follow gravitational laws. These predictions
+                can be tested. The explanation is hard to vary because changing
+                any part breaks the predictions.
+              </p>
+              <p>
+                Now consider an alternative: those points of light are the
+                campfires of Ouranos, the sky god. This explains the same
+                observation. But it is easy to vary. Why campfires? Why Ouranos?
+                You can substitute any god, any mechanism, any story. The
+                explanation has no tight structure that resists modification.
+              </p>
+              <p>
+                The problem is that high leap-factor ideas are initially hard to
+                verify. And if you cannot verify them, it is hard to distinguish
+                hard-to-vary explanations from easy-to-vary ones. Both explain
+                the same observations equally well until you can run the tests.
+              </p>
+              <p>
+                This is why verifiability matters for the leap factor.
+                Large-leap hypotheses need eventual verification to distinguish
+                them from mythology. Without it, galaxies and Ouranos are
+                equally valid. With it, only hard-to-vary explanations survive.
+              </p>
+            </Prose>
+
+            <TOCHeading id="model-collapse" level={3}>
+              Model Collapse: The Interpolation Trap
+            </TOCHeading>
+            <Prose>
+              <p>
+                There is an interesting counterpoint to the interpolation view:
+                model collapse.
+              </p>
+              <p>
+                Model collapse occurs when AI models are trained on data
+                generated by other AI models. Each generation loses information.
+                The distribution narrows. Rare events disappear. Eventually the
+                model produces only high-probability outputs, forgetting the
+                tails of the original distribution.
+              </p>
+              <p>
+                Why does this happen? Because models generate within their
+                &quot;comfortable bounds.&quot; They produce outputs that have
+                high probability under their learned distribution. When you
+                train on these outputs, you are training on a filtered subset of
+                the original data manifold. The next model learns an even
+                narrower distribution. Iterate this process and you converge to
+                a small, degenerate subspace.
+              </p>
+              <p>
+                This is why training on synthetic data does not work as naively
+                hoped. If your generator produces only a subspace of the full
+                distribution, training on its outputs teaches the next model to
+                produce an even smaller subspace. You do not expand knowledge.
+                You contract it.
+              </p>
+              <p>
+                Model collapse suggests that even interpolation requires access
+                to the full training distribution. Lose the tails and you lose
+                the ability to generate rare combinations. The high-dimensional
+                space of first-order discoveries shrinks.
+              </p>
+              <p>
+                The solution requires diversity pressure. You need mechanisms
+                that push toward rare outputs, not just likely ones. Evolution
+                provides one model. Verification provides another. Both require
+                something beyond maximum likelihood generation.
+              </p>
+            </Prose>
+
+            <TOCHeading id="ood-approaches" level={3}>
+              Approaches to Out-of-Distribution Thinking
+            </TOCHeading>
+            <Prose>
+              <p>
+                If most knowledge is interpolation, how do we push models toward
+                the edges of their learned space? Several approaches show
+                promise.
+              </p>
+            </Prose>
+
+            <ComparisonTable
+              headers={['Approach', 'Mechanism', 'Why It Might Work']}
+              rows={[
+                [
+                  'Different post-training biases',
+                  'OpenAI, Anthropic, Google use similar pretraining data but different RLHF',
+                  'Same base knowledge, different exploration of the space',
+                ],
+                [
+                  'Different architectures',
+                  'Transformer, Hyena, Mamba, energy-based, text diffusion',
+                  'Different inductive biases navigate the space differently',
+                ],
+                [
+                  'Researcher prompting',
+                  'Prompt models to adopt researcher mindset, question assumptions',
+                  'Changes the sampling distribution toward novel regions',
+                ],
+                [
+                  'Recursive Self-Aggregation (RSA)',
+                  'Generate N chains in parallel, aggregate K random subsets, iterate T times',
+                  'Combines diverse reasoning paths, surfaces novel combinations',
+                ],
+                [
+                  'Galapagos evolution',
+                  'High variation, strong selection, fast iteration, verified fitness',
+                  'Novelty emerges from process, not single generation',
+                ],
+                [
+                  'Architectural ensembles',
+                  'Combine autoregressive, diffusion, and SSM models',
+                  'Different models explore different regions of hypothesis space',
+                ],
+              ]}
+            />
+
+            <Prose>
+              <p>
+                The Recursive Self-Aggregation (RSA) algorithm is particularly
+                interesting. As{' '}
+                <a
+                  href="https://x.com/siddarthv66/status/2015585206283948485"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  described by researchers
+                </a>
+                : generate N full reasoning chains in parallel, make N subsets
+                of K randomly chosen chains, prompt the model to aggregate each
+                subset into a new chain, repeat T times. For the ARC benchmark,
+                using K=4, N=16, and T=2-9 iterations significantly improved
+                performance.
+              </p>
+              <p>
+                RSA works because aggregation forces the model to synthesize
+                diverse perspectives. Different reasoning chains explore
+                different paths through the solution space. Combining them
+                creates novel trajectories that no single chain would find.
+              </p>
+              <p>
+                The Galapagos analogy from evolutionary biology suggests another
+                path. Darwin&apos;s finches did not &quot;know&quot; they were
+                optimizing beak shapes. Variation was random. Selection was
+                based on fitness. Isolation allowed divergence. Novelty emerged
+                from the process.
+              </p>
+              <p>
+                For AI, this means: instead of asking models to generate novel
+                ideas directly, create environments where variation is high,
+                selection is verifiable, and iteration is fast. FunSearch from
+                DeepMind demonstrates this. LLM proposes code variations.
+                Automated evaluator verifies. Evolutionary selection improves.
+                The result: the largest increase in cap set sizes in 20 years.
+              </p>
+            </Prose>
+
+            <InsightBox title="The Philosophical Bottom Line">
+              <p>
+                Whether AI can generate truly novel knowledge is more
+                philosophical than scientific. We cannot run the experiment that
+                would settle it because we do not agree on what
+                &quot;novel&quot; means.
+              </p>
+              <p className="mt-2">
+                But this does not matter for practical purposes. The space of
+                first-order combinations is vast. If models can explore this
+                space effectively, they can contribute to human knowledge even
+                if every output is technically interpolation. The key is
+                verification. We need to know which interpolations are valuable
+                and which are noise.
+              </p>
+              <p className="mt-2">
+                This is why verifiability is the bottleneck. Not because
+                generation is limited to interpolation, but because even
+                interpolation needs verification to be useful.
+              </p>
+            </InsightBox>
+          </ArticleSection>
+
+          {/* Section 3: Dimensions of Verifiability */}
           <TOCHeading id="dimensions" level={2}>
             The Dimensions of Verifiability
           </TOCHeading>
