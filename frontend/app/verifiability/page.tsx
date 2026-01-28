@@ -178,6 +178,27 @@ export default function VerifiabilityArticle() {
                 systems. The Babylonians used it. The Mayans used it. But it was
                 not considered a &quot;number&quot; in its own right.
               </p>
+
+              <Figure
+                src="/articles/verifiability/zero-1.png"
+                alt="The history and significance of zero"
+                side={true}
+              />
+              <Figure
+                src="/articles/verifiability/zero-2.png"
+                alt="Zero as a conceptual primitive"
+                side={true}
+              />
+              <Figure
+                src="/articles/verifiability/zero-3.png"
+                alt="Mathematical implications of zero"
+                side={true}
+              />
+              <Figure
+                src="/articles/verifiability/zero-4.png"
+                alt="Zero expanding the surface area of mathematics"
+                side={true}
+              />
               <p>
                 Why? Because numbers represented quantities. You could have
                 three sheep or seven coins. What would it mean to have zero
@@ -216,6 +237,12 @@ export default function VerifiabilityArticle() {
                 upon.
               </p>
             </Prose>
+
+            <Figure
+              src="/articles/verifiability/knowledge-hierarchy.png"
+              alt="The hierarchy of knowledge: interpolation to zeroth-order discoveries"
+              caption="From gap-filling to conceptual expansion"
+            />
 
             <Aside title="Special Relativity: Interpolation or Extrapolation?">
               <p>
@@ -364,6 +391,12 @@ export default function VerifiabilityArticle() {
               </p>
             </Prose>
 
+            <Figure
+              src="/articles/verifiability/model-collapse.png"
+              alt="Model collapse over generations of synthetic data training"
+              caption="The distribution narrows with each generation"
+            />
+
             <TOCHeading id="ood-approaches" level={3}>
               Approaches to Out-of-Distribution Thinking
             </TOCHeading>
@@ -410,6 +443,32 @@ export default function VerifiabilityArticle() {
                 ],
               ]}
             />
+
+            <Figure
+              src="/articles/verifiability/ood-approaches.png"
+              alt="Approaches to out-of-distribution thinking"
+              caption="Multiple paths to pushing beyond the training manifold"
+            />
+
+            <Aside title="Pliny and Adversarial Prompting">
+              <p>
+                There is an underexplored connection between adversarial
+                prompting and OOD generation. Researchers like Pliny who
+                specialize in &quot;jailbreaking&quot; models are essentially
+                invoking the model to think in unique parts of its manifold.
+              </p>
+              <p className="mt-2">
+                The same techniques that bypass safety filters might be valuable
+                for generating outputs that are genuinely out of distribution.
+                If you can prompt a model to access rare regions of its learned
+                space, you might prevent model collapse and generate more
+                diverse hypotheses.
+              </p>
+              <p className="mt-2">
+                Whether this scales is unclear. But adversarial prompting as a
+                diversity mechanism is an interesting research direction.
+              </p>
+            </Aside>
 
             <Prose>
               <p>
@@ -1107,6 +1166,12 @@ export default function VerifiabilityArticle() {
               </p>
             </Prose>
 
+            <Figure
+              src="/articles/verifiability/claim-types.png"
+              alt="Five types of AI research claims arranged by verifiability"
+              caption="From performance claims (highly verifiable) to safety claims (hard to verify)"
+            />
+
             <TOCHeading id="claims-performance" level={3}>
               Performance Claims
             </TOCHeading>
@@ -1538,6 +1603,12 @@ export default function VerifiabilityArticle() {
                   'Confounding, wrong ablation',
                 ],
               ]}
+            />
+
+            <Figure
+              src="/articles/verifiability/ml-experiment-parts.png"
+              alt="Parts of an ML experiment arranged by verifiability"
+              caption="Verifiability decreases as you move from data to causal claims"
             />
 
             <Prose>
@@ -2314,6 +2385,12 @@ export default function VerifiabilityArticle() {
               ]}
             />
 
+            <Figure
+              src="/articles/verifiability/verifiable-data.png"
+              alt="Types of valuable verification data"
+              caption="The verification data market"
+            />
+
             <Prose>
               <p>
                 The highest value data is both verifiable and relevant to
@@ -2323,6 +2400,12 @@ export default function VerifiabilityArticle() {
                 where the most valuable training data lives.
               </p>
             </Prose>
+
+            <Figure
+              src="/articles/verifiability/ai-discoveries.png"
+              alt="Where AI discoveries come from"
+              caption="The intersection of verifiable domains, search, and human collaboration"
+            />
 
             <TOCHeading id="market-third-party" level={3}>
               Third-Party Verification
