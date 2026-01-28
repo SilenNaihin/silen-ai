@@ -1667,6 +1667,12 @@ export default function VerifiabilityArticle() {
               </p>
             </Prose>
 
+            <Figure
+              src="/articles/verifiability/knowledge-lenses.png"
+              alt="13 research lenses arranged by verifiability"
+              caption="Research lenses from most verifiable (top) to least verifiable (bottom)"
+            />
+
             <ComparisonTable
               headers={[
                 'Research Lens',
