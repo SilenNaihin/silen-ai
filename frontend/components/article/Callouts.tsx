@@ -1,6 +1,7 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * Prose container for article text content.
@@ -333,8 +334,116 @@ export function Aside({ children, title, className = '' }: AsideProps) {
 }
 
 /**
+ * Lightbox modal for viewing images at full size.
+ * Follows common lightbox patterns (click outside to close, Escape key, dark overlay).
+ */
+interface LightboxProps {
+  src: string;
+  alt: string;
+  caption?: string;
+  href?: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function Lightbox({ src, alt, caption, href, isOpen, onClose }: LightboxProps) {
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    },
+    [onClose]
+  );
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, handleKeyDown]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8"
+          onClick={onClose}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/80" />
+
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 p-2 text-white/70 hover:text-white transition-colors"
+            aria-label="Close lightbox"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          {/* Image container */}
+          <motion.figure
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="relative max-w-5xl max-h-[90vh] flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={src}
+              alt={alt}
+              className="max-w-full max-h-[80vh] object-contain rounded-lg"
+            />
+            {caption && (
+              <figcaption className="mt-3 text-sm text-white/70 text-center">
+                {href ? (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white underline"
+                  >
+                    {caption}
+                  </a>
+                ) : (
+                  caption
+                )}
+              </figcaption>
+            )}
+          </motion.figure>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/**
  * Figure with image and caption.
  * Caption can include a link (e.g., to source).
+ * Side images are clickable and open in a lightbox modal.
  *
  * @example
  * <Figure
@@ -352,6 +461,7 @@ interface FigureProps {
   /**
    * On desktop (xl+): render in the right margin (like `Aside`).
    * On mobile (<xl): render inline (default behavior).
+   * Side images are clickable and open in a lightbox modal.
    *
    * Must be used within an `ArticleSection` (position: relative) for correct positioning.
    */
@@ -367,6 +477,8 @@ export function Figure({
   side = false,
   className = '',
 }: FigureProps) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
   const content = (
     <>
       <img
@@ -397,6 +509,37 @@ export function Figure({
     return <figure className={`mt-4 mb-2 ${className}`}>{content}</figure>;
   }
 
+  const clickableImage = (
+    <button
+      onClick={() => setLightboxOpen(true)}
+      className="block w-full text-left cursor-zoom-in group"
+      aria-label={`View ${alt} in full size`}
+    >
+      <img
+        src={src}
+        alt={alt}
+        className="rounded-lg border border-neutral-200 w-full transition-all group-hover:border-neutral-400 group-hover:shadow-md"
+      />
+      {caption && (
+        <figcaption className="mt-2 text-sm text-neutral-500 text-center">
+          {href ? (
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(href, '_blank', 'noopener,noreferrer');
+              }}
+              className="hover:text-neutral-700 underline cursor-pointer"
+            >
+              {caption}
+            </span>
+          ) : (
+            caption
+          )}
+        </figcaption>
+      )}
+    </button>
+  );
+
   return (
     <>
       {/* Desktop: Right margin positioning (like `Aside`) */}
@@ -404,11 +547,21 @@ export function Figure({
         className={`hidden xl:block absolute left-full ml-4 w-72 2xl:ml-8 2xl:w-88 my-6 ${className}`}
         style={{ top: 'auto' }}
       >
-        {content}
+        {clickableImage}
       </figure>
 
       {/* Mobile: Inline figure */}
-      <figure className={`xl:hidden my-6 ${className}`}>{content}</figure>
+      <figure className={`xl:hidden my-6 ${className}`}>{clickableImage}</figure>
+
+      {/* Lightbox modal */}
+      <Lightbox
+        src={src}
+        alt={alt}
+        caption={caption}
+        href={href}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
     </>
   );
 }
