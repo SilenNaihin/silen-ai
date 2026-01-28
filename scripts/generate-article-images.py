@@ -128,8 +128,14 @@ Modern infographic. No people. Professional research aesthetic.
 }
 
 
-def generate_image(name: str, prompt: str) -> None:
+def generate_image(name: str, prompt: str, skip_existing: bool = True) -> None:
     """Generate and save an image using Gemini's native image generation."""
+    output_path = OUTPUT_DIR / f"{name}.png"
+
+    if skip_existing and output_path.exists():
+        print(f"Skipping: {name} (already exists)")
+        return
+
     print(f"Generating: {name}")
 
     try:
@@ -147,8 +153,6 @@ def generate_image(name: str, prompt: str) -> None:
             if part.inline_data is not None:
                 import base64
                 image_data = part.inline_data.data
-                output_path = OUTPUT_DIR / f"{name}.png"
-
                 # Save the image bytes directly
                 with open(output_path, 'wb') as f:
                     f.write(image_data)
