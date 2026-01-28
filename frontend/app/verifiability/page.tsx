@@ -178,32 +178,31 @@ export default function VerifiabilityArticle() {
                 systems. The Babylonians used it. The Mayans used it. But it was
                 not considered a &quot;number&quot; in its own right.
               </p>
+            </Prose>
 
-              <Figure
-                src="/articles/verifiability/zero-1.png"
-                alt="The history and significance of zero"
-                side={true}
-              />
-              <Figure
-                src="/articles/verifiability/zero-2.png"
-                alt="Zero as a conceptual primitive"
-                side={true}
-              />
-              <Figure
-                src="/articles/verifiability/zero-3.png"
-                alt="Mathematical implications of zero"
-                side={true}
-              />
-              <Figure
-                src="/articles/verifiability/zero-4.png"
-                alt="Zero expanding the surface area of mathematics"
-                side={true}
-              />
+            <Figure
+              src="/articles/verifiability/zero-1.png"
+              alt="The history and significance of zero"
+              side={true}
+            />
+
+            <Prose>
               <p>
                 Why? Because numbers represented quantities. You could have
                 three sheep or seven coins. What would it mean to have zero
                 sheep? The concept of &quot;nothing as a quantity&quot; was
                 philosophically incoherent within existing frameworks.
+              </p>
+            </Prose>
+
+            <Figure
+              src="/articles/verifiability/zero-2.png"
+              alt="Zero as a conceptual primitive"
+              side={true}
+            />
+
+            <Prose>
+              <p>
                 Brahmagupta in 7th century India formalized zero as a number
                 with its own arithmetic properties. This was not just adding a
                 new number to the list. It expanded the conceptual surface area
@@ -211,6 +210,15 @@ export default function VerifiabilityArticle() {
                 calculus, all became possible. Zero did not fill a gap in
                 existing knowledge. It created new territory.
               </p>
+            </Prose>
+
+            <Figure
+              src="/articles/verifiability/zero-3.png"
+              alt="Mathematical implications of zero"
+              side={true}
+            />
+
+            <Prose>
               <p>
                 <strong>Similarly:</strong> complex numbers. When mathematicians
                 first encountered √(-1), they called the results
@@ -222,6 +230,17 @@ export default function VerifiabilityArticle() {
                 mathematics. They expanded the universality of mathematical
                 language.
               </p>
+            </Prose>
+
+            <Figure
+              src="/articles/verifiability/zero-4.png"
+              alt="Zero expanding the surface area of mathematics"
+              caption="From Veritasium's History of Mathematics"
+              href="https://www.youtube.com/watch?v=T647CGsuOVU&list=PLiaHhY2iBX9g6KIvZ_703G3KJXapKkNaF&index=1"
+              side={true}
+            />
+
+            <Prose>
               <p>
                 This is the class of discoveries that Bryan Johnson calls{' '}
                 <a
@@ -362,6 +381,12 @@ export default function VerifiabilityArticle() {
                 tails of the original distribution.
               </p>
               <p>
+                You can observe this at inference time too. Ask ChatGPT to tell
+                you a joke 100 times. You will get the same 10 jokes repeated.
+                The model has collapsed to a small region of joke-space, the
+                high-probability outputs that its training reinforced.
+              </p>
+              <p>
                 Why does this happen? Because models generate within their
                 &quot;comfortable bounds.&quot; They produce outputs that have
                 high probability under their learned distribution. When you
@@ -440,6 +465,11 @@ export default function VerifiabilityArticle() {
                   'Architectural ensembles',
                   'Combine autoregressive, diffusion, and SSM models',
                   'Different models explore different regions of hypothesis space',
+                ],
+                [
+                  'Sampling strategies',
+                  'Higher temperature, top-p/top-k variation, nucleus sampling',
+                  'Accesses lower-probability regions of the output distribution',
                 ],
               ]}
             />
