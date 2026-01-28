@@ -4,187 +4,169 @@
 import os
 from pathlib import Path
 
-# Set the API key from environment or use default
-# To use: export GOOGLE_API_KEY=your_key_here
 if "GOOGLE_API_KEY" not in os.environ:
     raise ValueError("GOOGLE_API_KEY environment variable not set")
 
 from google import genai
 from google.genai import types
 
-# Output directory
 OUTPUT_DIR = Path(__file__).parent.parent / "frontend" / "public" / "articles" / "verifiability"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
-# Image prompts for the verifiability article
 PROMPTS = {
-    # --- EXISTING IMAGES (commented out to preserve) ---
-    # "spectrum": """...""",
-    # "dimensions": """...""",
-    # "verification-loop": """...""",
-    # "meta-bottleneck": """...""",
-    # "claim-types": """...""",
-    # "knowledge-hierarchy": """...""",
-    # "model-collapse": """...""",
-    # "ood-approaches": """...""",
-    # "ai-discoveries": """...""",
-    # "verifiable-data": """...""",
-    # "ml-experiment-parts": """...""",
-    # "knowledge-lenses": """...""",
+    "verification-loop-v3": """
+A circular flow diagram with EXACTLY 3 nodes connected by 3 arrows forming a triangle/cycle:
 
-    # --- V2 IMAGES FOR COMPARISON ---
-    "verification-loop-v2": """
-A simple circular flow diagram with exactly 3 steps in a cycle:
-1. PROPOSE (top) - an agent proposes a hypothesis
-2. VERIFY (right) - we verify whether it holds
-3. IMPROVE (left) - we improve based on the result
-Arrow from IMPROVE back to PROPOSE completing the cycle.
+Node 1 (top): "PROPOSE" with subtitle "(forward pass, candidate solution)"
+Node 2 (bottom right): "VERIFY" with subtitle "(get real signal)"
+Node 3 (bottom left): "IMPROVE" with subtitle "(update future behaviour based on result)"
 
-Style: Clean minimalist design, white background, large clear arrows connecting steps.
-Blue and gray color scheme. Modern sans-serif typography.
-Professional diagram like you'd see in a research paper. No people.
+Arrows: PROPOSE → VERIFY → IMPROVE → back to PROPOSE
+
+EXACTLY 3 arrows, no more. Clean triangular cycle.
+Style: Clean minimalist, white background, blue/gray colors. Modern sans-serif.
+No title, no extra text. Just the cycle diagram.
 """,
 
-    "knowledge-hierarchy-v2": """
-An INVERTED pyramid diagram (widest at TOP, narrowest at BOTTOM) showing levels of knowledge:
+    "knowledge-hierarchy-v3": """
+An INVERTED pyramid (widest at TOP, narrowest at BOTTOM):
 
-TOP (widest section, blue): "INTERPOLATION" - filling gaps in learned space, most common
-MIDDLE (medium width, teal): "FIRST-ORDER COMBINATIONS" - novel recombinations of concepts
-BOTTOM (narrowest section, gold): "ZEROTH-ORDER DISCOVERIES" - rare foundational primitives
+TOP (widest, blue): "INTERPOLATION" - with small example "moving a comma in a poem"
+MIDDLE (medium, teal): "FIRST-ORDER COMBINATIONS" - with example "special relativity"
+BOTTOM (narrowest, gold): "ZEROTH-ORDER DISCOVERIES" - with example "the number zero, complex numbers"
 
-The narrow bottom represents rarity and foundational importance - like the number zero or complex numbers.
-The wide top shows that most knowledge is interpolation.
+The narrow bottom shows rarity. Wide top shows most knowledge is interpolation.
+Include the small examples next to each level.
 
-Style: Clean minimalist design, white background. Smooth gradient from blue (top) to gold (bottom).
-Modern typography with clear labels. No people. Professional infographic style.
+Style: Clean minimalist, white background. Gradient blue to gold.
+No title. Just the inverted pyramid with labels and examples.
 """,
 
-    "model-collapse-v2": """
-A visualization showing model collapse as diversity loss over training generations.
+    "model-collapse-v3": """
+A funnel or cone showing model collapse - diversity loss over generations.
 
-Show as a FUNNEL or CONE shape narrowing from left to right:
-- LEFT (wide): "Generation 0" with many diverse colorful dots/samples spread out
-- MIDDLE: "Generation 3" with fewer, more clustered samples
-- RIGHT (narrow): "Generation N" with just a few samples clustered tightly
+LEFT (wide): "Generation 0" with many diverse colorful dots spread out
+MIDDLE: "Generation 3" with fewer, clustered dots
+RIGHT (narrow): "Generation N" with just a few dots tightly clustered
 
-OR show as a series of sample grids where variety visibly decreases.
-Labels: "Full distribution" on left, "Collapsed distribution" on right.
+Labels only: "Full distribution" on left, "Collapsed" on right.
 
-Style: Clean scientific visualization, white background, blue-to-gray color scheme.
-Professional, like a figure from a machine learning paper.
+Style: Clean scientific visualization, white background, blue-gray colors.
+NO title. NO "Figure 1" text. NO caption. Just the visual.
 """,
 
-    "ood-approaches-v2": """
-A mind map or radial diagram with exactly 6 branches:
+    "ood-approaches-v3": """
+A radial mind map with exactly 6 branches:
 
-CENTER: "Out-of-Distribution Generation" (or "OOD Thinking")
+CENTER CIRCLE: "OOD Thinking" (just these two words)
 
-6 BRANCHES radiating out (each with a small icon):
-1. Post-training diversity (different RLHF)
-2. Architectural diversity (transformers + SSMs + diffusion + ensembles)
-3. Researcher prompting (mindset shift)
-4. RSA aggregation (recursive synthesis)
-5. Galapagos evolution (variation + selection)
-6. Sampling strategies (temperature, top-p)
+6 BRANCHES with icons:
+1. "Post-training diversity" with subtitle "RLHF, RLVR"
+2. "Architectural diversity" with subtitle "transformers, SSMs, diffusion"
+3. "In-context activation shift" (this replaces researcher prompting)
+4. "RSA aggregation" with subtitle "recursive synthesis"
+5. "Galapagos evolution" with subtitle "variation + selection"
+6. "Sampling strategies" with subtitle "temperature, top-p"
 
-Style: Clean node-and-edge diagram, white background. Modern infographic.
-Each branch has a small distinctive icon. Blue and gray colors. No people.
+Style: Clean node-and-edge diagram, white background. Blue/gray colors.
+Each branch has small icon. No title. No extra text.
 """,
 
-    "dimensions-v2": """
-A clean visualization of 10 verifiability dimensions - NOT a radar/spider chart.
+    "dimensions-v3": """
+A HORIZONTAL infographic showing 10 verifiability dimensions as a flowing strip or ribbon.
 
-Show as a VERTICAL LADDER or STACKED BARS or PERIODIC TABLE style grid:
-The 10 dimensions: Speed, Cost, Certainty, Meta-verifiability, Reproducibility,
-Granularity, Complexity, Interpretability, Falsifiability, Composability
+Left to right, 10 connected boxes or segments:
+Speed | Cost | Certainty | Meta-verifiability | Reproducibility | Granularity | Complexity | Interpretability | Falsifiability | Composability
 
-Each dimension has its own box/cell with the name and a small icon.
-Could arrange in 2 columns of 5, or a 2x5 grid, or a vertical stack.
+Each box has small icon above the label.
+Subtle color gradient across the strip (not indicating anything, just visual interest).
 
-Style: Clean infographic, white background, modern sans-serif typography.
-Subtle blue/gray color variations. Professional and technical aesthetic. No people.
+Style: Clean horizontal infographic, white background. Wide/landscape format.
+Modern typography. No title. Just the 10 dimensions in a row.
 """,
 
-    "claim-types-v2": """
-A visualization showing 6 types of AI research claims arranged by verifiability.
-Show as a GRADIENT or SPECTRUM from green (verifiable) to red (hard to verify):
+    "claim-types-v3": """
+A flowing gradient visualization showing 6 types of AI research claims.
+NOT numbered. Show as a smooth spectrum from green to red.
 
-1. Performance Claims (benchmarks) - GREEN, most verifiable
-2. Theoretical Claims (proofs, bounds) - GREEN-YELLOW, highly verifiable if formal
-3. Method Claims (ablations, components) - YELLOW, verifiable with effort
-4. Mechanistic Claims (interpretability) - ORANGE, medium difficulty
-5. Emergent Claims (capabilities, reasoning) - ORANGE-RED, hard to pin down
-6. Safety Claims (alignment, honesty) - RED, hardest to verify
+GREEN (left, most verifiable):
+- Performance Claims
+- Theoretical Claims
 
-Show nuance: each type could have sub-boxes showing variations.
-NOT just simple stacked boxes - show it as a flowing gradient or connected chain.
+YELLOW (middle):
+- Method Claims
+- Mechanistic Claims
 
-Style: Clean infographic showing spectrum, white background. Professional aesthetic.
+RED (right, hardest to verify):
+- Emergent Claims
+- Safety Claims
+
+Show as connected flowing shapes or a gradient band, not stacked boxes.
+Each claim type is a region in the gradient, no numbers, minimal text.
+
+Style: Clean infographic, white background. Flowing gradient green to red.
+NO title. NO numbering. NO "Figure" text. Just the visual spectrum.
 """,
 
-    "knowledge-lenses-v2": """
-A comprehensive grid or wheel showing 14 research lenses for AI/ML arranged by verifiability.
+    "knowledge-lenses-v3": """
+A grid showing 13 research lenses for AI/ML arranged by verifiability.
+NO repeated lenses. Each appears exactly once.
 
-HIGHLY VERIFIABLE (green zone):
-- Computational Efficiency
+GREEN ZONE (highly verifiable):
+- Computational Efficiency & Hardware
 - Algorithmic Framing (CS Theory)
 - Training Stability
-- Hardware-Aware Design
 
-MEDIUM VERIFIABLE (yellow zone):
+YELLOW ZONE (medium):
 - Compute Regimes & Scaling
 - Representational Capacity
 - Data as First-Class
 - Probabilistic Inference
 - Strategic Interaction
 
-LOW VERIFIABLE (red zone):
+RED ZONE (low verifiability):
 - Physical Principles
 - Meta-Learning
 - Cognitive Substrate (Brain)
-- Biological Optimization (Evolution)
+- Biological Optimization
 - Philosophical Foundations
 
-Each lens has a small icon and is clearly labeled.
-Style: Grid or wheel layout, gradient from green to red indicating verifiability.
-Professional academic aesthetic, white background. No people.
+Each lens has small icon. Gradient from green to red.
+Style: Grid layout, white background. No title. No repeats.
 """,
 
-    "verifiable-data-v2": """
-A creative visualization (NOT a bar graph) showing the verification data ecosystem.
+    "claim-strength-v1": """
+A visualization showing 6 levels of claim strength arranged by verifiability:
 
-Show as a FLOW DIAGRAM or ECOSYSTEM MAP with interconnected nodes:
+From STRONGEST (top, green) to WEAKEST (bottom, red):
+1. Existence proof - "X is possible"
+2. Narrow empirical - "X works on dataset Y"
+3. Hedged empirical - "X tends to work when..."
+4. Systematic claim - "X works across conditions"
+5. Universal claim - "X always works"
+6. Guarantee - "X will never fail"
 
-DATA SOURCES (left side):
-- Code repositories
-- Math/proof libraries
-- Physical labs
-- Teleoperation/robotics
-- Simulations
-- Games
-- Human annotators
-- Red team exercises
+Show as descending steps or a ladder from strong/verifiable to weak/hard-to-verify.
+Paradox: stronger claims (guarantees) are harder to verify.
 
-VERIFIERS (middle):
-- Test execution
-- Proof assistants
-- Measurement equipment
-- Sensor feedback
-- Physics engines
-- Game rules
-- Human judgment
-- Adversarial evaluation
+Style: Clean infographic, white background. Green to red gradient.
+No title. Just the 6 levels with brief descriptions.
+""",
 
-VALUE (right side):
-- Model capabilities
+    "verifiable-data-v3": """
+A SIMPLE flow diagram showing verification data ecosystem.
 
-Show flows/connections between sources, verifiers, and value.
-Some paths are thicker (more valuable/verified) than others.
+LEFT (data sources): Code, Math, Labs, Robots, Sims, Games, Humans
+CENTER (verifiers): Tests, Proofs, Sensors, Rules, Judgment
+RIGHT (output): Model Capabilities
 
-Style: Modern infographic, white background, colorful but professional.
-Network/ecosystem visualization, not a simple chart.
+Simple arrows connecting left → center → right.
+Some paths thicker than others (code+tests is thick, humans+judgment is thin).
+
+Style: Clean minimalist, white background. Simple network diagram.
+NO title. NO "Figure" text. NO complicated labels. Just nodes and flows.
 """
 }
 
@@ -200,7 +182,6 @@ def generate_image(name: str, prompt: str, skip_existing: bool = True) -> None:
     print(f"Generating: {name}")
 
     try:
-        # Use Gemini's native image generation
         response = client.models.generate_content(
             model='nano-banana-pro-preview',
             contents=prompt.strip(),
@@ -209,12 +190,9 @@ def generate_image(name: str, prompt: str, skip_existing: bool = True) -> None:
             )
         )
 
-        # Extract and save the image
         for part in response.candidates[0].content.parts:
             if part.inline_data is not None:
-                import base64
                 image_data = part.inline_data.data
-                # Save the image bytes directly
                 with open(output_path, 'wb') as f:
                     f.write(image_data)
                 print(f"  Saved to: {output_path}")

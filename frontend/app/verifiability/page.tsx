@@ -96,14 +96,9 @@ export default function VerifiabilityArticle() {
             </Prose>
 
             <Figure
-              src="/articles/verifiability/verification-loop.png"
+              src="/articles/verifiability/verification-loop-v3.png"
               alt="The verification loop: Propose, Verify, Improve"
-              caption="Propose → Verify → Improve. The speed of this loop determines the speed of progress."
-            />
-            <Figure
-              src="/articles/verifiability/verification-loop-v2.png"
-              alt="The verification loop v2: Propose, Verify, Improve"
-              caption="(v2 for comparison)"
+              caption="Propose (forward pass) → Verify (get signal) → Improve (update behaviour)"
             />
           </ArticleSection>
 
@@ -274,6 +269,12 @@ export default function VerifiabilityArticle() {
               caption="(v2 - inverted pyramid for comparison)"
               side={true}
             />
+            <Figure
+              src="/articles/verifiability/knowledge-hierarchy-v3.png"
+              alt="The hierarchy of knowledge v3: with examples"
+              caption="(v3 - with examples for comparison)"
+              side={true}
+            />
 
             <Aside title="Special Relativity: Interpolation or Extrapolation?">
               <p>
@@ -438,6 +439,11 @@ export default function VerifiabilityArticle() {
               alt="Model collapse v2 - funnel visualization"
               caption="(v2 for comparison)"
             />
+            <Figure
+              src="/articles/verifiability/model-collapse-v3.png"
+              alt="Model collapse v3 - clean funnel"
+              caption="(v3 - no title/caption for comparison)"
+            />
 
             <TOCHeading id="ood-approaches" level={3}>
               Approaches to Out-of-Distribution Thinking
@@ -454,8 +460,8 @@ export default function VerifiabilityArticle() {
               headers={['Approach', 'Mechanism', 'Why It Might Work']}
               rows={[
                 [
-                  'Different post-training biases',
-                  'OpenAI, Anthropic, Google use similar pretraining data but different RLHF',
+                  'Post-training diversity',
+                  'RLHF, RLVR; OpenAI, Anthropic, Google use similar pretraining but different alignment',
                   'Same base knowledge, different exploration of the space',
                 ],
                 [
@@ -464,7 +470,7 @@ export default function VerifiabilityArticle() {
                   'Different inductive biases explore different regions of hypothesis space',
                 ],
                 [
-                  'Researcher prompting',
+                  'In-context activation shift',
                   'Prompt models to adopt researcher mindset, question assumptions',
                   'Changes the sampling distribution toward novel regions',
                 ],
@@ -495,6 +501,11 @@ export default function VerifiabilityArticle() {
               src="/articles/verifiability/ood-approaches-v2.png"
               alt="OOD approaches v2 - 6 branches"
               caption="(v2 - 6 branches for comparison)"
+            />
+            <Figure
+              src="/articles/verifiability/ood-approaches-v3.png"
+              alt="OOD Thinking with RLHF/RLVR and in-context activation"
+              caption="(v3 - updated labels for comparison)"
             />
 
             <Aside title="Pliny and Adversarial Prompting">
@@ -984,6 +995,11 @@ export default function VerifiabilityArticle() {
               caption="(v2 - non-radar chart for comparison)"
               side={true}
             />
+            <Figure
+              src="/articles/verifiability/dimensions-v3.png"
+              alt="Horizontal strip of 10 verifiability dimensions"
+              caption="(v3 - horizontal for comparison)"
+            />
           </ArticleSection>
 
           {/* Section 3: The Verifiability Spectrum */}
@@ -1229,6 +1245,11 @@ export default function VerifiabilityArticle() {
               src="/articles/verifiability/claim-types-v2.png"
               alt="Six types of AI research claims with gradient"
               caption="(v2 - 6 claim types for comparison)"
+            />
+            <Figure
+              src="/articles/verifiability/claim-types-v3.png"
+              alt="Flowing gradient of 6 claim types"
+              caption="(v3 - no numbering, minimal text for comparison)"
             />
 
             <TOCHeading id="claims-performance" level={3}>
@@ -1773,6 +1794,11 @@ export default function VerifiabilityArticle() {
               alt="14 research lenses with enhanced detail"
               caption="(v2 - enhanced context for comparison)"
             />
+            <Figure
+              src="/articles/verifiability/knowledge-lenses-v3.png"
+              alt="13 research lenses with combined efficiency/hardware"
+              caption="(v3 - no repeats, combined rows for comparison)"
+            />
 
             <ComparisonTable
               fullWidth={true}
@@ -1785,11 +1811,11 @@ export default function VerifiabilityArticle() {
               ]}
               rows={[
                 [
-                  'Computational Efficiency',
-                  'How do we preserve the core idea while removing unnecessary cost?',
-                  'Flash Attention (IO-aware tiling), LoRA (low-rank adapters), knowledge distillation, linear attention (Performer)',
-                  'Sparsity, pruning, quantization, conditional computation, activation checkpointing',
-                  'High (minutes, benchmarkable)',
+                  'Computational Efficiency & Hardware',
+                  'How do we preserve the core idea while removing cost, and what emerges from understanding hardware?',
+                  'Flash Attention (IO-aware tiling), LoRA, knowledge distillation, Mamba (state-space), Ring Attention, PagedAttention, FP8 training',
+                  'Sparsity, pruning, quantization, memory hierarchy, kernel fusion, algorithm-hardware co-design',
+                  'High (minutes-hours, benchmarkable)',
                 ],
                 [
                   'Algorithmic Framing (CS Theory)',
@@ -1804,13 +1830,6 @@ export default function VerifiabilityArticle() {
                   'Residual connections, LayerNorm, He/Xavier init, gradient clipping, spectral normalization',
                   'Dynamical systems stability, conditioning, gradient flow geometry',
                   'High (hours, observable)',
-                ],
-                [
-                  'Hardware-Aware Design',
-                  'What innovations emerge from understanding memory hierarchies?',
-                  'Flash Attention, Mamba (state-space), Ring Attention, PagedAttention (vLLM), FP8 training',
-                  'Memory hierarchy, kernel fusion, algorithm-hardware co-design, tensor cores',
-                  'High (hours, profilable)',
                 ],
                 [
                   'Compute Regimes & Scaling',
@@ -1926,6 +1945,12 @@ export default function VerifiabilityArticle() {
                 evidence must be.
               </p>
             </Prose>
+
+            <Figure
+              src="/articles/verifiability/claim-strength-v1.png"
+              alt="Claim strength levels from existence proof to guarantee"
+              caption="Paradox: stronger claims (guarantees) are harder to verify"
+            />
 
             <ComparisonTable
               headers={[
@@ -2529,6 +2554,11 @@ export default function VerifiabilityArticle() {
               src="/articles/verifiability/verifiable-data-v2.png"
               alt="Verification data ecosystem flow diagram"
               caption="(v2 - ecosystem visualization for comparison)"
+            />
+            <Figure
+              src="/articles/verifiability/verifiable-data-v3.png"
+              alt="Simple verification data flow"
+              caption="(v3 - simplified, no title for comparison)"
             />
 
             <Prose>
