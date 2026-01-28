@@ -49,11 +49,11 @@ export default function VerifiabilityArticle() {
                 perfectly. The real issue is verifiability.
               </p>
               <p>
-                Verifiability determines the speed of the improvement loop. When
-                an agent generates a hypothesis, writes code, or proposes an
-                action, how quickly can we know if it worked? The answer to this
-                question predicts almost everything about how fast that domain
-                will advance.
+                Verifiability determines the speed of the improvement loop. An
+                agent proposes a hypothesis, we verify whether it holds, and we
+                improve based on the result. How quickly can we complete this
+                cycle? The answer predicts almost everything about how fast that
+                domain will advance.
               </p>
               <p>
                 This explains the uneven progress across AI applications. Code
@@ -97,8 +97,13 @@ export default function VerifiabilityArticle() {
 
             <Figure
               src="/articles/verifiability/verification-loop.png"
-              alt="The verification loop: Generate, Verify, Learn, Improve"
-              caption="The speed of this loop determines the speed of progress"
+              alt="The verification loop: Propose, Verify, Improve"
+              caption="Propose → Verify → Improve. The speed of this loop determines the speed of progress."
+            />
+            <Figure
+              src="/articles/verifiability/verification-loop-v2.png"
+              alt="The verification loop v2: Propose, Verify, Improve"
+              caption="(v2 for comparison)"
             />
           </ArticleSection>
 
@@ -261,6 +266,13 @@ export default function VerifiabilityArticle() {
               src="/articles/verifiability/knowledge-hierarchy.png"
               alt="The hierarchy of knowledge: interpolation to zeroth-order discoveries"
               caption="From gap-filling to conceptual expansion"
+              side={true}
+            />
+            <Figure
+              src="/articles/verifiability/knowledge-hierarchy-v2.png"
+              alt="The hierarchy of knowledge v2: inverted pyramid"
+              caption="(v2 - inverted pyramid for comparison)"
+              side={true}
             />
 
             <Aside title="Special Relativity: Interpolation or Extrapolation?">
@@ -421,6 +433,11 @@ export default function VerifiabilityArticle() {
               alt="Model collapse over generations of synthetic data training"
               caption="The distribution narrows with each generation"
             />
+            <Figure
+              src="/articles/verifiability/model-collapse-v2.png"
+              alt="Model collapse v2 - funnel visualization"
+              caption="(v2 for comparison)"
+            />
 
             <TOCHeading id="ood-approaches" level={3}>
               Approaches to Out-of-Distribution Thinking
@@ -442,9 +459,9 @@ export default function VerifiabilityArticle() {
                   'Same base knowledge, different exploration of the space',
                 ],
                 [
-                  'Different architectures',
-                  'Transformer, Hyena, Mamba, energy-based, text diffusion',
-                  'Different inductive biases navigate the space differently',
+                  'Architectural diversity',
+                  'Transformers, Hyena, Mamba, energy-based, diffusion; ensembles combine multiple',
+                  'Different inductive biases explore different regions of hypothesis space',
                 ],
                 [
                   'Researcher prompting',
@@ -462,11 +479,6 @@ export default function VerifiabilityArticle() {
                   'Novelty emerges from process, not single generation',
                 ],
                 [
-                  'Architectural ensembles',
-                  'Combine autoregressive, diffusion, and SSM models',
-                  'Different models explore different regions of hypothesis space',
-                ],
-                [
                   'Sampling strategies',
                   'Higher temperature, top-p/top-k variation, nucleus sampling',
                   'Accesses lower-probability regions of the output distribution',
@@ -478,6 +490,11 @@ export default function VerifiabilityArticle() {
               src="/articles/verifiability/ood-approaches.png"
               alt="Approaches to out-of-distribution thinking"
               caption="Multiple paths to pushing beyond the training manifold"
+            />
+            <Figure
+              src="/articles/verifiability/ood-approaches-v2.png"
+              alt="OOD approaches v2 - 6 branches"
+              caption="(v2 - 6 branches for comparison)"
             />
 
             <Aside title="Pliny and Adversarial Prompting">
@@ -961,6 +978,12 @@ export default function VerifiabilityArticle() {
               alt="Radar chart showing the 10 dimensions of verifiability"
               caption="The 10 dimensions of verifiability"
             />
+            <Figure
+              src="/articles/verifiability/dimensions-v2.png"
+              alt="Non-radar visualization of 10 verifiability dimensions"
+              caption="(v2 - non-radar chart for comparison)"
+              side={true}
+            />
           </ArticleSection>
 
           {/* Section 3: The Verifiability Spectrum */}
@@ -1200,6 +1223,12 @@ export default function VerifiabilityArticle() {
               src="/articles/verifiability/claim-types.png"
               alt="Five types of AI research claims arranged by verifiability"
               caption="From performance claims (highly verifiable) to safety claims (hard to verify)"
+              side={true}
+            />
+            <Figure
+              src="/articles/verifiability/claim-types-v2.png"
+              alt="Six types of AI research claims with gradient"
+              caption="(v2 - 6 claim types for comparison)"
             />
 
             <TOCHeading id="claims-performance" level={3}>
@@ -1272,6 +1301,73 @@ export default function VerifiabilityArticle() {
                 Real-world deployment claims are meaningful but hard to verify.
                 The gap between benchmark and deployment is where many AI
                 projects fail.
+              </p>
+            </Prose>
+
+            <TOCHeading id="claims-theoretical" level={3}>
+              Theoretical Claims
+            </TOCHeading>
+            <ComparisonTable
+              headers={[
+                'Claim Type',
+                'Example',
+                'Speed',
+                'Certainty',
+                'Complexity',
+                'Falsifiability',
+              ]}
+              rows={[
+                [
+                  'Formal proof',
+                  '"Our algorithm provably converges"',
+                  'Hours-days',
+                  'Very High',
+                  'Very High',
+                  'Very High',
+                ],
+                [
+                  'Complexity bound',
+                  '"O(n log n) time complexity"',
+                  'Hours',
+                  'Very High',
+                  'High',
+                  'Very High',
+                ],
+                [
+                  'PAC bound',
+                  '"Sample complexity of O(1/ε²)"',
+                  'Hours',
+                  'High',
+                  'High',
+                  'High',
+                ],
+                [
+                  'Approximation guarantee',
+                  '"Within 2x of optimal"',
+                  'Hours',
+                  'High',
+                  'High',
+                  'High',
+                ],
+                [
+                  'Informal argument',
+                  '"This should generalize because..."',
+                  'Minutes',
+                  'Low',
+                  'Low',
+                  'Low',
+                ],
+              ]}
+            />
+
+            <Prose>
+              <p>
+                Theoretical claims sit in an interesting position. When
+                formalized in Lean or Coq, they are among the most verifiable
+                claims in AI research. A machine-checked proof is certain.
+                But informal theoretical arguments can be as hand-wavy as any
+                other claim. The gap between &quot;we prove&quot; and &quot;we
+                argue&quot; is enormous.
               </p>
             </Prose>
 
@@ -1672,128 +1768,119 @@ export default function VerifiabilityArticle() {
               alt="13 research lenses arranged by verifiability"
               caption="Research lenses from most verifiable (top) to least verifiable (bottom)"
             />
+            <Figure
+              src="/articles/verifiability/knowledge-lenses-v2.png"
+              alt="14 research lenses with enhanced detail"
+              caption="(v2 - enhanced context for comparison)"
+            />
 
             <ComparisonTable
+              fullWidth={true}
               headers={[
                 'Research Lens',
                 'Core Question',
-                'Verification Method',
-                'Speed',
-                'Certainty',
-                'Example Claims',
+                'Canonical Examples',
+                'Topics to Explore',
+                'Verifiability',
               ]}
               rows={[
                 [
                   'Computational Efficiency',
-                  'Can we do the same thing cheaper?',
-                  'Runtime benchmarks, FLOPs counts',
-                  'Minutes',
-                  'High',
-                  '"Flash Attention is 2x faster" (highly verifiable)',
+                  'How do we preserve the core idea while removing unnecessary cost?',
+                  'Flash Attention (IO-aware tiling), LoRA (low-rank adapters), knowledge distillation, linear attention (Performer)',
+                  'Sparsity, pruning, quantization, conditional computation, activation checkpointing',
+                  'High (minutes, benchmarkable)',
                 ],
                 [
                   'Algorithmic Framing (CS Theory)',
-                  'What bounds and guarantees apply?',
-                  'Mathematical proofs, complexity analysis',
-                  'Hours-days',
-                  'Very High',
-                  '"PAC bound of O(1/sqrt(n))" (verifiable if formalized)',
+                  'What happens when we analyze learning using theoretical CS guarantees?',
+                  'PAC learning, VC dimension, online learning regret bounds, boosting, kernel methods (SVM)',
+                  'Regret bounds, sample complexity, computational-statistical tradeoffs',
+                  'Very High (if formalized)',
                 ],
                 [
-                  'Training Stability',
-                  'Does the signal flow correctly?',
-                  'Loss curves, gradient norms, NaN checks',
-                  'Hours',
-                  'High',
-                  '"LayerNorm prevents gradient explosion" (verifiable)',
+                  'Training Stability & Control',
+                  'What prevents signals from exploding, vanishing, or collapsing?',
+                  'Residual connections, LayerNorm, He/Xavier init, gradient clipping, spectral normalization',
+                  'Dynamical systems stability, conditioning, gradient flow geometry',
+                  'High (hours, observable)',
                 ],
                 [
                   'Hardware-Aware Design',
-                  'Does it use the hardware well?',
-                  'Profiling, memory bandwidth, utilization',
-                  'Hours',
-                  'High',
-                  '"Ring Attention scales linearly" (verifiable)',
+                  'What innovations emerge from understanding memory hierarchies?',
+                  'Flash Attention, Mamba (state-space), Ring Attention, PagedAttention (vLLM), FP8 training',
+                  'Memory hierarchy, kernel fusion, algorithm-hardware co-design, tensor cores',
+                  'High (hours, profilable)',
                 ],
                 [
                   'Compute Regimes & Scaling',
-                  'What happens at scale?',
-                  'Scaling curves, compute sweeps',
-                  'Days-weeks',
-                  'Medium',
-                  '"Chinchilla optimal is 20 tokens/param" (moderately verifiable)',
+                  'What ideas only become viable at sufficient compute scale?',
+                  'Deep CNNs (AlexNet), transformer pretraining, Chinchilla scaling laws, in-context learning, chain-of-thought',
+                  'Compute-optimal training, phase transitions, emergent abilities, test-time compute',
+                  'Medium (days-weeks)',
                 ],
                 [
                   'Representational Capacity',
-                  'What can this architecture express?',
-                  'Expressivity proofs, ablations',
-                  'Days',
-                  'Medium',
-                  '"Attention can represent any function" (partially verifiable)',
+                  'What functions can this architecture represent?',
+                  'Untied embeddings, RoPE encodings, depth over width, attention vs convolution, mixture-of-experts',
+                  'Universality limits, symmetry & equivariance, operator rank, modular representations',
+                  'Medium (days)',
                 ],
                 [
                   'Data as First-Class Object',
-                  'How does data shape learning?',
-                  'Ablations on data, distribution analysis',
-                  'Days-weeks',
-                  'Medium',
-                  '"Curriculum helps" (moderately verifiable, dataset-dependent)',
+                  'How does data structure shape what can be learned?',
+                  'Next-token prediction, self-supervised objectives, SimCLR augmentations, curriculum learning, synthetic data',
+                  'Data scaling laws, diversity vs quality, active learning, distribution shift',
+                  'Medium (days-weeks)',
                 ],
                 [
                   'Probabilistic Inference',
-                  'Is learning approximate inference?',
-                  'ELBO bounds, calibration metrics',
-                  'Hours-days',
-                  'Medium',
-                  '"VAE posterior is calibrated" (verifiable within assumptions)',
+                  'What if learning is best understood as approximate inference?',
+                  'VAEs, Bayesian neural networks, entropy-regularized RL (SAC), contrastive learning (InfoNCE), GPs',
+                  'Posterior collapse, calibration, belief propagation, uncertainty-aware planning',
+                  'Medium (assumption-dependent)',
                 ],
                 [
                   'Strategic Interaction (Game Theory)',
-                  'What emerges from multi-agent dynamics?',
-                  'Nash equilibrium analysis, win rates',
-                  'Days-weeks',
-                  'Medium',
-                  '"Self-play improves" (verifiable in games, hard elsewhere)',
+                  'What emerges when multiple optimizing agents interact?',
+                  'GANs, self-play (AlphaGo), adversarial training, RLHF, AI debate, multi-agent RL',
+                  'Nash equilibria, mechanism design, cooperative AI, emergent communication',
+                  'Medium (games verifiable)',
                 ],
                 [
                   'Physical Principles',
-                  'What laws govern learning?',
-                  'Energy measurements, equilibrium analysis',
-                  'Days-weeks',
-                  'Low-Medium',
-                  '"Diffusion reverses entropy" (conceptual, hard to falsify)',
+                  'What learning rules fall out of universal laws like energy minimization?',
+                  'Energy-based models, Boltzmann machines, diffusion models, Langevin dynamics, neural ODEs, normalizing flows',
+                  'Non-equilibrium learning, reversibility, thermodynamic limits, symmetry principles',
+                  'Low-Medium (conceptual)',
                 ],
                 [
                   'Meta-Learning & Automation',
-                  'Can we automate ML itself?',
-                  'Few-shot performance, adaptation speed',
-                  'Days-weeks',
-                  'Low-Medium',
-                  '"MAML enables fast adaptation" (verifiable on benchmarks)',
+                  'What happens when we treat the ML engineer\'s job as an optimization target?',
+                  'MAML, learned optimizers, NAS, AutoML, Constitutional AI, grokking',
+                  'Learning to learn, few-shot adaptation, self-improvement, recursive improvement',
+                  'Low-Medium (benchmark-dependent)',
                 ],
                 [
                   'Cognitive Substrate (Brain)',
-                  'What does the brain teach us?',
-                  'Behavioral similarity, neural correlates',
-                  'Weeks-months',
-                  'Low',
-                  '"Attention mirrors human focus" (suggestive, not verifiable)',
+                  'What computational principles emerge from the most complex known learning system?',
+                  'Hebbian learning, Hopfield networks, attention mechanisms, predictive coding, experience replay (DQN), sparse coding, dropout',
+                  'Dendritic computation, neuromodulation, cortical hierarchies, biological credit assignment',
+                  'Low (suggestive only)',
                 ],
                 [
                   'Biological Optimization (Evolution)',
-                  'What did evolution discover?',
-                  'Diversity metrics, fitness landscapes',
-                  'Weeks',
-                  'Low',
-                  '"Evolution finds robust solutions" (hard to verify claims)',
+                  'What optimization strategies did evolution discover that gradient descent did not?',
+                  'Evolutionary algorithms, population-based training, NEAT, MAP-Elites, co-evolution',
+                  'Open-endedness, novelty search, robustness, behavioral diversity',
+                  'Low (hard to falsify)',
                 ],
                 [
                   'Philosophical Foundations',
-                  'What does learning mean?',
-                  'Conceptual analysis, thought experiments',
-                  'N/A',
-                  'Very Low',
-                  '"Compression is generalization" (unfalsifiable as stated)',
+                  'What does it mean for a system to learn, generalize, or create?',
+                  'Learning as compression (MDL), abstraction via composition, causal representation learning, symbol grounding',
+                  'Induction, abstraction hierarchies, causality, interpretability, epistemology of ML',
+                  'Very Low (unfalsifiable)',
                 ],
               ]}
             />
@@ -2390,19 +2477,31 @@ export default function VerifiabilityArticle() {
                 ],
                 [
                   'Math + proofs',
-                  'Proof assistants',
+                  'Proof assistants (Lean, Coq)',
                   'Formal reasoning signal',
-                  'Lean community, competition math',
+                  'Lean community, competition math, theorem libraries',
                 ],
                 [
-                  'Science + simulations',
-                  'Domain-specific simulators',
-                  'Scientific reasoning signal',
-                  'Research labs, compute providers',
+                  'Physical lab experiments',
+                  'Wet labs, measurement equipment',
+                  'Ground-truth scientific signal',
+                  'Research universities, pharma, materials science labs',
+                ],
+                [
+                  'Teleoperation / robotics',
+                  'Real-world execution, sensor feedback',
+                  'Embodied manipulation signal',
+                  'Robotics companies, factory automation, surgical robotics',
+                ],
+                [
+                  'Simulations',
+                  'Physics engines, molecular dynamics',
+                  'Scalable synthetic scientific signal',
+                  'Compute providers, game engines, scientific computing',
                 ],
                 [
                   'Games + outcomes',
-                  'Game rules',
+                  'Game rules, win/loss',
                   'Strategic reasoning signal',
                   'Game companies, RL researchers',
                 ],
@@ -2410,13 +2509,13 @@ export default function VerifiabilityArticle() {
                   'Human preferences',
                   'Human annotation',
                   'Alignment signal',
-                  'Annotation companies, crowdwork',
+                  'Annotation companies, crowdwork platforms',
                 ],
                 [
                   'Safety red-teaming',
-                  'Human + automated evaluation',
+                  'Human + automated adversarial evaluation',
                   'Safety signal',
-                  'Safety teams, external auditors',
+                  'Safety teams, external auditors, bounty programs',
                 ],
               ]}
             />
@@ -2425,6 +2524,11 @@ export default function VerifiabilityArticle() {
               src="/articles/verifiability/verifiable-data.png"
               alt="Types of valuable verification data"
               caption="The verification data market"
+            />
+            <Figure
+              src="/articles/verifiability/verifiable-data-v2.png"
+              alt="Verification data ecosystem flow diagram"
+              caption="(v2 - ecosystem visualization for comparison)"
             />
 
             <Prose>
