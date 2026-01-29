@@ -72,7 +72,7 @@ export function ArchitecturesContent() {
           Simple Recurrence
         </TOCHeading>
         <Prose>
-          <p id="simplest-rnn">
+          <p>
             The simplest solution is beautifully elegant: give the network a
             &quot;hidden state&quot; that persists across time steps. At each step,
             the network takes two inputs: the current word AND its previous hidden
@@ -82,6 +82,9 @@ export function ArchitecturesContent() {
         <FormulaBox label="The RNN Equation">
           {'h_t = \\tanh(W_{xh} \\cdot x_t + W_{hh} \\cdot h_{t-1} + b)'}
         </FormulaBox>
+      </ArticleSection>
+
+      <ArticleSection>
         <Prose>
           <p id="simple-rnn-cell">
             That&apos;s it. The hidden state <Math>{'h_t'}</Math> is computed from
@@ -198,11 +201,16 @@ export function ArchitecturesContent() {
           Unrolling the Network
         </TOCHeading>
         <Prose>
-          <p id="unrolled-view">
+          <p>
             To understand how RNNs really work, it helps to &quot;unroll&quot;
             them across time. The compact diagram with a self-loop becomes a
             chain of identical cells, one for each time step.
           </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Prose>
           <p id="unroll-viz">
             When unrolled, we see that an RNN is really a very deep feedforward
             network where the depth equals the sequence length. Process 100
@@ -296,6 +304,11 @@ export function ArchitecturesContent() {
             typically less than 1. Multiply many numbers less than 1 together
             and you get... something very close to zero.
           </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Prose>
           <p id="exponential-decay">
             This is the <strong>vanishing gradient problem</strong>. By the time
             gradients reach the early timesteps, they&apos;ve shrunk to nearly
@@ -416,18 +429,28 @@ export function ArchitecturesContent() {
           </p>
         </Aside>
         <Prose>
-          <p id="the-cell-state">
+          <p>
             The LSTM&apos;s key innovation is the <strong>cell state</strong>: a
             separate pathway that runs through the entire sequence. Think of it
             as a conveyor belt. Information can flow along it unchanged, or be
             modified at specific points.
           </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Prose>
           <p id="lstm-impl">
             This solves vanishing gradients because gradients can flow directly
             through the cell state without being repeatedly multiplied by small
             numbers.
           </p>
-          <p id="gates-need-activations">
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
+        <Prose>
+          <p>
             But how do we control this conveyor belt? We need <em>gates</em>.
             Gates should output values between 0 and 1 (0 = block everything, 1
             = let everything through). That means <strong>sigmoid</strong>.
@@ -502,7 +525,7 @@ export function ArchitecturesContent() {
           {'h_t = o_t \\odot \\tanh(C_t)'}
         </FormulaBox>
         <Prose>
-          <p id="lstm-complete">
+          <p>
             And that&apos;s the complete LSTM! Three gates (forget, input,
             output) controlling the flow of information through a cell state
             that acts as long-term memory.
@@ -515,6 +538,9 @@ export function ArchitecturesContent() {
             stays near 0. Gradients flow through this pathway without vanishing.
           </p>
         </InsightBox>
+      </ArticleSection>
+
+      <ArticleSection>
         <Prose>
           <p id="visualize-gates">
             Experiment with the LSTM below. Toggle each gate on and off to see
