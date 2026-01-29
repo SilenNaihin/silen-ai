@@ -15,15 +15,19 @@ import { Math, FormulaBox } from '@/components/article/Math';
 import { SimpleRNNInteractive } from '@/components/stardust/SimpleRNNInteractive';
 import { GradientFlowInteractive } from '@/components/stardust/GradientFlowInteractive';
 import { LSTMBuildupInteractive } from '@/components/stardust/LSTMBuildupInteractive';
+import { UseNotebook } from '@/contexts/NotebookContext';
+
+const RNN_NOTEBOOK_GITHUB_URL =
+  'https://github.com/SilenNaihin/silen-ai/blob/main/projects/rnn/rnn.ipynb';
 
 export function ArchitecturesContent() {
   return (
     <>
-      {/* ========== SECTION 1: THE SEQUENCE PROBLEM ========== */}
+      <UseNotebook
+        path="projects/rnn/rnn.ipynb"
+        githubUrl={RNN_NOTEBOOK_GITHUB_URL}
+      />
       <ArticleSection>
-        <TOCHeading id="the-sequence-problem" level={2}>
-          The Sequence Problem
-        </TOCHeading>
         <Prose>
           <p id="sequence-intro">
             &quot;The dog bit the man&quot; and &quot;The man bit the dog.&quot;
@@ -79,7 +83,7 @@ export function ArchitecturesContent() {
           {'h_t = \\tanh(W_{xh} \\cdot x_t + W_{hh} \\cdot h_{t-1} + b)'}
         </FormulaBox>
         <Prose>
-          <p>
+          <p id="simple-rnn-cell">
             That&apos;s it. The hidden state <Math>{'h_t'}</Math> is computed from
             the current input <Math>{'x_t'}</Math> plus the previous hidden state{' '}
             <Math>{'h_{t-1}'}</Math>. The tanh squashes everything to [-1, 1] to
@@ -199,7 +203,7 @@ export function ArchitecturesContent() {
             them across time. The compact diagram with a self-loop becomes a
             chain of identical cells, one for each time step.
           </p>
-          <p id="sequence-length-flexibility">
+          <p id="unroll-viz">
             When unrolled, we see that an RNN is really a very deep feedforward
             network where the depth equals the sequence length. Process 100
             tokens? That&apos;s 100 layers deep. The same weights are used at
@@ -229,7 +233,7 @@ export function ArchitecturesContent() {
           </p>
         </Aside>
         <Prose>
-          <p id="full-bptt">
+          <p id="bptt-impl">
             How do we train an unrolled network? The same way we train any
             network: backpropagation. But now gradients must flow backward
             through time. At each timestep, we compute a loss, and gradients
@@ -286,13 +290,13 @@ export function ArchitecturesContent() {
           The Problem with RNNs
         </TOCHeading>
         <Prose>
-          <p id="vanishing-gradients">
+          <p id="vanishing-demo">
             Here&apos;s where that product of partial derivatives becomes a
             problem. Each <Math>{'\\partial h_k / \\partial h_{k-1}'}</Math> is
             typically less than 1. Multiply many numbers less than 1 together
             and you get... something very close to zero.
           </p>
-          <p>
+          <p id="exponential-decay">
             This is the <strong>vanishing gradient problem</strong>. By the time
             gradients reach the early timesteps, they&apos;ve shrunk to nearly
             nothing. The network can&apos;t learn long-range dependencies
@@ -356,7 +360,7 @@ export function ArchitecturesContent() {
           <GradientFlowInteractive />
         </div>
         <Prose>
-          <p>
+          <p id="compare-gradient-flow">
             The interactive above shows how information degrades in an RNN vs
             LSTM as sequence length increases. Slide the sequence length to see
             how quickly RNNs lose context.
@@ -418,7 +422,7 @@ export function ArchitecturesContent() {
             as a conveyor belt. Information can flow along it unchanged, or be
             modified at specific points.
           </p>
-          <p>
+          <p id="lstm-impl">
             This solves vanishing gradients because gradients can flow directly
             through the cell state without being repeatedly multiplied by small
             numbers.
@@ -512,7 +516,7 @@ export function ArchitecturesContent() {
           </p>
         </InsightBox>
         <Prose>
-          <p>
+          <p id="visualize-gates">
             Experiment with the LSTM below. Toggle each gate on and off to see
             how they affect the cell state and output. Notice how the forget
             gate controls memory retention and the input gate controls new
@@ -530,7 +534,7 @@ export function ArchitecturesContent() {
           A Note on Activation Functions
         </TOCHeading>
         <Prose>
-          <p>
+          <p id="activation-comparison">
             You might wonder why LSTMs use different activation functions in
             different places. It&apos;s not arbitrary.
           </p>
@@ -600,6 +604,14 @@ export function ArchitecturesContent() {
             for a state-of-the-art language model you can experiment with.
           </p>
         </InsightBox>
+        <Prose>
+          <p id="char-lm">
+            Even a tiny character-level LSTM can learn interesting patterns.
+            Training on just a few hundred characters of repetitive text, the
+            model learns to predict the next character. This is the foundation
+            of all language modeling—scale it up and you get GPT.
+          </p>
+        </Prose>
       </ArticleSection>
 
       {/* ========== SECTION 11: BIDIRECTIONAL RNNs ========== */}
@@ -704,6 +716,13 @@ export function ArchitecturesContent() {
             But they have fundamental limitations. Processing must be
             sequential. Context windows are still limited. Very long documents
             remain challenging.
+          </p>
+          <p>
+            Still, the result is systems that can classify sentiment, recognize
+            images, and generate text. They&apos;re not intelligent in the way
+            we are. But they&apos;re getting better at predicting the world,
+            which, by our working definition, means they&apos;re getting better
+            at thinking.
           </p>
         </Prose>
         <QuoteBox>
