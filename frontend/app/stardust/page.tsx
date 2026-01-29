@@ -50,13 +50,23 @@ export default function StardustArticle() {
   return (
     <TOCProvider>
       <TabsProvider tabs={TABS} defaultTab="foundations">
-        <UseNotebook
-          path="projects/rnn/networks.ipynb"
-          githubUrl={NOTEBOOK_GITHUB_URL}
-        />
+        {/* Foundations and Training use networks.ipynb */}
+        <TabContent tabId="foundations">
+          <UseNotebook
+            path="projects/rnn/networks.ipynb"
+            githubUrl={NOTEBOOK_GITHUB_URL}
+          />
+        </TabContent>
+        <TabContent tabId="training">
+          <UseNotebook
+            path="projects/rnn/networks.ipynb"
+            githubUrl={NOTEBOOK_GITHUB_URL}
+          />
+        </TabContent>
+        {/* Architectures uses rnn.ipynb - defined in ArchitecturesContent */}
 
         <StickyHeader
-          title="How Do We Make Stardust Think?"
+          title="How did we make stardust think?"
           tabs={<TabButtons variant="minimal" />}
         />
 
@@ -225,7 +235,7 @@ export default function StardustArticle() {
                       // Simple recurrence
                       {
                         render: (p) => <SimpleRecurrenceAnimation progress={p} />,
-                        startElementId: 'the-sequence-problem',
+                        startElementId: 'sequence-intro',
                         milestones: [
                           { elementId: 'simplest-rnn', progress: 0.3 },
                           { elementId: 'weight-sharing', progress: 0.7 },
@@ -302,10 +312,13 @@ export default function StardustArticle() {
           >
             {/* Article Title */}
             <h1 className="text-4xl font-bold mb-2 text-black">
-              How Do We Make Stardust Think?
+              How did we make stardust think?
             </h1>
             <p className="text-lg text-neutral-600 mb-8">
-              From neurons to neural networks
+              From carbon atoms forged in dying stars to neurons firing in your
+              skull to silicon learning to see. The improbable chain that led to
+              artificial intelligence. A first principles and historical journey
+              through neural foundations, backpropagation, and recurrence.
             </p>
 
             {/* Tab 1: Foundations */}
