@@ -10,11 +10,10 @@ interface VanishingGradientAnimationProps {
 /**
  * Vanishing/Exploding Gradient Animation
  *
- * Phase 1 (0-0.20): Show long sequence with many timesteps
- * Phase 2 (0.20-0.45): Gradients flow backward, getting exponentially smaller
- * Phase 3 (0.45-0.65): Show the math - product of Jacobians
- * Phase 4 (0.65-0.85): Exploding gradient demo
- * Phase 5 (0.85-1.0): Gradient clipping solution
+ * Phase 1 (0-0.25): Setup - show a chain of timesteps
+ * Phase 2 (0.25-0.5): Show gradient signal starting strong at the end
+ * Phase 3 (0.5-0.75): Show exponential decay as gradient flows backward - KEY visual
+ * Phase 4 (0.75-1): Show exploding gradients briefly (when factor > 1)
  */
 export function VanishingGradientAnimation({
   progress,
@@ -27,7 +26,7 @@ export function VanishingGradientAnimation({
     const width = canvas.width / (window.devicePixelRatio || 1);
     const height = canvas.height / (window.devicePixelRatio || 1);
 
-    const centerY = height * 0.5;
+    const centerY = height * 0.40;
     const titleY = height * 0.08;
     const phaseLabelY = height * 0.92;
 
@@ -40,46 +39,41 @@ export function VanishingGradientAnimation({
     ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
     ctx.fillText('The Vanishing Gradient Problem', width * 0.5, titleY);
 
-    // Phase 1-2: Vanishing gradients
-    if (progress < 0.65) {
-      const numCells = 8;
-      const spacing = (width - 80) / numCells;
-      const baseX = 50;
+    // Phase 1-3: Vanishing gradients visualization
+    if (progress < 0.75) {
+      const numCells = 10;
+      const spacing = (width - 60) / numCells;
+      const baseX = 40;
 
-      // Draw cells
-      const cellAlpha = Math.min(1, progress / 0.15);
-      drawCells(ctx, baseX, centerY, spacing, numCells, cellAlpha);
-
-      // Phase 2: Vanishing gradients
-      if (progress >= 0.20 && progress < 0.45) {
-        const vanishProgress = (progress - 0.20) / 0.25;
-        drawVanishingGradients(
-          ctx,
-          baseX,
-          centerY,
-          spacing,
-          numCells,
-          vanishProgress
-        );
+      // Phase 1: Build up the chain
+      if (progress < 0.25) {
+        const setupProgress = progress / 0.25;
+        drawTimestepChain(ctx, baseX, centerY, spacing, numCells, setupProgress);
       }
 
-      // Phase 3: Math explanation
-      if (progress >= 0.45 && progress < 0.65) {
-        const mathProgress = (progress - 0.45) / 0.2;
-        drawMathExplanation(ctx, width, height, mathProgress);
+      // Phase 2: Show gradient starting strong at the end
+      if (progress >= 0.25 && progress < 0.5) {
+        // Keep chain visible
+        drawTimestepChain(ctx, baseX, centerY, spacing, numCells, 1);
+
+        const gradientStartProgress = (progress - 0.25) / 0.25;
+        drawGradientStart(ctx, baseX, centerY, spacing, numCells, gradientStartProgress, width);
+      }
+
+      // Phase 3: The KEY visual - exponential decay
+      if (progress >= 0.5 && progress < 0.75) {
+        // Keep chain visible
+        drawTimestepChain(ctx, baseX, centerY, spacing, numCells, 1);
+
+        const decayProgress = (progress - 0.5) / 0.25;
+        drawExponentialDecay(ctx, baseX, centerY, spacing, numCells, decayProgress, width, height);
       }
     }
 
     // Phase 4: Exploding gradients
-    if (progress >= 0.65 && progress < 0.85) {
-      const explodeProgress = (progress - 0.65) / 0.2;
+    if (progress >= 0.75) {
+      const explodeProgress = (progress - 0.75) / 0.25;
       drawExplodingGradients(ctx, width, height, centerY, explodeProgress);
-    }
-
-    // Phase 5: Gradient clipping
-    if (progress >= 0.85) {
-      const clipProgress = (progress - 0.85) / 0.15;
-      drawGradientClipping(ctx, width, height, centerY, clipProgress);
     }
 
     // Draw phase label
@@ -94,160 +88,251 @@ export function VanishingGradientAnimation({
 }
 
 function getPhase(progress: number): number {
-  if (progress < 0.20) return 1;
-  if (progress < 0.45) return 2;
-  if (progress < 0.65) return 3;
-  if (progress < 0.85) return 4;
-  return 5;
+  if (progress < 0.25) return 1;
+  if (progress < 0.5) return 2;
+  if (progress < 0.75) return 3;
+  return 4;
 }
 
-function drawCells(
+function drawTimestepChain(
   ctx: CanvasRenderingContext2D,
   baseX: number,
   centerY: number,
   spacing: number,
   numCells: number,
-  alpha: number
+  progress: number
 ) {
   const cellSize = 28;
 
   for (let t = 0; t < numCells; t++) {
     const x = baseX + t * spacing;
+    const tDelay = t * 0.08;
+    const tAlpha = Math.min(1, Math.max(0, (progress - tDelay) / 0.15));
 
-    // Cell
-    ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.5})`;
+    if (tAlpha <= 0) continue;
+
+    // Cell box
+    ctx.strokeStyle = `rgba(0, 0, 0, ${tAlpha * 0.5})`;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.roundRect(x - cellSize / 2, centerY - cellSize / 2, cellSize, cellSize, 4);
     ctx.stroke();
 
-    ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.03})`;
+    ctx.fillStyle = `rgba(0, 0, 0, ${tAlpha * 0.03})`;
     ctx.fill();
 
     // Label
     ctx.font = '9px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
-    ctx.fillText(`h${t + 1}`, x, centerY);
+    ctx.fillStyle = `rgba(0, 0, 0, ${tAlpha * 0.6})`;
+    ctx.fillText(`t${t + 1}`, x, centerY);
 
-    // Connection
-    if (t < numCells - 1) {
+    // Connection to next cell
+    if (t < numCells - 1 && tAlpha > 0.5) {
       const nextX = baseX + (t + 1) * spacing;
-      ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.3})`;
+      const connAlpha = (tAlpha - 0.5) * 2;
+
+      ctx.strokeStyle = `rgba(0, 0, 0, ${connAlpha * 0.3})`;
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(x + cellSize / 2 + 2, centerY);
-      ctx.lineTo(nextX - cellSize / 2 - 2, centerY);
+      ctx.lineTo(nextX - cellSize / 2 - 6, centerY);
       ctx.stroke();
+
+      // Arrow
+      ctx.fillStyle = `rgba(0, 0, 0, ${connAlpha * 0.3})`;
+      drawArrowhead(ctx, nextX - cellSize / 2 - 6, centerY, 0, 4);
     }
+  }
+
+  // Show "100 timesteps" indication
+  if (progress > 0.8) {
+    const labelAlpha = (progress - 0.8) / 0.2;
+    ctx.font = '10px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(0, 0, 0, ${labelAlpha * 0.5})`;
+    ctx.textAlign = 'center';
+    ctx.fillText('... imagine 100 of these ...', baseX + (numCells * spacing) / 2, centerY + 35);
   }
 }
 
-function drawVanishingGradients(
+function drawGradientStart(
   ctx: CanvasRenderingContext2D,
   baseX: number,
   centerY: number,
   spacing: number,
   numCells: number,
-  progress: number
+  progress: number,
+  width: number
 ) {
-  const barWidth = spacing * 0.6;
-  const maxBarHeight = 60;
-  const barY = centerY + 50;
+  const lastCellX = baseX + (numCells - 1) * spacing;
+  const barMaxHeight = 80;
+  const barY = centerY + 55;
 
-  // Gradient magnitude bars (exponentially decreasing from right to left)
-  for (let t = numCells - 1; t >= 0; t--) {
-    const x = baseX + t * spacing;
-    const stepsFromEnd = numCells - 1 - t;
-    const gradientMagnitude = Math.pow(0.6, stepsFromEnd); // Decay factor
+  // Show "Loss" label at the end
+  const lossAlpha = Math.min(1, progress * 3);
+  ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = `rgba(180, 60, 60, ${lossAlpha * 0.9})`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Loss', lastCellX, centerY - 25);
 
-    // Animate appearance from right to left
-    const appearProgress = progress * numCells - (numCells - 1 - t);
-    const barAlpha = Math.min(1, Math.max(0, appearProgress));
+  // Draw gradient magnitude bar at the last cell (starts at 100%)
+  if (progress > 0.2) {
+    const barAlpha = Math.min(1, (progress - 0.2) / 0.3);
+    const barHeight = barMaxHeight * barAlpha;
+    const barWidth = 20;
 
-    if (barAlpha > 0) {
-      const barHeight = maxBarHeight * gradientMagnitude * barAlpha;
+    // Gradient bar
+    ctx.fillStyle = `rgba(180, 60, 60, ${barAlpha * 0.7})`;
+    ctx.beginPath();
+    ctx.roundRect(lastCellX - barWidth / 2, barY - barHeight, barWidth, barHeight, 3);
+    ctx.fill();
 
-      // Bar
-      ctx.fillStyle = `rgba(180, 60, 60, ${0.3 + gradientMagnitude * 0.5})`;
-      ctx.beginPath();
-      ctx.roundRect(
-        x - barWidth / 2,
-        barY - barHeight,
-        barWidth,
-        barHeight,
-        3
-      );
-      ctx.fill();
+    // Label
+    ctx.font = 'bold 10px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(180, 60, 60, ${barAlpha * 0.9})`;
+    ctx.fillText('100%', lastCellX, barY + 15);
 
-      // Label
-      ctx.font = '8px system-ui, -apple-system, sans-serif';
+    // "Gradient signal" label
+    if (progress > 0.5) {
+      const labelAlpha = (progress - 0.5) / 0.5;
+      ctx.font = '11px system-ui, -apple-system, sans-serif';
+      ctx.fillStyle = `rgba(180, 60, 60, ${labelAlpha * 0.8})`;
       ctx.textAlign = 'center';
-      ctx.fillStyle = `rgba(0, 0, 0, ${barAlpha * 0.6})`;
-      ctx.fillText(`${(gradientMagnitude * 100).toFixed(0)}%`, x, barY + 12);
-
-      // Backward arrow above
-      if (t < numCells - 1 && barAlpha > 0.5) {
-        ctx.strokeStyle = `rgba(180, 60, 60, ${(barAlpha - 0.5) * 2 * 0.5})`;
-        ctx.lineWidth = 1.5;
-        const arrowY = centerY - 25;
-        ctx.beginPath();
-        ctx.moveTo(x + spacing / 2, arrowY);
-        ctx.lineTo(x + 10, arrowY);
-        ctx.stroke();
-
-        ctx.fillStyle = `rgba(180, 60, 60, ${(barAlpha - 0.5) * 2 * 0.5})`;
-        drawArrowhead(ctx, x + 10, arrowY, Math.PI, 4);
-      }
+      ctx.fillText('Gradient signal: strong!', width * 0.5, barY + 40);
     }
   }
 
-  // "Vanishing" label
-  if (progress > 0.5) {
-    ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(180, 60, 60, ${(progress - 0.5) * 2 * 0.8})`;
-    ctx.textAlign = 'left';
-    ctx.fillText('Gradient vanishes!', baseX - 30, barY + 30);
+  // Backward arrow indicating direction
+  if (progress > 0.6) {
+    const arrowAlpha = (progress - 0.6) / 0.4;
+    ctx.strokeStyle = `rgba(180, 60, 60, ${arrowAlpha * 0.6})`;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(lastCellX - 25, centerY - 40);
+    ctx.lineTo(baseX + 25, centerY - 40);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = `rgba(180, 60, 60, ${arrowAlpha * 0.6})`;
+    drawArrowhead(ctx, baseX + 25, centerY - 40, Math.PI, 6);
+
+    ctx.font = '9px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(180, 60, 60, ${arrowAlpha * 0.6})`;
+    ctx.fillText('Backpropagation', width * 0.5, centerY - 50);
   }
 }
 
-function drawMathExplanation(
+function drawExponentialDecay(
   ctx: CanvasRenderingContext2D,
+  baseX: number,
+  centerY: number,
+  spacing: number,
+  numCells: number,
+  progress: number,
   width: number,
-  height: number,
-  progress: number
+  height: number
 ) {
-  const mathY = height * 0.75;
+  const barMaxHeight = 80;
+  const barY = centerY + 55;
+  const barWidth = 18;
 
-  // Formula
-  ctx.font = '12px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${progress * 0.8})`;
-  ctx.textAlign = 'center';
+  // The decay factor (0.9 is typical for many RNNs)
+  const decayFactor = 0.9;
 
-  ctx.fillText(
-    '∂L/∂h₁ = ∂L/∂hₜ × ∂hₜ/∂hₜ₋₁ × ... × ∂h₂/∂h₁',
-    width * 0.5,
-    mathY - 15
-  );
+  // How many cells to show gradient for (animated)
+  const cellsWithGradient = Math.floor(progress * numCells) + 1;
 
-  if (progress > 0.3) {
-    ctx.font = '11px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(180, 60, 60, ${(progress - 0.3) / 0.7 * 0.8})`;
-    ctx.fillText(
-      'Each ∂hₜ/∂hₜ₋₁ is typically < 1, so the product shrinks exponentially',
-      width * 0.5,
-      mathY + 10
+  // Draw gradient bars flowing backward from the end
+  for (let i = 0; i < Math.min(cellsWithGradient, numCells); i++) {
+    const cellIndex = numCells - 1 - i; // Start from the end
+    const x = baseX + cellIndex * spacing;
+
+    // Calculate gradient magnitude: decayFactor^stepsFromEnd
+    const stepsFromEnd = i;
+    const gradientMagnitude = Math.pow(decayFactor, stepsFromEnd);
+    const barHeight = barMaxHeight * gradientMagnitude;
+
+    // Animate bar appearance
+    const barProgress = Math.min(1, (progress * numCells - i) / 1);
+    if (barProgress <= 0) continue;
+
+    // Color intensity based on magnitude
+    const intensity = gradientMagnitude;
+    ctx.fillStyle = `rgba(180, 60, 60, ${0.3 + intensity * 0.5})`;
+    ctx.beginPath();
+    ctx.roundRect(
+      x - barWidth / 2,
+      barY - barHeight * barProgress,
+      barWidth,
+      barHeight * barProgress,
+      3
     );
+    ctx.fill();
+
+    // Percentage label
+    const percentage = gradientMagnitude * 100;
+    ctx.font = '8px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(0, 0, 0, ${barProgress * 0.7})`;
+    if (percentage >= 1) {
+      ctx.fillText(`${percentage.toFixed(0)}%`, x, barY + 12);
+    } else if (percentage >= 0.01) {
+      ctx.fillText(`${percentage.toFixed(1)}%`, x, barY + 12);
+    } else {
+      ctx.fillText('~0%', x, barY + 12);
+    }
   }
 
-  if (progress > 0.6) {
-    ctx.font = '10px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(0, 0, 0, ${(progress - 0.6) / 0.4 * 0.6})`;
-    ctx.fillText(
-      'After 100 steps: 0.9¹⁰⁰ ≈ 0.00003 (effectively zero!)',
-      width * 0.5,
-      mathY + 30
-    );
+  // THE KEY INSIGHT: Show the math
+  const mathY = height * 0.78;
+
+  if (progress > 0.3) {
+    const mathAlpha = Math.min(1, (progress - 0.3) / 0.2);
+
+    // Show the multiplication
+    ctx.font = '12px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(0, 0, 0, ${mathAlpha * 0.8})`;
+    ctx.textAlign = 'center';
+
+    // How many steps shown
+    const stepsShown = Math.min(cellsWithGradient - 1, numCells - 1);
+
+    if (stepsShown >= 2) {
+      // Build the multiplication string dynamically
+      const factors = [];
+      for (let i = 0; i < Math.min(stepsShown, 5); i++) {
+        factors.push('0.9');
+      }
+      if (stepsShown > 5) {
+        factors.push('...');
+      }
+
+      const result = Math.pow(0.9, stepsShown);
+      const resultStr = result >= 0.01 ? result.toFixed(2) : result.toExponential(1);
+
+      ctx.fillText(`${factors.join(' x ')} = ${resultStr}`, width * 0.5, mathY);
+    }
+  }
+
+  // The punch line - show what 100 steps looks like
+  if (progress > 0.7) {
+    const punchAlpha = Math.min(1, (progress - 0.7) / 0.2);
+
+    ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(180, 60, 60, ${punchAlpha * 0.95})`;
+    ctx.textAlign = 'center';
+    ctx.fillText('0.9^100 = 0.000027 (basically zero!)', width * 0.5, mathY + 25);
+
+    // Add emphasis
+    if (progress > 0.85) {
+      const emphasisAlpha = (progress - 0.85) / 0.15;
+      ctx.font = '11px system-ui, -apple-system, sans-serif';
+      ctx.fillStyle = `rgba(180, 60, 60, ${emphasisAlpha * 0.8})`;
+      ctx.fillText('Gradient vanishes completely - early layers never learn!', width * 0.5, mathY + 45);
+    }
   }
 }
 
@@ -258,146 +343,132 @@ function drawExplodingGradients(
   centerY: number,
   progress: number
 ) {
-  const numCells = 6;
-  const spacing = (width - 100) / numCells;
-  const baseX = 60;
-  const barY = centerY + 50;
-  const maxBarHeight = 100;
+  const numCells = 8;
+  const spacing = (width - 80) / numCells;
+  const baseX = 50;
+  const barY = centerY + 55;
+  const barMaxHeight = 70;
+  const barWidth = 18;
 
-  // Title
-  ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(180, 100, 60, ${progress * 0.8})`;
+  // Title transition
+  ctx.font = 'bold 15px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = `rgba(0, 0, 0, 0.85)`;
   ctx.textAlign = 'center';
-  ctx.fillText('Exploding Gradients (when ∂h/∂h > 1)', width * 0.5, height * 0.18);
+  ctx.fillText('The Exploding Gradient Problem', width * 0.5, height * 0.08);
 
-  // Draw cells
-  drawCells(ctx, baseX, centerY, spacing, numCells, progress);
+  // Subtitle
+  ctx.font = '11px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = `rgba(180, 100, 60, ${Math.min(1, progress * 2) * 0.8})`;
+  ctx.fillText('When gradient factor > 1 (e.g., 1.1)', width * 0.5, height * 0.15);
 
-  // Growing gradient bars
-  for (let t = numCells - 1; t >= 0; t--) {
+  // Draw timestep chain
+  const chainAlpha = Math.min(1, progress * 3);
+  const cellSize = 28;
+
+  for (let t = 0; t < numCells; t++) {
     const x = baseX + t * spacing;
-    const stepsFromEnd = numCells - 1 - t;
-    const gradientMagnitude = Math.pow(1.5, stepsFromEnd); // Growth factor
-    const clampedMag = Math.min(gradientMagnitude, 5); // Visual cap
 
-    const appearProgress = progress * numCells - (numCells - 1 - t);
-    const barAlpha = Math.min(1, Math.max(0, appearProgress));
+    ctx.strokeStyle = `rgba(0, 0, 0, ${chainAlpha * 0.5})`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(x - cellSize / 2, centerY - cellSize / 2, cellSize, cellSize, 4);
+    ctx.stroke();
 
-    if (barAlpha > 0) {
-      const barHeight = Math.min(maxBarHeight, maxBarHeight * (clampedMag / 5) * barAlpha);
-      const barWidth = spacing * 0.5;
+    ctx.fillStyle = `rgba(0, 0, 0, ${chainAlpha * 0.03})`;
+    ctx.fill();
 
-      // Bar (gets more intense as it grows)
-      const intensity = Math.min(1, clampedMag / 3);
-      ctx.fillStyle = `rgba(180, ${100 - intensity * 60}, 60, ${0.4 + intensity * 0.4})`;
+    ctx.font = '9px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(0, 0, 0, ${chainAlpha * 0.6})`;
+    ctx.fillText(`t${t + 1}`, x, centerY);
+
+    if (t < numCells - 1) {
+      const nextX = baseX + (t + 1) * spacing;
+      ctx.strokeStyle = `rgba(0, 0, 0, ${chainAlpha * 0.3})`;
       ctx.beginPath();
-      ctx.roundRect(
-        x - barWidth / 2,
-        barY - barHeight,
-        barWidth,
-        barHeight,
-        3
-      );
-      ctx.fill();
-
-      // Label
-      ctx.font = '8px system-ui, -apple-system, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = `rgba(0, 0, 0, ${barAlpha * 0.6})`;
-      const displayMag = gradientMagnitude > 10 ? 'NaN!' : `${(gradientMagnitude * 100).toFixed(0)}%`;
-      ctx.fillText(displayMag, x, barY + 12);
+      ctx.moveTo(x + cellSize / 2 + 2, centerY);
+      ctx.lineTo(nextX - cellSize / 2 - 6, centerY);
+      ctx.stroke();
     }
   }
 
-  // Warning
-  if (progress > 0.6) {
-    ctx.font = '10px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(180, 60, 60, ${(progress - 0.6) / 0.4 * 0.8})`;
-    ctx.textAlign = 'center';
-    ctx.fillText('Gradients explode → NaN → training crashes!', width * 0.5, barY + 35);
-  }
-}
+  // Exploding gradient bars
+  const explodeFactor = 1.1;
+  const cellsWithGradient = Math.floor(progress * numCells * 1.5) + 1;
 
-function drawGradientClipping(
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  centerY: number,
-  progress: number
-) {
-  const barY = centerY + 40;
-  const clipThreshold = height * 0.12;
+  for (let i = 0; i < Math.min(cellsWithGradient, numCells); i++) {
+    const cellIndex = numCells - 1 - i;
+    const x = baseX + cellIndex * spacing;
 
-  // Title
-  ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(60, 140, 80, ${progress * 0.8})`;
-  ctx.textAlign = 'center';
-  ctx.fillText('Solution: Gradient Clipping', width * 0.5, height * 0.18);
+    const stepsFromEnd = i;
+    const gradientMagnitude = Math.pow(explodeFactor, stepsFromEnd);
 
-  // Before/After comparison
-  const leftX = width * 0.25;
-  const rightX = width * 0.75;
+    // Cap visual height but show the real number
+    const visualMag = Math.min(gradientMagnitude, 5);
+    const barHeight = barMaxHeight * (visualMag / 5);
 
-  // Before (exploding)
-  ctx.font = '10px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${progress * 0.6})`;
-  ctx.textAlign = 'center';
-  ctx.fillText('Before', leftX, centerY - 60);
+    const barProgress = Math.min(1, (progress * numCells * 1.5 - i) / 1.5);
+    if (barProgress <= 0) continue;
 
-  const beforeHeights = [30, 50, 80, 140];
-  const barWidth = 25;
-  for (let i = 0; i < beforeHeights.length; i++) {
-    const x = leftX - 60 + i * 40;
-    const h = beforeHeights[i] * progress;
-
-    ctx.fillStyle = `rgba(180, 60, 60, 0.6)`;
+    // Color gets more intense/orange as it explodes
+    const intensity = Math.min(1, gradientMagnitude / 3);
+    ctx.fillStyle = `rgba(180, ${Math.floor(100 - intensity * 60)}, 60, ${0.4 + intensity * 0.4})`;
     ctx.beginPath();
-    ctx.roundRect(x - barWidth / 2, barY - h, barWidth, h, 3);
-    ctx.fill();
-  }
-
-  // Clip line
-  ctx.strokeStyle = `rgba(60, 140, 80, ${progress * 0.8})`;
-  ctx.lineWidth = 2;
-  ctx.setLineDash([5, 5]);
-  ctx.beginPath();
-  ctx.moveTo(leftX - 80, barY - clipThreshold);
-  ctx.lineTo(rightX + 80, barY - clipThreshold);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  ctx.font = '9px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(60, 140, 80, ${progress * 0.7})`;
-  ctx.textAlign = 'right';
-  ctx.fillText('max_norm', leftX - 85, barY - clipThreshold + 3);
-
-  // After (clipped)
-  ctx.font = '10px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${progress * 0.6})`;
-  ctx.textAlign = 'center';
-  ctx.fillText('After', rightX, centerY - 60);
-
-  const afterHeights = beforeHeights.map((h) => Math.min(h, clipThreshold / progress));
-  for (let i = 0; i < afterHeights.length; i++) {
-    const x = rightX - 60 + i * 40;
-    const h = Math.min(afterHeights[i] * progress, clipThreshold);
-
-    ctx.fillStyle = `rgba(60, 140, 80, 0.6)`;
-    ctx.beginPath();
-    ctx.roundRect(x - barWidth / 2, barY - h, barWidth, h, 3);
-    ctx.fill();
-  }
-
-  // Formula
-  if (progress > 0.5) {
-    ctx.font = '11px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(0, 0, 0, ${(progress - 0.5) * 2 * 0.7})`;
-    ctx.textAlign = 'center';
-    ctx.fillText(
-      'if ||g|| > max_norm: g = g × (max_norm / ||g||)',
-      width * 0.5,
-      barY + 40
+    ctx.roundRect(
+      x - barWidth / 2,
+      barY - barHeight * barProgress,
+      barWidth,
+      barHeight * barProgress,
+      3
     );
+    ctx.fill();
+
+    // Label
+    ctx.font = '8px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(0, 0, 0, ${barProgress * 0.7})`;
+
+    const percentage = gradientMagnitude * 100;
+    if (percentage < 1000) {
+      ctx.fillText(`${percentage.toFixed(0)}%`, x, barY + 12);
+    } else if (percentage < 100000) {
+      ctx.fillText(`${(percentage / 1000).toFixed(1)}k%`, x, barY + 12);
+    } else {
+      ctx.fillStyle = `rgba(180, 60, 60, ${barProgress * 0.9})`;
+      ctx.font = 'bold 8px system-ui, -apple-system, sans-serif';
+      ctx.fillText('NaN!', x, barY + 12);
+    }
+  }
+
+  // The math for exploding
+  const mathY = height * 0.78;
+
+  if (progress > 0.4) {
+    const mathAlpha = Math.min(1, (progress - 0.4) / 0.2);
+
+    ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(180, 80, 60, ${mathAlpha * 0.95})`;
+    ctx.textAlign = 'center';
+    ctx.fillText('1.1^100 = 13,780 (gradient explosion!)', width * 0.5, mathY);
+  }
+
+  if (progress > 0.65) {
+    const crashAlpha = Math.min(1, (progress - 0.65) / 0.2);
+
+    ctx.font = '11px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(180, 60, 60, ${crashAlpha * 0.85})`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Weights overflow to NaN - training crashes!', width * 0.5, mathY + 22);
+  }
+
+  // Solution hint
+  if (progress > 0.85) {
+    const solutionAlpha = Math.min(1, (progress - 0.85) / 0.15);
+
+    ctx.font = '11px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(60, 140, 80, ${solutionAlpha * 0.85})`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Solutions: Gradient clipping, LSTM/GRU architectures', width * 0.5, mathY + 44);
   }
 }
 
@@ -435,19 +506,16 @@ function drawPhaseLabel(
 
   switch (phase) {
     case 1:
-      labelText = 'Long sequence: many timesteps';
+      labelText = 'RNN: A chain of timesteps';
       break;
     case 2:
-      labelText = 'Gradients shrink exponentially';
+      labelText = 'Gradient starts strong at the loss';
       break;
     case 3:
-      labelText = 'Product of many small numbers → 0';
+      labelText = '0.9 x 0.9 x 0.9 ... approaches zero';
       break;
     case 4:
-      labelText = 'Or gradients explode → NaN';
-      break;
-    case 5:
-      labelText = 'Gradient clipping prevents explosion';
+      labelText = 'Or: 1.1 x 1.1 x 1.1 ... explodes to infinity';
       break;
   }
 
@@ -473,9 +541,7 @@ function drawPhaseLabel(
   const color =
     phase <= 3
       ? 'rgba(180, 60, 60, 0.9)'
-      : phase === 4
-        ? 'rgba(180, 100, 60, 0.9)'
-        : 'rgba(60, 140, 80, 0.9)';
+      : 'rgba(180, 100, 60, 0.9)';
   ctx.fillStyle = color;
   ctx.fillText(labelText, x, y);
 }

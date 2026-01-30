@@ -8,12 +8,12 @@ interface ActivationFunctionsAnimationProps {
 }
 
 /**
- * Activation Functions Animation comparing ReLU, Sigmoid, and Tanh
+ * Activation Functions Animation - Why LSTMs use sigmoid for gates and tanh for values
  *
- * Phase 1 (0-0.25): ReLU graph and properties
- * Phase 2 (0.25-0.50): Sigmoid graph and why it's used for gates
- * Phase 3 (0.50-0.75): Tanh graph and why it's used for cell state
- * Phase 4 (0.75-1.0): Comparison - why LSTM uses sigmoid for gates, tanh for values
+ * Phase 1 (0-0.25): Sigmoid function - outputs [0,1] - "how much to let through"
+ * Phase 2 (0.25-0.50): Tanh function - outputs [-1,1] - "positive or negative values"
+ * Phase 3 (0.50-0.75): Both together - gates need sigmoid, values need tanh
+ * Phase 4 (0.75-1.0): Visual LSTM gates showing where each is used
  */
 export function ActivationFunctionsAnimation({
   progress,
@@ -36,30 +36,37 @@ export function ActivationFunctionsAnimation({
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-    ctx.fillText('Activation Functions', width * 0.5, titleY);
+    const titles = [
+      '',
+      'Sigmoid: The Gate Function',
+      'Tanh: The Value Function',
+      'Why Different Functions?',
+      'LSTM Uses Both Strategically',
+    ];
+    ctx.fillText(titles[phase] || 'Activation Functions', width * 0.5, titleY);
 
-    // Phase 1: ReLU
+    // Phase 1: Sigmoid - for gates
     if (phase === 1) {
-      const alpha = Math.min(1, progress / 0.2);
-      drawReLU(ctx, width * 0.5, height * 0.5, alpha);
+      const phaseProgress = progress / 0.25;
+      drawSigmoidPhase(ctx, width, height, phaseProgress);
     }
 
-    // Phase 2: Sigmoid
+    // Phase 2: Tanh - for values
     if (phase === 2) {
-      const alpha = Math.min(1, (progress - 0.25) / 0.2);
-      drawSigmoid(ctx, width * 0.5, height * 0.5, alpha);
+      const phaseProgress = (progress - 0.25) / 0.25;
+      drawTanhPhase(ctx, width, height, phaseProgress);
     }
 
-    // Phase 3: Tanh
+    // Phase 3: Comparison - why different
     if (phase === 3) {
-      const alpha = Math.min(1, (progress - 0.5) / 0.2);
-      drawTanh(ctx, width * 0.5, height * 0.5, alpha);
+      const phaseProgress = (progress - 0.50) / 0.25;
+      drawComparisonPhase(ctx, width, height, phaseProgress);
     }
 
-    // Phase 4: Comparison
+    // Phase 4: LSTM usage
     if (phase === 4) {
-      const alpha = Math.min(1, (progress - 0.75) / 0.2);
-      drawComparison(ctx, width, height, alpha);
+      const phaseProgress = (progress - 0.75) / 0.25;
+      drawLSTMUsagePhase(ctx, width, height, phaseProgress);
     }
 
     // Draw phase label
@@ -80,85 +87,261 @@ function getPhase(progress: number): number {
   return 4;
 }
 
-function drawReLU(
+function drawSigmoidPhase(
   ctx: CanvasRenderingContext2D,
-  centerX: number,
-  centerY: number,
-  alpha: number
+  width: number,
+  height: number,
+  progress: number
 ) {
-  const graphWidth = 200;
-  const graphHeight = 120;
-  const left = centerX - graphWidth / 2;
-  const right = centerX + graphWidth / 2;
-  const top = centerY - graphHeight / 2;
-  const bottom = centerY + graphHeight / 2;
+  const centerX = width * 0.35;
+  const centerY = height * 0.45;
+  const graphWidth = 180;
+  const graphHeight = 100;
 
-  // Axes
-  drawAxes(ctx, left, right, top, bottom, centerX, centerY, alpha);
+  // Fade in graph
+  const graphAlpha = Math.min(1, progress * 2);
 
-  // ReLU function
-  ctx.strokeStyle = `rgba(60, 140, 80, ${alpha * 0.9})`;
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  // Flat part (x < 0 -> y = 0)
-  ctx.moveTo(left, centerY);
-  ctx.lineTo(centerX, centerY);
-  // Linear part (x > 0 -> y = x)
-  ctx.lineTo(right, top + 20);
-  ctx.stroke();
+  // Draw sigmoid graph
+  drawSigmoidGraph(ctx, centerX, centerY, graphWidth, graphHeight, graphAlpha);
 
-  // Formula
-  ctx.font = '12px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
-  ctx.textAlign = 'center';
-  ctx.fillText('ReLU(x) = max(0, x)', centerX, bottom + 35);
+  // Properties on the right
+  const propX = width * 0.65;
+  const propStartY = height * 0.28;
+  const lineHeight = 28;
 
-  // Properties
-  ctx.font = '10px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
-  ctx.textAlign = 'left';
-  const propX = centerX + graphWidth / 2 + 30;
-  ctx.fillText('Range: [0, ∞)', propX, centerY - 30);
-  ctx.fillText('Fast to compute', propX, centerY - 10);
-  ctx.fillText('No saturation for x > 0', propX, centerY + 10);
-  ctx.fillStyle = `rgba(180, 60, 60, ${alpha * 0.6})`;
-  ctx.fillText('Can "die" if x < 0', propX, centerY + 30);
+  // Animate properties appearing one by one
+  const propDelay = 0.2;
+  const properties = [
+    { text: 'Output range: [0, 1]', color: '100, 100, 180', bold: true },
+    { text: 'Perfect for "gates"', color: '0, 0, 0', bold: false },
+    { text: '0 = completely closed', color: '180, 60, 60', bold: false },
+    { text: '1 = completely open', color: '60, 140, 80', bold: false },
+    { text: 'Controls how much flows through', color: '0, 0, 0', bold: false },
+  ];
+
+  properties.forEach((prop, i) => {
+    const propProgress = Math.max(0, Math.min(1, (progress - propDelay - i * 0.12) * 3));
+    if (propProgress > 0) {
+      ctx.font = prop.bold ? 'bold 12px system-ui, -apple-system, sans-serif' : '11px system-ui, -apple-system, sans-serif';
+      ctx.fillStyle = `rgba(${prop.color}, ${propProgress * 0.85})`;
+      ctx.textAlign = 'left';
+      ctx.fillText(prop.text, propX, propStartY + i * lineHeight);
+    }
+  });
+
+  // Visual gate metaphor below
+  if (progress > 0.5) {
+    const gateAlpha = (progress - 0.5) * 2;
+    drawGateMetaphor(ctx, width * 0.5, height * 0.78, gateAlpha);
+  }
 }
 
-function drawSigmoid(
+function drawTanhPhase(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  progress: number
+) {
+  const centerX = width * 0.35;
+  const centerY = height * 0.45;
+  const graphWidth = 180;
+  const graphHeight = 100;
+
+  // Fade in graph
+  const graphAlpha = Math.min(1, progress * 2);
+
+  // Draw tanh graph
+  drawTanhGraph(ctx, centerX, centerY, graphWidth, graphHeight, graphAlpha);
+
+  // Properties on the right
+  const propX = width * 0.65;
+  const propStartY = height * 0.28;
+  const lineHeight = 28;
+
+  const propDelay = 0.2;
+  const properties = [
+    { text: 'Output range: [-1, 1]', color: '180, 100, 60', bold: true },
+    { text: 'Zero-centered', color: '0, 0, 0', bold: false },
+    { text: 'Negative = decrease', color: '100, 100, 180', bold: false },
+    { text: 'Positive = increase', color: '60, 140, 80', bold: false },
+    { text: 'Controls value magnitude & sign', color: '0, 0, 0', bold: false },
+  ];
+
+  properties.forEach((prop, i) => {
+    const propProgress = Math.max(0, Math.min(1, (progress - propDelay - i * 0.12) * 3));
+    if (propProgress > 0) {
+      ctx.font = prop.bold ? 'bold 12px system-ui, -apple-system, sans-serif' : '11px system-ui, -apple-system, sans-serif';
+      ctx.fillStyle = `rgba(${prop.color}, ${propProgress * 0.85})`;
+      ctx.textAlign = 'left';
+      ctx.fillText(prop.text, propX, propStartY + i * lineHeight);
+    }
+  });
+
+  // Visual value metaphor below
+  if (progress > 0.5) {
+    const valueAlpha = (progress - 0.5) * 2;
+    drawValueMetaphor(ctx, width * 0.5, height * 0.78, valueAlpha);
+  }
+}
+
+function drawComparisonPhase(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  progress: number
+) {
+  const graphY = height * 0.4;
+  const graphWidth = 140;
+  const graphHeight = 80;
+
+  // Left: Sigmoid
+  const sigmoidX = width * 0.28;
+  const sigmoidAlpha = Math.min(1, progress * 2);
+  drawSigmoidGraph(ctx, sigmoidX, graphY, graphWidth, graphHeight, sigmoidAlpha);
+
+  // Right: Tanh
+  const tanhX = width * 0.72;
+  const tanhAlpha = Math.min(1, progress * 2);
+  drawTanhGraph(ctx, tanhX, graphY, graphWidth, graphHeight, tanhAlpha);
+
+  // Labels above graphs
+  ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = `rgba(100, 100, 180, ${sigmoidAlpha * 0.9})`;
+  ctx.fillText('Sigmoid (Gates)', sigmoidX, graphY - graphHeight / 2 - 20);
+
+  ctx.fillStyle = `rgba(180, 100, 60, ${tanhAlpha * 0.9})`;
+  ctx.fillText('Tanh (Values)', tanhX, graphY - graphHeight / 2 - 20);
+
+  // Comparison explanation below
+  const explainY = height * 0.68;
+  if (progress > 0.3) {
+    const explainAlpha = (progress - 0.3) / 0.7;
+
+    ctx.font = '11px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+
+    ctx.fillStyle = `rgba(100, 100, 180, ${explainAlpha * 0.8})`;
+    ctx.fillText('"How much to let through"', sigmoidX, explainY);
+    ctx.font = '10px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(0, 0, 0, ${explainAlpha * 0.6})`;
+    ctx.fillText('[0, 1] = 0% to 100%', sigmoidX, explainY + 18);
+
+    ctx.font = '11px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(180, 100, 60, ${explainAlpha * 0.8})`;
+    ctx.fillText('"What value to use"', tanhX, explainY);
+    ctx.font = '10px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(0, 0, 0, ${explainAlpha * 0.6})`;
+    ctx.fillText('[-1, 1] = add or subtract', tanhX, explainY + 18);
+  }
+
+  // Gate * Value example
+  if (progress > 0.6) {
+    const formulaAlpha = (progress - 0.6) / 0.4;
+    ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(0, 0, 0, ${formulaAlpha * 0.85})`;
+    ctx.textAlign = 'center';
+    ctx.fillText('gate(σ) × value(tanh) = controlled update', width * 0.5, height * 0.82);
+  }
+}
+
+function drawLSTMUsagePhase(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  progress: number
+) {
+  const cellY = height * 0.42;
+  const cellWidth = 280;
+  const cellHeight = 80;
+  const left = (width - cellWidth) / 2;
+
+  const alpha = Math.min(1, progress * 2);
+
+  // Cell outline
+  ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.3})`;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.roundRect(left - 20, cellY - cellHeight / 2 - 20, cellWidth + 40, cellHeight + 60, 8);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Cell state line at top
+  const cellStateY = cellY - cellHeight / 2 + 10;
+  ctx.strokeStyle = `rgba(100, 100, 180, ${alpha * 0.6})`;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(left - 10, cellStateY);
+  ctx.lineTo(left + cellWidth + 10, cellStateY);
+  ctx.stroke();
+
+  ctx.font = '9px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = `rgba(100, 100, 180, ${alpha * 0.7})`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Cell State', width * 0.5, cellStateY - 15);
+
+  // Gates with labels
+  const gateY = cellY + 10;
+  const gates = [
+    { x: left + 45, label: 'Forget', type: 'sigmoid' as const },
+    { x: left + 120, label: 'Input', type: 'sigmoid' as const },
+    { x: left + 175, label: 'Candidate', type: 'tanh' as const },
+    { x: left + 235, label: 'Output', type: 'sigmoid' as const },
+  ];
+
+  gates.forEach((gate, i) => {
+    const gateProgress = Math.max(0, Math.min(1, (progress - 0.15 - i * 0.15) * 3));
+    if (gateProgress > 0) {
+      drawGateBox(ctx, gate.x, gateY, gate.label, gate.type, gateProgress);
+    }
+  });
+
+  // Summary at bottom
+  if (progress > 0.5) {
+    const summaryAlpha = (progress - 0.5) * 2;
+    const summaryY = height * 0.75;
+
+    ctx.font = '11px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+
+    // Sigmoid count
+    ctx.fillStyle = `rgba(100, 100, 180, ${summaryAlpha * 0.9})`;
+    ctx.fillText('3 sigmoids = 3 gates (forget, input, output)', width * 0.5, summaryY);
+
+    // Tanh count
+    ctx.fillStyle = `rgba(180, 100, 60, ${summaryAlpha * 0.9})`;
+    ctx.fillText('1 tanh = candidate values for cell state', width * 0.5, summaryY + 20);
+  }
+
+  // Key insight
+  if (progress > 0.75) {
+    const insightAlpha = (progress - 0.75) * 4;
+    ctx.font = '10px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = `rgba(0, 0, 0, ${insightAlpha * 0.6})`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Gates control flow (0-100%), values provide magnitude (-1 to +1)', width * 0.5, height * 0.85);
+  }
+}
+
+function drawSigmoidGraph(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
+  graphWidth: number,
+  graphHeight: number,
   alpha: number
 ) {
-  const graphWidth = 200;
-  const graphHeight = 120;
   const left = centerX - graphWidth / 2;
   const right = centerX + graphWidth / 2;
   const top = centerY - graphHeight / 2;
   const bottom = centerY + graphHeight / 2;
 
   // Axes
-  drawAxes(ctx, left, right, top, bottom, centerX, centerY, alpha);
+  drawAxes(ctx, left, right, top, bottom, centerX, bottom, alpha); // Y axis at bottom for sigmoid
 
-  // Sigmoid function
-  ctx.strokeStyle = `rgba(100, 100, 180, ${alpha * 0.9})`;
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  for (let px = left; px <= right; px += 2) {
-    const x = (px - centerX) / (graphWidth / 6); // Scale to [-3, 3]
-    const y = 1 / (1 + Math.exp(-x));
-    const py = bottom - y * graphHeight;
-    if (px === left) {
-      ctx.moveTo(px, py);
-    } else {
-      ctx.lineTo(px, py);
-    }
-  }
-  ctx.stroke();
-
-  // 0 and 1 lines
-  ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.2})`;
+  // 0 and 1 reference lines
+  ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.15})`;
   ctx.lineWidth = 1;
   ctx.setLineDash([3, 3]);
   ctx.beginPath();
@@ -169,55 +352,21 @@ function drawSigmoid(
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Labels for 0 and 1
+  // Labels
   ctx.font = '9px system-ui, -apple-system, sans-serif';
   ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.5})`;
   ctx.textAlign = 'right';
   ctx.fillText('1', left - 5, top + 4);
   ctx.fillText('0', left - 5, bottom + 4);
 
-  // Formula
-  ctx.font = '12px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
-  ctx.textAlign = 'center';
-  ctx.fillText('σ(x) = 1 / (1 + e⁻ˣ)', centerX, bottom + 35);
-
-  // Properties
-  ctx.font = '10px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
-  ctx.textAlign = 'left';
-  const propX = centerX + graphWidth / 2 + 30;
-  ctx.fillStyle = `rgba(60, 140, 80, ${alpha * 0.7})`;
-  ctx.fillText('Range: [0, 1]', propX, centerY - 30);
-  ctx.fillText('Perfect for "gates"', propX, centerY - 10);
-  ctx.fillText('0 = fully closed', propX, centerY + 10);
-  ctx.fillText('1 = fully open', propX, centerY + 30);
-}
-
-function drawTanh(
-  ctx: CanvasRenderingContext2D,
-  centerX: number,
-  centerY: number,
-  alpha: number
-) {
-  const graphWidth = 200;
-  const graphHeight = 120;
-  const left = centerX - graphWidth / 2;
-  const right = centerX + graphWidth / 2;
-  const top = centerY - graphHeight / 2;
-  const bottom = centerY + graphHeight / 2;
-
-  // Axes
-  drawAxes(ctx, left, right, top, bottom, centerX, centerY, alpha);
-
-  // Tanh function
-  ctx.strokeStyle = `rgba(180, 100, 60, ${alpha * 0.9})`;
+  // Sigmoid curve
+  ctx.strokeStyle = `rgba(100, 100, 180, ${alpha * 0.9})`;
   ctx.lineWidth = 2.5;
   ctx.beginPath();
   for (let px = left; px <= right; px += 2) {
-    const x = (px - centerX) / (graphWidth / 6); // Scale to [-3, 3]
-    const y = Math.tanh(x);
-    const py = centerY - y * (graphHeight / 2);
+    const x = (px - centerX) / (graphWidth / 6);
+    const y = 1 / (1 + Math.exp(-x));
+    const py = bottom - y * graphHeight;
     if (px === left) {
       ctx.moveTo(px, py);
     } else {
@@ -226,8 +375,31 @@ function drawTanh(
   }
   ctx.stroke();
 
-  // -1 and 1 lines
-  ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.2})`;
+  // Formula below
+  ctx.font = '11px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = `rgba(100, 100, 180, ${alpha * 0.8})`;
+  ctx.textAlign = 'center';
+  ctx.fillText('σ(x) = 1 / (1 + e⁻ˣ)', centerX, bottom + 25);
+}
+
+function drawTanhGraph(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  graphWidth: number,
+  graphHeight: number,
+  alpha: number
+) {
+  const left = centerX - graphWidth / 2;
+  const right = centerX + graphWidth / 2;
+  const top = centerY - graphHeight / 2;
+  const bottom = centerY + graphHeight / 2;
+
+  // Axes - Y axis in center for tanh
+  drawAxes(ctx, left, right, top, bottom, centerX, centerY, alpha);
+
+  // -1 and +1 reference lines
+  ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.15})`;
   ctx.lineWidth = 1;
   ctx.setLineDash([3, 3]);
   ctx.beginPath();
@@ -245,74 +417,27 @@ function drawTanh(
   ctx.fillText('+1', left - 5, top + 4);
   ctx.fillText('-1', left - 5, bottom + 4);
 
-  // Formula
-  ctx.font = '12px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
-  ctx.textAlign = 'center';
-  ctx.fillText('tanh(x) = (eˣ - e⁻ˣ) / (eˣ + e⁻ˣ)', centerX, bottom + 35);
-
-  // Properties
-  ctx.font = '10px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
-  ctx.textAlign = 'left';
-  const propX = centerX + graphWidth / 2 + 30;
-  ctx.fillStyle = `rgba(180, 100, 60, ${alpha * 0.7})`;
-  ctx.fillText('Range: [-1, 1]', propX, centerY - 30);
-  ctx.fillText('Zero-centered', propX, centerY - 10);
-  ctx.fillText('Good for cell values', propX, centerY + 10);
-  ctx.fillText('Can be + or -', propX, centerY + 30);
-}
-
-function drawComparison(
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  alpha: number
-) {
-  const centerY = height * 0.45;
-
-  // LSTM uses both
-  ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
-  ctx.textAlign = 'center';
-  ctx.fillText('Why LSTM Uses Both', width * 0.5, height * 0.2);
-
-  // Sigmoid for gates
-  const leftX = width * 0.3;
-  ctx.font = '11px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(100, 100, 180, ${alpha * 0.9})`;
-  ctx.textAlign = 'center';
-  ctx.fillText('Sigmoid σ for Gates', leftX, centerY - 40);
-
-  ctx.font = '10px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
-  ctx.fillText('Output in [0, 1]', leftX, centerY - 15);
-  ctx.fillText('Acts as a "dial"', leftX, centerY + 5);
-  ctx.fillText('0 = block everything', leftX, centerY + 25);
-  ctx.fillText('1 = pass everything', leftX, centerY + 45);
-
-  // Tanh for values
-  const rightX = width * 0.7;
-  ctx.font = '11px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(180, 100, 60, ${alpha * 0.9})`;
-  ctx.textAlign = 'center';
-  ctx.fillText('Tanh for Values', rightX, centerY - 40);
-
-  ctx.font = '10px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
-  ctx.fillText('Output in [-1, 1]', rightX, centerY - 15);
-  ctx.fillText('Zero-centered', rightX, centerY + 5);
-  ctx.fillText('Can increase or', rightX, centerY + 25);
-  ctx.fillText('decrease cell state', rightX, centerY + 45);
-
-  // Visual: gate × value
-  if (alpha > 0.5) {
-    const vizY = height * 0.75;
-    ctx.font = '11px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(0, 0, 0, ${(alpha - 0.5) * 2 * 0.7})`;
-    ctx.textAlign = 'center';
-    ctx.fillText('gate (σ) × value (tanh) = controlled update', width * 0.5, vizY);
+  // Tanh curve
+  ctx.strokeStyle = `rgba(180, 100, 60, ${alpha * 0.9})`;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let px = left; px <= right; px += 2) {
+    const x = (px - centerX) / (graphWidth / 6);
+    const y = Math.tanh(x);
+    const py = centerY - y * (graphHeight / 2);
+    if (px === left) {
+      ctx.moveTo(px, py);
+    } else {
+      ctx.lineTo(px, py);
+    }
   }
+  ctx.stroke();
+
+  // Formula below
+  ctx.font = '11px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = `rgba(180, 100, 60, ${alpha * 0.8})`;
+  ctx.textAlign = 'center';
+  ctx.fillText('tanh(x)', centerX, bottom + 25);
 }
 
 function drawAxes(
@@ -330,23 +455,153 @@ function drawAxes(
 
   // X axis
   ctx.beginPath();
-  ctx.moveTo(left, centerY);
-  ctx.lineTo(right, centerY);
+  ctx.moveTo(left - 5, centerY);
+  ctx.lineTo(right + 5, centerY);
   ctx.stroke();
 
   // Y axis
   ctx.beginPath();
-  ctx.moveTo(centerX, top - 10);
-  ctx.lineTo(centerX, bottom + 10);
+  ctx.moveTo(centerX, top - 5);
+  ctx.lineTo(centerX, bottom + 5);
   ctx.stroke();
 
-  // Axis labels
+  // Small arrowhead on X axis
+  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.3})`;
+  ctx.beginPath();
+  ctx.moveTo(right + 5, centerY);
+  ctx.lineTo(right - 2, centerY - 3);
+  ctx.lineTo(right - 2, centerY + 3);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawGateMetaphor(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  alpha: number
+) {
+  // Draw a visual gate/valve metaphor
+  const gateWidth = 60;
+  const gateHeight = 30;
+
+  // Closed gate (left)
+  ctx.strokeStyle = `rgba(180, 60, 60, ${alpha * 0.7})`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(x - 80 - gateWidth / 2, y - gateHeight / 2, gateWidth, gateHeight, 4);
+  ctx.stroke();
+
+  // Filled (blocked)
+  ctx.fillStyle = `rgba(180, 60, 60, ${alpha * 0.2})`;
+  ctx.fill();
+
   ctx.font = '9px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.4})`;
+  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
   ctx.textAlign = 'center';
-  ctx.fillText('x', right + 10, centerY + 4);
-  ctx.textAlign = 'right';
-  ctx.fillText('y', centerX - 5, top - 15);
+  ctx.fillText('σ = 0', x - 80, y + gateHeight / 2 + 12);
+  ctx.fillText('blocked', x - 80, y);
+
+  // Open gate (right)
+  ctx.strokeStyle = `rgba(60, 140, 80, ${alpha * 0.7})`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(x + 80 - gateWidth / 2, y - gateHeight / 2, gateWidth, gateHeight, 4);
+  ctx.stroke();
+
+  // Arrow through
+  ctx.strokeStyle = `rgba(60, 140, 80, ${alpha * 0.7})`;
+  ctx.beginPath();
+  ctx.moveTo(x + 80 - 20, y);
+  ctx.lineTo(x + 80 + 20, y);
+  ctx.stroke();
+  ctx.fillStyle = `rgba(60, 140, 80, ${alpha * 0.7})`;
+  ctx.beginPath();
+  ctx.moveTo(x + 80 + 20, y);
+  ctx.lineTo(x + 80 + 14, y - 4);
+  ctx.lineTo(x + 80 + 14, y + 4);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.font = '9px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
+  ctx.textAlign = 'center';
+  ctx.fillText('σ = 1', x + 80, y + gateHeight / 2 + 12);
+  ctx.fillText('flows', x + 80, y);
+}
+
+function drawValueMetaphor(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  alpha: number
+) {
+  // Draw a value scale metaphor (-1 to +1)
+  const scaleWidth = 180;
+  const scaleHeight = 8;
+
+  // Scale bar
+  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.1})`;
+  ctx.beginPath();
+  ctx.roundRect(x - scaleWidth / 2, y - scaleHeight / 2, scaleWidth, scaleHeight, 4);
+  ctx.fill();
+
+  // Gradient from blue (-) to orange (+)
+  const gradient = ctx.createLinearGradient(x - scaleWidth / 2, y, x + scaleWidth / 2, y);
+  gradient.addColorStop(0, `rgba(100, 100, 180, ${alpha * 0.6})`);
+  gradient.addColorStop(0.5, `rgba(200, 200, 200, ${alpha * 0.3})`);
+  gradient.addColorStop(1, `rgba(60, 140, 80, ${alpha * 0.6})`);
+  ctx.fillStyle = gradient;
+  ctx.fill();
+
+  // Labels
+  ctx.font = '10px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = `rgba(100, 100, 180, ${alpha * 0.8})`;
+  ctx.textAlign = 'center';
+  ctx.fillText('-1', x - scaleWidth / 2, y + 18);
+  ctx.fillText('decrease', x - scaleWidth / 2, y + 30);
+
+  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.5})`;
+  ctx.fillText('0', x, y + 18);
+
+  ctx.fillStyle = `rgba(60, 140, 80, ${alpha * 0.8})`;
+  ctx.fillText('+1', x + scaleWidth / 2, y + 18);
+  ctx.fillText('increase', x + scaleWidth / 2, y + 30);
+}
+
+function drawGateBox(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  label: string,
+  type: 'sigmoid' | 'tanh',
+  alpha: number
+) {
+  const size = 32;
+  const isSigmoid = type === 'sigmoid';
+  const color = isSigmoid ? '100, 100, 180' : '180, 100, 60';
+
+  // Box
+  ctx.strokeStyle = `rgba(${color}, ${alpha * 0.8})`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(x - size / 2, y - size / 2, size, size, 4);
+  ctx.stroke();
+
+  ctx.fillStyle = `rgba(${color}, ${alpha * 0.1})`;
+  ctx.fill();
+
+  // Symbol
+  ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = `rgba(${color}, ${alpha * 0.9})`;
+  ctx.fillText(isSigmoid ? 'σ' : 'tanh', x, y);
+
+  // Label below
+  ctx.font = '8px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
+  ctx.fillText(label, x, y + size / 2 + 10);
 }
 
 function drawPhaseLabel(
@@ -357,10 +612,10 @@ function drawPhaseLabel(
 ) {
   const labels = [
     '',
-    'ReLU: fast, but can die',
-    'Sigmoid: perfect for gates [0,1]',
-    'Tanh: good for values [-1,1]',
-    'LSTM uses both strategically',
+    'Sigmoid: [0,1] range for controlling flow',
+    'Tanh: [-1,1] range for positive/negative values',
+    'Gates need sigmoid, values need tanh',
+    'LSTM: 3 sigmoid gates + 1 tanh value generator',
   ];
 
   const labelText = labels[phase] || '';
@@ -385,9 +640,9 @@ function drawPhaseLabel(
   ctx.textBaseline = 'middle';
   const colors = [
     '',
-    'rgba(60, 140, 80, 0.9)',
     'rgba(100, 100, 180, 0.9)',
     'rgba(180, 100, 60, 0.9)',
+    'rgba(0, 0, 0, 0.7)',
     'rgba(0, 0, 0, 0.7)',
   ];
   ctx.fillStyle = colors[phase] || 'rgba(0, 0, 0, 0.7)';
