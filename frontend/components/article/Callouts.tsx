@@ -483,6 +483,12 @@ interface FigureProps {
    * Must be used within an `ArticleSection` (position: relative) for correct positioning.
    */
   side?: boolean;
+  /**
+   * On desktop (xl+): render in the left margin.
+   * On mobile (<xl): render inline (default behavior).
+   * Cannot be used with `side` prop.
+   */
+  leftSide?: boolean;
   className?: string;
 }
 
@@ -492,6 +498,7 @@ export function Figure({
   caption,
   href,
   side = false,
+  leftSide = false,
   className = '',
 }: FigureProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -522,7 +529,7 @@ export function Figure({
     </>
   );
 
-  if (!side) {
+  if (!side && !leftSide) {
     return <figure className={`mt-4 mb-2 ${className}`}>{content}</figure>;
   }
 
@@ -556,6 +563,34 @@ export function Figure({
       )}
     </button>
   );
+
+  // Left side positioning
+  if (leftSide) {
+    return (
+      <>
+        {/* Desktop: Left margin positioning */}
+        <figure
+          className={`hidden xl:block absolute right-full mr-4 w-72 2xl:mr-8 2xl:w-88 my-6 ${className}`}
+          style={{ top: 'auto' }}
+        >
+          {clickableImage}
+        </figure>
+
+        {/* Mobile: Inline figure */}
+        <figure className={`xl:hidden my-6 ${className}`}>{clickableImage}</figure>
+
+        {/* Lightbox modal */}
+        <Lightbox
+          src={src}
+          alt={alt}
+          caption={caption}
+          href={href}
+          isOpen={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+        />
+      </>
+    );
+  }
 
   return (
     <>

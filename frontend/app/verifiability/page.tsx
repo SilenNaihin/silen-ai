@@ -81,6 +81,56 @@ export default function VerifiabilityArticle() {
               </p>
             </QuoteBox>
 
+            <Aside title="Brandolini's Law and LK-99">
+              <p>
+                &quot;The amount of energy needed to refute bullshit is an order
+                of magnitude bigger than that needed to produce it.&quot;
+              </p>
+              <p className="mt-2">
+                The{' '}
+                <a
+                  href="https://en.wikipedia.org/wiki/LK-99"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  LK-99 debacle
+                </a>{' '}
+                in 2023 illustrated this perfectly. A preprint claimed
+                room-temperature superconductivity. Within weeks, dozens of labs
+                worldwide mobilized to replicate the results. The claim took one
+                paper to make. Refuting it required coordinated effort across
+                continents, consuming thousands of researcher-hours.
+              </p>
+              <p className="mt-2">
+                This asymmetry is why verification infrastructure matters. Fast
+                verification doesn&apos;t just accelerate progress. It raises
+                the cost of producing nonsense.
+              </p>
+            </Aside>
+
+            <Aside title="Verification Shifts, It Doesn't Disappear">
+              <p>
+                <a
+                  href="https://alperenkeles.com/posts/verifiability-is-the-limit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Keles observes
+                </a>
+                : &quot;With LLMs, we are able to offload code writing to LLMs,
+                but the verification process cannot be offloaded, only pushed up
+                to a different layer.&quot;
+              </p>
+              <p className="mt-2">
+                A security agent might add security checks, but those checks are
+                worthless without verifying they match your intent. A testing
+                agent might generate tests, but the tests are meaningless until
+                you verify they correspond to what you actually want. More
+                agents don&apos;t solve verification. They just move where the
+                human has to look.
+              </p>
+            </Aside>
+
             <Prose>
               <p>
                 For recursive self-improvement, verifiability is the
@@ -100,6 +150,193 @@ export default function VerifiabilityArticle() {
               alt="The verification loop: Propose, Verify, Improve"
               caption="Propose (forward pass) → Verify (get signal) → Improve (update behaviour)"
             />
+
+            <TOCHeading id="asymmetry-spectrum" level={3}>
+              The Spectrum of Verification Asymmetry
+            </TOCHeading>
+            <Prose>
+              <p>
+                Not all tasks have the same relationship between generation
+                difficulty and verification difficulty.{' '}
+                <a
+                  href="https://www.jasonwei.net/blog/asymmetry-of-verification-and-verifiers-law"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Wei identifies three regimes
+                </a>
+                :
+              </p>
+              <p>
+                <strong>High asymmetry</strong> (easy to verify, hard to
+                generate): Sudoku puzzles take significant effort to solve but
+                trivial effort to check. Building Twitter took years of
+                engineering; checking if it works takes seconds. Competition
+                math problems require deep reasoning; verifying an answer
+                against the key is instant. These are the sweet spot for AI
+                training. Reinforcement learning thrives here.
+              </p>
+              <p>
+                <strong>Near-symmetry</strong> (similar effort to verify and
+                generate): Adding two 900-digit numbers takes the same work to
+                verify as to compute. Reading someone&apos;s data processing
+                code to check correctness takes as long as writing it yourself.
+                These tasks don&apos;t benefit as much from generate-and-test
+                approaches because verification provides no leverage.
+              </p>
+              <p>
+                <strong>Reverse asymmetry</strong> (harder to verify than
+                generate): Proposing a novel diet takes one sentence.
+                Verifying whether it improves health outcomes takes years of
+                clinical trials. Writing a factual essay takes hours;
+                fact-checking every claim can take longer. Scientific
+                hypotheses are cheap to generate but expensive to test.
+              </p>
+              <p>
+                The implications are direct: AI progress will be fastest in
+                high-asymmetry domains, slower in symmetric domains, and
+                slowest (or dependent on humans) in reverse-asymmetry domains.
+                This explains why code generation is ahead of scientific
+                discovery. Code has high asymmetry. Science often has reverse
+                asymmetry.
+              </p>
+            </Prose>
+
+            <TOCHeading id="improving-asymmetry" level={3}>
+              Improving Verification Asymmetry
+            </TOCHeading>
+            <Prose>
+              <p>
+                Here is the key insight: asymmetry is not fixed. You can
+                engineer better verification. Front-loading work into
+                verification infrastructure transforms the economics of an
+                entire domain.
+              </p>
+            </Prose>
+
+            <Figure
+              src="/articles/verifiability/asymmetry-improvement.png"
+              alt="Asymmetry of verification can be improved with privileged information"
+              caption="From Jason Wei - privileged information shifts tasks toward easy verification"
+              href="https://www.jasonwei.net/blog/asymmetry-of-verification-and-verifiers-law"
+            />
+
+            <Prose>
+              <p>
+                <strong>Test cases transform code verification.</strong>{' '}
+                Without tests, verifying code requires reading every line and
+                reasoning about correctness. This is near-symmetric. With
+                comprehensive test cases, verification becomes &quot;run tests,
+                check green.&quot; This is why SWE-bench works: the test suite
+                is the privileged information that makes verification trivial.
+                Leetcode exploits the same principle.
+              </p>
+              <p>
+                <strong>Answer keys transform math verification.</strong>{' '}
+                Verifying a competition math solution without the answer
+                requires re-solving the problem. With the answer key,
+                verification is instant comparison. AIME problems shift from
+                near-symmetric to highly asymmetric once you have the key.
+              </p>
+              <p>
+                <strong>Formal systems transform proof verification.</strong>{' '}
+                Checking a natural language proof requires deep mathematical
+                understanding. Checking a Lean proof requires only running the
+                type checker. The formal system is privileged infrastructure
+                that makes verification mechanical.
+              </p>
+              <p>
+                <strong>Simulation transforms physical verification.</strong>{' '}
+                Verifying whether a car design is aerodynamic used to require
+                building the car and testing in a wind tunnel. Now CFD
+                simulations provide faster, cheaper verification. The
+                simulation is privileged infrastructure. Same pattern: robotics
+                simulation, molecular dynamics, climate models.
+              </p>
+              <p>
+                <strong>Novel examples of asymmetry improvement:</strong>
+              </p>
+              <p>
+                Protein structure prediction was reverse-asymmetric for
+                decades. Predicting a fold was easy; verifying it required
+                expensive crystallography. AlphaFold changed this. Now the
+                model&apos;s predictions are trusted enough to skip wet-lab
+                verification for many applications. The model itself became
+                verification infrastructure.
+              </p>
+              <p>
+                Legal contract review used to be near-symmetric: checking a
+                contract took as long as writing one. Now LLMs with retrieval
+                over case law can flag issues in seconds. The indexed legal
+                corpus is privileged information.
+              </p>
+              <p>
+                Security vulnerability detection was reverse-asymmetric:
+                writing vulnerable code is easy, finding the vulnerability is
+                hard. Static analysis tools and fuzzing frameworks shift this
+                toward high asymmetry. The vulnerability database and analysis
+                rules are privileged infrastructure.
+              </p>
+            </Prose>
+
+            <InsightBox title="The Verification Infrastructure Thesis">
+              <p>
+                Investment in verification infrastructure has
+                disproportionate returns. Making verification 10x faster
+                doesn&apos;t just speed up one project. It accelerates every
+                future project in that domain. It enables RL training that was
+                previously intractable. It raises the bar for low-quality work
+                by making nonsense easier to detect.
+              </p>
+              <p className="mt-2">
+                AlphaEvolve from Google DeepMind exemplifies this. By building
+                infrastructure to rapidly verify mathematical and algorithmic
+                solutions, they enabled ruthless optimization that produced
+                genuine innovations. The verification infrastructure was the
+                enabling technology.
+              </p>
+            </InsightBox>
+
+            <Aside title="Property-Based Testing">
+              <p>
+                <a
+                  href="https://alperenkeles.com/posts/verifiability-is-the-limit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Keles argues
+                </a>{' '}
+                for property-based testing as verification infrastructure. Instead
+                of writing many unit tests (each requiring verification), you
+                define one predicate that should hold over all inputs. The
+                framework generates random inputs and checks the predicate.
+              </p>
+              <p className="mt-2">
+                One general property is easier to inspect than a hundred unit
+                tests. It&apos;s also harder for an LLM to &quot;game&quot;
+                because the inputs are random. This shifts verification from
+                checking many specific cases to understanding one general
+                invariant.
+              </p>
+            </Aside>
+
+            <Aside title="Perfect Oracles">
+              <p>
+                LLMs succeed in domains with perfect oracles. A perfect oracle
+                gives unambiguous correct/incorrect feedback every time. Games
+                have perfect oracles: you win or lose. Competitive programming
+                has perfect oracles: your code passes the judge or it
+                doesn&apos;t.
+              </p>
+              <p className="mt-2">
+                Real-world domains rarely have perfect oracles. Even theorem
+                provers aren&apos;t perfect oracles. They tell you if your
+                proof is complete, but not if you&apos;re on the right track
+                during construction. The gap between perfect oracles and noisy
+                real-world feedback explains much of the gap between AI
+                performance in games versus practical applications.
+              </p>
+            </Aside>
           </ArticleSection>
 
           {/* Section 2: The Hierarchy of Knowledge */}
@@ -159,6 +396,13 @@ export default function VerifiabilityArticle() {
             <TOCHeading id="spectrum-novelty" level={3}>
               The Spectrum of Novelty
             </TOCHeading>
+
+            <Figure
+              src="/articles/verifiability/zero-1.png"
+              alt="The history and significance of zero"
+              side={true}
+            />
+
             <Prose>
               <p>
                 Consider the spectrum from obvious interpolation to apparent
@@ -172,21 +416,21 @@ export default function VerifiabilityArticle() {
                 places&quot; is trivially covered by the space of
                 &quot;poems.&quot;
               </p>
+            </Prose>
+
+            <Figure
+              src="/articles/verifiability/zero-2.png"
+              alt="Zero as a conceptual primitive"
+              side={true}
+            />
+
+            <Prose>
               <p>
                 <strong>On the opposite end:</strong> the number zero. For
                 millennia, zero was used as a placeholder in positional number
                 systems. The Babylonians used it. The Mayans used it. But it was
                 not considered a &quot;number&quot; in its own right.
               </p>
-            </Prose>
-
-            <Figure
-              src="/articles/verifiability/zero-1.png"
-              alt="The history and significance of zero"
-              side={true}
-            />
-
-            <Prose>
               <p>
                 Why? Because numbers represented quantities. You could have
                 three sheep or seven coins. What would it mean to have zero
@@ -196,8 +440,8 @@ export default function VerifiabilityArticle() {
             </Prose>
 
             <Figure
-              src="/articles/verifiability/zero-2.png"
-              alt="Zero as a conceptual primitive"
+              src="/articles/verifiability/zero-3.png"
+              alt="Mathematical implications of zero"
               side={true}
             />
 
@@ -213,8 +457,10 @@ export default function VerifiabilityArticle() {
             </Prose>
 
             <Figure
-              src="/articles/verifiability/zero-3.png"
-              alt="Mathematical implications of zero"
+              src="/articles/verifiability/zero-4.png"
+              alt="Zero expanding the surface area of mathematics"
+              caption="From Welch Labs' Imaginary Numbers Are Real"
+              href="https://www.youtube.com/watch?v=T647CGsuOVU&list=PLiaHhY2iBX9g6KIvZ_703G3KJXapKkNaF&index=1"
               side={true}
             />
 
@@ -231,14 +477,6 @@ export default function VerifiabilityArticle() {
                 language.
               </p>
             </Prose>
-
-            <Figure
-              src="/articles/verifiability/zero-4.png"
-              alt="Zero expanding the surface area of mathematics"
-              caption="From Veritasium's History of Mathematics"
-              href="https://www.youtube.com/watch?v=T647CGsuOVU&list=PLiaHhY2iBX9g6KIvZ_703G3KJXapKkNaF&index=1"
-              side={true}
-            />
 
             <Prose>
               <p>
@@ -261,19 +499,7 @@ export default function VerifiabilityArticle() {
               src="/articles/verifiability/knowledge-hierarchy.png"
               alt="The hierarchy of knowledge: interpolation to zeroth-order discoveries"
               caption="From gap-filling to conceptual expansion"
-              side={true}
-            />
-            <Figure
-              src="/articles/verifiability/knowledge-hierarchy-v2.png"
-              alt="The hierarchy of knowledge v2: inverted pyramid"
-              caption="(v2 - inverted pyramid for comparison)"
-              side={true}
-            />
-            <Figure
-              src="/articles/verifiability/knowledge-hierarchy-v3.png"
-              alt="The hierarchy of knowledge v3: with examples"
-              caption="(v3 - with examples for comparison)"
-              side={true}
+              leftSide={true}
             />
 
             <Aside title="Special Relativity: Interpolation or Extrapolation?">
@@ -434,16 +660,6 @@ export default function VerifiabilityArticle() {
               alt="Model collapse over generations of synthetic data training"
               caption="The distribution narrows with each generation"
             />
-            <Figure
-              src="/articles/verifiability/model-collapse-v2.png"
-              alt="Model collapse v2 - funnel visualization"
-              caption="(v2 for comparison)"
-            />
-            <Figure
-              src="/articles/verifiability/model-collapse-v3.png"
-              alt="Model collapse v3 - clean funnel"
-              caption="(v3 - no title/caption for comparison)"
-            />
 
             <TOCHeading id="ood-approaches" level={3}>
               Approaches to Out-of-Distribution Thinking
@@ -493,19 +709,9 @@ export default function VerifiabilityArticle() {
             />
 
             <Figure
-              src="/articles/verifiability/ood-approaches.png"
-              alt="Approaches to out-of-distribution thinking"
-              caption="Multiple paths to pushing beyond the training manifold"
-            />
-            <Figure
-              src="/articles/verifiability/ood-approaches-v2.png"
-              alt="OOD approaches v2 - 6 branches"
-              caption="(v2 - 6 branches for comparison)"
-            />
-            <Figure
-              src="/articles/verifiability/ood-approaches-v3.png"
-              alt="OOD Thinking with RLHF/RLVR and in-context activation"
-              caption="(v3 - updated labels for comparison)"
+              src="/articles/verifiability/ood-approaches-v4.png"
+              alt="OOD Thinking approaches"
+              caption="Six approaches to out-of-distribution thinking"
             />
 
             <Aside title="Pliny and Adversarial Prompting">
@@ -924,6 +1130,39 @@ export default function VerifiabilityArticle() {
               </p>
             </Prose>
 
+            <TOCHeading id="dim-continuous" level={3}>
+              Continuous Reward
+            </TOCHeading>
+            <Prose>
+              <p>Can you rank multiple solutions against each other?</p>
+              <p>
+                Binary verification gives you pass or fail. Continuous
+                verification gives you a score. The difference is profound for
+                learning systems.
+              </p>
+              <p>
+                With binary feedback, you know solution A works and solution B
+                fails. With continuous feedback, you know solution A scores 0.8,
+                solution B scores 0.6, and solution C scores 0.9. You can rank
+                them. You can compute gradients. You can do reinforcement
+                learning efficiently.
+              </p>
+              <p>
+                Most real-world tasks have continuous quality even if
+                verification is binary. A working website can be fast or slow,
+                beautiful or ugly, accessible or not. A correct proof can be
+                elegant or convoluted. A passing test suite can have 60% or 99%
+                coverage.
+              </p>
+              <p>
+                The challenge is surfacing this continuous signal. Wei notes
+                that even binary benchmarks can yield continuous reward by
+                averaging across many examples. But richer verification that
+                directly measures quality gradients accelerates learning
+                further.
+              </p>
+            </Prose>
+
             {/* Summary Table */}
             <TOCHeading id="dimensions-summary" level={3}>
               Summary: The Dimensions
@@ -944,7 +1183,7 @@ export default function VerifiabilityArticle() {
                 [
                   'Certainty',
                   'How confident is the result?',
-                  'Noisy verification compounds errors',
+                  'Noisy verification compounds errors; Wei calls this "low noise"',
                 ],
                 [
                   'Meta-verifiability',
@@ -981,24 +1220,18 @@ export default function VerifiabilityArticle() {
                   'Do parts compose?',
                   'Systems fail where components do not',
                 ],
+                [
+                  'Continuous Reward',
+                  'Can you rank solutions?',
+                  'Enables gradient signal; binary pass/fail limits learning',
+                ],
               ]}
             />
 
             <Figure
               src="/articles/verifiability/dimensions.png"
               alt="Radar chart showing the 10 dimensions of verifiability"
-              caption="The 10 dimensions of verifiability"
-            />
-            <Figure
-              src="/articles/verifiability/dimensions-v2.png"
-              alt="Non-radar visualization of 10 verifiability dimensions"
-              caption="(v2 - non-radar chart for comparison)"
-              side={true}
-            />
-            <Figure
-              src="/articles/verifiability/dimensions-v3.png"
-              alt="Horizontal strip of 10 verifiability dimensions"
-              caption="(v3 - horizontal for comparison)"
+              caption="The dimensions of verifiability"
             />
           </ArticleSection>
 
@@ -1240,16 +1473,6 @@ export default function VerifiabilityArticle() {
               alt="Five types of AI research claims arranged by verifiability"
               caption="From performance claims (highly verifiable) to safety claims (hard to verify)"
               side={true}
-            />
-            <Figure
-              src="/articles/verifiability/claim-types-v2.png"
-              alt="Six types of AI research claims with gradient"
-              caption="(v2 - 6 claim types for comparison)"
-            />
-            <Figure
-              src="/articles/verifiability/claim-types-v3.png"
-              alt="Flowing gradient of 6 claim types"
-              caption="(v3 - no numbering, minimal text for comparison)"
             />
 
             <TOCHeading id="claims-performance" level={3}>
@@ -1789,16 +2012,6 @@ export default function VerifiabilityArticle() {
               alt="13 research lenses arranged by verifiability"
               caption="Research lenses from most verifiable (top) to least verifiable (bottom)"
             />
-            <Figure
-              src="/articles/verifiability/knowledge-lenses-v2.png"
-              alt="14 research lenses with enhanced detail"
-              caption="(v2 - enhanced context for comparison)"
-            />
-            <Figure
-              src="/articles/verifiability/knowledge-lenses-v3.png"
-              alt="13 research lenses with combined efficiency/hardware"
-              caption="(v3 - no repeats, combined rows for comparison)"
-            />
 
             <ComparisonTable
               fullWidth={true}
@@ -1947,9 +2160,9 @@ export default function VerifiabilityArticle() {
             </Prose>
 
             <Figure
-              src="/articles/verifiability/claim-strength-v1.png"
-              alt="Claim strength levels from existence proof to guarantee"
-              caption="Paradox: stronger claims (guarantees) are harder to verify"
+              src="/articles/verifiability/claim-strength-v4.png"
+              alt="Claim strength levels - guarantee at top (most verifiable)"
+              caption="Guarantee at top: one counterexample falsifies it"
             />
 
             <ComparisonTable
@@ -2546,19 +2759,9 @@ export default function VerifiabilityArticle() {
             />
 
             <Figure
-              src="/articles/verifiability/verifiable-data.png"
-              alt="Types of valuable verification data"
-              caption="The verification data market"
-            />
-            <Figure
-              src="/articles/verifiability/verifiable-data-v2.png"
-              alt="Verification data ecosystem flow diagram"
-              caption="(v2 - ecosystem visualization for comparison)"
-            />
-            <Figure
-              src="/articles/verifiability/verifiable-data-v3.png"
-              alt="Simple verification data flow"
-              caption="(v3 - simplified, no title for comparison)"
+              src="/articles/verifiability/verifiable-data-v4.png"
+              alt="Sankey-style verification data ecosystem"
+              caption="Data sources → verifiers → model capabilities"
             />
 
             <Prose>
