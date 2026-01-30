@@ -232,74 +232,93 @@ export default function StardustArticle() {
                   <AnimationSequence
                     scrollProgress={scrollProgress}
                     animations={[
-                      // Simple recurrence
+                      // Simple recurrence - extend through predictions section
                       {
                         render: (p) => <SimpleRecurrenceAnimation progress={p} />,
                         startElementId: 'sequence-intro',
                         milestones: [
-                          { elementId: 'simplest-rnn', progress: 0.3 },
-                          { elementId: 'weight-sharing', progress: 0.7 },
+                          { elementId: 'simple-recurrence', progress: 0.15 },
+                          { elementId: 'simple-rnn-cell', progress: 0.3 },
+                          { elementId: 'weight-sharing', progress: 0.5 },
+                          { elementId: 'predictions-every-step', progress: 0.7 },
+                          { elementId: 'output-projection', progress: 0.85 },
                         ],
                         overlap: 0.1,
                       },
-                      // Unrolled view
+                      // Unrolled view - extend through section
                       {
                         render: (p) => <UnrolledRNNAnimation progress={p} />,
                         startElementId: 'unrolling',
+                        milestones: [
+                          { elementId: 'unroll-viz', progress: 0.5 },
+                        ],
                         overlap: 0.1,
                       },
-                      // BPTT
+                      // BPTT - fixed IDs, extend coverage
                       {
                         render: (p) => <BPTTAnimation progress={p} />,
                         startElementId: 'bptt',
                         milestones: [
-                          { elementId: 'full-bptt', progress: 0.35 },
-                          { elementId: 'tbptt', progress: 0.7 },
+                          { elementId: 'bptt-impl', progress: 0.4 },
+                          { elementId: 'tbptt', progress: 0.75 },
                         ],
                         overlap: 0.1,
                       },
-                      // Vanishing gradients
+                      // Vanishing gradients - fixed IDs
                       {
                         render: (p) => <VanishingGradientAnimation progress={p} />,
                         startElementId: 'rnn-problems',
                         milestones: [
-                          { elementId: 'vanishing-gradients', progress: 0.4 },
-                          { elementId: 'exploding-gradients', progress: 0.7 },
+                          { elementId: 'vanishing-demo', progress: 0.25 },
+                          { elementId: 'exponential-decay', progress: 0.5 },
+                          { elementId: 'exploding-gradients', progress: 0.75 },
                         ],
                         overlap: 0.1,
                       },
-                      // Context loss demo
+                      // Context loss demo - add milestones, extend to patches section
                       {
                         render: (p) => <ContextLossAnimation progress={p} />,
                         startElementId: 'long-term-context-demo',
+                        milestones: [
+                          { elementId: 'compare-gradient-flow', progress: 0.4 },
+                          { elementId: 'patches-not-solutions', progress: 0.7 },
+                          { elementId: 'dropout-rnn', progress: 0.9 },
+                        ],
                         overlap: 0.1,
                       },
-                      // LSTM build-up
+                      // LSTM build-up - fixed IDs
                       {
                         render: (p) => <LSTMProgressiveAnimation progress={p} />,
                         startElementId: 'building-lstm',
                         milestones: [
-                          { elementId: 'the-cell-state', progress: 0.15 },
+                          { elementId: 'lstm-impl', progress: 0.15 },
                           { elementId: 'forget-gate', progress: 0.3 },
                           { elementId: 'input-gate', progress: 0.45 },
                           { elementId: 'output-gate', progress: 0.6 },
-                          { elementId: 'lstm-complete', progress: 0.8 },
+                          { elementId: 'visualize-gates', progress: 0.8 },
                         ],
                         overlap: 0.1,
                       },
-                      // Activation functions
+                      // Activation functions - extend through optimizations
                       {
                         render: (p) => <ActivationFunctionsAnimation progress={p} />,
                         startElementId: 'activation-functions',
+                        milestones: [
+                          { elementId: 'activation-comparison', progress: 0.25 },
+                          { elementId: 'lstm-optimizations', progress: 0.5 },
+                          { elementId: 'char-lm', progress: 0.75 },
+                          { elementId: 'bidirectional-rnns', progress: 0.9 },
+                        ],
                         overlap: 0.1,
                       },
-                      // Sequential bottleneck - transformer teaser
+                      // Sequential bottleneck - transformer teaser, extend coverage
                       {
                         render: (p) => <SequentialBottleneckAnimation progress={p} />,
                         startElementId: 'problems-remaining',
                         milestones: [
-                          { elementId: 'sequential-processing', progress: 0.3 },
-                          { elementId: 'whats-next', progress: 0.6 },
+                          { elementId: 'sequential-processing', progress: 0.25 },
+                          { elementId: 'fixed-context-window', progress: 0.5 },
+                          { elementId: 'whats-next', progress: 0.75 },
                         ],
                         overlap: 0.1,
                       },

@@ -420,6 +420,22 @@ export function ArchitecturesContent() {
         <TOCHeading id="building-lstm" level={2}>
           Building the LSTM
         </TOCHeading>
+        <Prose>
+          <p>
+            Let&apos;s restate the problem clearly: gradients vanish because we
+            multiply through many timesteps. Each multiplication shrinks the
+            signal. By timestep 100, gradients are essentially zero.
+          </p>
+          <p>
+            What if we could <strong>add</strong> instead of multiply? Addition
+            doesn&apos;t shrink signals. If we can create a pathway where
+            information flows via addition, gradients could survive much longer
+            sequences.
+          </p>
+        </Prose>
+      </ArticleSection>
+
+      <ArticleSection>
         <Aside title="LSTM Paper (1997)">
           <p>
             Hochreiter and Schmidhuber introduced the LSTM in &quot;Long
