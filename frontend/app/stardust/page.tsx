@@ -28,7 +28,6 @@ import { UnrolledRNNAnimation } from '@/components/stardust/UnrolledRNNAnimation
 import { BPTTAnimation } from '@/components/stardust/BPTTAnimation';
 import { VanishingGradientAnimation } from '@/components/stardust/VanishingGradientAnimation';
 import { LSTMProgressiveAnimation } from '@/components/stardust/LSTMProgressiveAnimation';
-import { ActivationFunctionsAnimation } from '@/components/stardust/ActivationFunctionsAnimation';
 import { ContextLossAnimation } from '@/components/stardust/ContextLossAnimation';
 import { StardustToSiliconAnimation } from '@/components/stardust/StardustToSiliconAnimation';
 import { SequentialBottleneckAnimation } from '@/components/stardust/SequentialBottleneckAnimation';
@@ -299,26 +298,16 @@ export default function StardustArticle() {
                         ],
                         overlap: 0.1,
                       },
-                      // Activation functions - extend through optimizations
-                      {
-                        render: (p) => <ActivationFunctionsAnimation progress={p} />,
-                        startElementId: 'activation-functions',
-                        milestones: [
-                          { elementId: 'activation-comparison', progress: 0.25 },
-                          { elementId: 'lstm-optimizations', progress: 0.5 },
-                          { elementId: 'char-lm', progress: 0.75 },
-                          { elementId: 'bidirectional-rnns', progress: 0.9 },
-                        ],
-                        overlap: 0.1,
-                      },
-                      // Sequential bottleneck - transformer teaser, extend coverage
+                      // Sequential bottleneck - starts at activation-functions, extends through transformer teaser
                       {
                         render: (p) => <SequentialBottleneckAnimation progress={p} />,
-                        startElementId: 'problems-remaining',
+                        startElementId: 'activation-functions',
                         milestones: [
-                          { elementId: 'sequential-processing', progress: 0.25 },
-                          { elementId: 'fixed-context-window', progress: 0.5 },
-                          { elementId: 'whats-next', progress: 0.75 },
+                          { elementId: 'lstm-optimizations', progress: 0.2 },
+                          { elementId: 'problems-remaining', progress: 0.4 },
+                          { elementId: 'sequential-processing', progress: 0.55 },
+                          { elementId: 'fixed-context-window', progress: 0.7 },
+                          { elementId: 'whats-next', progress: 0.85 },
                         ],
                         overlap: 0.1,
                       },
