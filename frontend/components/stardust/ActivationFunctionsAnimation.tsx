@@ -10,10 +10,10 @@ interface ActivationFunctionsAnimationProps {
 /**
  * Activation Functions Animation - Why LSTMs use sigmoid for gates and tanh for values
  *
- * Phase 1 (0-0.25): Sigmoid function - outputs [0,1] - "how much to let through"
- * Phase 2 (0.25-0.50): Tanh function - outputs [-1,1] - "positive or negative values"
- * Phase 3 (0.50-0.75): Both together - gates need sigmoid, values need tanh
- * Phase 4 (0.75-1.0): Visual LSTM gates showing where each is used
+ * Phase 1 (0-0.20): Sigmoid function - outputs [0,1] - "how much to let through"
+ * Phase 2 (0.20-0.40): Tanh function - outputs [-1,1] - "positive or negative values"
+ * Phase 3 (0.40-0.55): Both together - gates need sigmoid, values need tanh
+ * Phase 4 (0.55-1.0): Visual LSTM gates showing where each is used
  */
 export function ActivationFunctionsAnimation({
   progress,
@@ -47,25 +47,25 @@ export function ActivationFunctionsAnimation({
 
     // Phase 1: Sigmoid - for gates
     if (phase === 1) {
-      const phaseProgress = progress / 0.25;
+      const phaseProgress = progress / 0.20;
       drawSigmoidPhase(ctx, width, height, phaseProgress);
     }
 
     // Phase 2: Tanh - for values
     if (phase === 2) {
-      const phaseProgress = (progress - 0.25) / 0.25;
+      const phaseProgress = (progress - 0.20) / 0.20;
       drawTanhPhase(ctx, width, height, phaseProgress);
     }
 
     // Phase 3: Comparison - why different
     if (phase === 3) {
-      const phaseProgress = (progress - 0.50) / 0.25;
+      const phaseProgress = (progress - 0.40) / 0.15;
       drawComparisonPhase(ctx, width, height, phaseProgress);
     }
 
-    // Phase 4: LSTM usage
+    // Phase 4: LSTM usage (longer phase - 45% of progress)
     if (phase === 4) {
-      const phaseProgress = (progress - 0.75) / 0.25;
+      const phaseProgress = (progress - 0.55) / 0.45;
       drawLSTMUsagePhase(ctx, width, height, phaseProgress);
     }
 
@@ -81,9 +81,9 @@ export function ActivationFunctionsAnimation({
 }
 
 function getPhase(progress: number): number {
-  if (progress < 0.25) return 1;
-  if (progress < 0.50) return 2;
-  if (progress < 0.75) return 3;
+  if (progress < 0.20) return 1;
+  if (progress < 0.40) return 2;
+  if (progress < 0.55) return 3;
   return 4;
 }
 
