@@ -10,10 +10,9 @@ interface ActivationFunctionsAnimationProps {
 /**
  * Activation Functions Animation - Why LSTMs use sigmoid for gates and tanh for values
  *
- * Phase 1 (0-0.20): Sigmoid function - outputs [0,1] - "how much to let through"
- * Phase 2 (0.20-0.40): Tanh function - outputs [-1,1] - "positive or negative values"
- * Phase 3 (0.40-0.55): Both together - gates need sigmoid, values need tanh
- * Phase 4 (0.55-1.0): Visual LSTM gates showing where each is used
+ * Phase 1 (0-0.33): Sigmoid function - outputs [0,1] - "how much to let through"
+ * Phase 2 (0.33-0.66): Tanh function - outputs [-1,1] - "positive or negative values"
+ * Phase 3 (0.66-1.0): Both together - gates need sigmoid, values need tanh
  */
 export function ActivationFunctionsAnimation({
   progress,
@@ -41,32 +40,25 @@ export function ActivationFunctionsAnimation({
       'Sigmoid: The Gate Function',
       'Tanh: The Value Function',
       'Why Different Functions?',
-      'LSTM Uses Both Strategically',
     ];
     ctx.fillText(titles[phase] || 'Activation Functions', width * 0.5, titleY);
 
     // Phase 1: Sigmoid - for gates
     if (phase === 1) {
-      const phaseProgress = progress / 0.20;
+      const phaseProgress = progress / 0.33;
       drawSigmoidPhase(ctx, width, height, phaseProgress);
     }
 
     // Phase 2: Tanh - for values
     if (phase === 2) {
-      const phaseProgress = (progress - 0.20) / 0.20;
+      const phaseProgress = (progress - 0.33) / 0.33;
       drawTanhPhase(ctx, width, height, phaseProgress);
     }
 
     // Phase 3: Comparison - why different
     if (phase === 3) {
-      const phaseProgress = (progress - 0.40) / 0.15;
+      const phaseProgress = (progress - 0.66) / 0.34;
       drawComparisonPhase(ctx, width, height, phaseProgress);
-    }
-
-    // Phase 4: LSTM usage (longer phase - 45% of progress)
-    if (phase === 4) {
-      const phaseProgress = (progress - 0.55) / 0.45;
-      drawLSTMUsagePhase(ctx, width, height, phaseProgress);
     }
 
     // Draw phase label
@@ -81,10 +73,9 @@ export function ActivationFunctionsAnimation({
 }
 
 function getPhase(progress: number): number {
-  if (progress < 0.20) return 1;
-  if (progress < 0.40) return 2;
-  if (progress < 0.55) return 3;
-  return 4;
+  if (progress < 0.33) return 1;
+  if (progress < 0.66) return 2;
+  return 3;
 }
 
 function drawSigmoidPhase(
@@ -242,85 +233,6 @@ function drawComparisonPhase(
     ctx.fillStyle = `rgba(0, 0, 0, ${formulaAlpha * 0.85})`;
     ctx.textAlign = 'center';
     ctx.fillText('gate(σ) × value(tanh) = controlled update', width * 0.5, height * 0.82);
-  }
-}
-
-function drawLSTMUsagePhase(
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  progress: number
-) {
-  const cellY = height * 0.42;
-  const cellWidth = 280;
-  const cellHeight = 80;
-  const left = (width - cellWidth) / 2;
-
-  const alpha = Math.min(1, progress * 2);
-
-  // Cell outline
-  ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.3})`;
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
-  ctx.beginPath();
-  ctx.roundRect(left - 20, cellY - cellHeight / 2 - 20, cellWidth + 40, cellHeight + 60, 8);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Cell state line at top
-  const cellStateY = cellY - cellHeight / 2 + 10;
-  ctx.strokeStyle = `rgba(100, 100, 180, ${alpha * 0.6})`;
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(left - 10, cellStateY);
-  ctx.lineTo(left + cellWidth + 10, cellStateY);
-  ctx.stroke();
-
-  ctx.font = '9px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(100, 100, 180, ${alpha * 0.7})`;
-  ctx.textAlign = 'center';
-  ctx.fillText('Cell State', width * 0.5, cellStateY - 15);
-
-  // Gates with labels
-  const gateY = cellY + 10;
-  const gates = [
-    { x: left + 45, label: 'Forget', type: 'sigmoid' as const },
-    { x: left + 120, label: 'Input', type: 'sigmoid' as const },
-    { x: left + 175, label: 'Candidate', type: 'tanh' as const },
-    { x: left + 235, label: 'Output', type: 'sigmoid' as const },
-  ];
-
-  gates.forEach((gate, i) => {
-    const gateProgress = Math.max(0, Math.min(1, (progress - 0.15 - i * 0.15) * 3));
-    if (gateProgress > 0) {
-      drawGateBox(ctx, gate.x, gateY, gate.label, gate.type, gateProgress);
-    }
-  });
-
-  // Summary at bottom
-  if (progress > 0.5) {
-    const summaryAlpha = (progress - 0.5) * 2;
-    const summaryY = height * 0.75;
-
-    ctx.font = '11px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-
-    // Sigmoid count
-    ctx.fillStyle = `rgba(100, 100, 180, ${summaryAlpha * 0.9})`;
-    ctx.fillText('3 sigmoids = 3 gates (forget, input, output)', width * 0.5, summaryY);
-
-    // Tanh count
-    ctx.fillStyle = `rgba(180, 100, 60, ${summaryAlpha * 0.9})`;
-    ctx.fillText('1 tanh = candidate values for cell state', width * 0.5, summaryY + 20);
-  }
-
-  // Key insight
-  if (progress > 0.75) {
-    const insightAlpha = (progress - 0.75) * 4;
-    ctx.font = '10px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = `rgba(0, 0, 0, ${insightAlpha * 0.6})`;
-    ctx.textAlign = 'center';
-    ctx.fillText('Gates control flow (0-100%), values provide magnitude (-1 to +1)', width * 0.5, height * 0.85);
   }
 }
 
@@ -569,41 +481,6 @@ function drawValueMetaphor(
   ctx.fillText('increase', x + scaleWidth / 2, y + 30);
 }
 
-function drawGateBox(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  label: string,
-  type: 'sigmoid' | 'tanh',
-  alpha: number
-) {
-  const size = 32;
-  const isSigmoid = type === 'sigmoid';
-  const color = isSigmoid ? '100, 100, 180' : '180, 100, 60';
-
-  // Box
-  ctx.strokeStyle = `rgba(${color}, ${alpha * 0.8})`;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.roundRect(x - size / 2, y - size / 2, size, size, 4);
-  ctx.stroke();
-
-  ctx.fillStyle = `rgba(${color}, ${alpha * 0.1})`;
-  ctx.fill();
-
-  // Symbol
-  ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = `rgba(${color}, ${alpha * 0.9})`;
-  ctx.fillText(isSigmoid ? 'σ' : 'tanh', x, y);
-
-  // Label below
-  ctx.font = '8px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
-  ctx.fillText(label, x, y + size / 2 + 10);
-}
-
 function drawPhaseLabel(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -615,7 +492,6 @@ function drawPhaseLabel(
     'Sigmoid: [0,1] range for controlling flow',
     'Tanh: [-1,1] range for positive/negative values',
     'Gates need sigmoid, values need tanh',
-    'LSTM: 3 sigmoid gates + 1 tanh value generator',
   ];
 
   const labelText = labels[phase] || '';
@@ -642,7 +518,6 @@ function drawPhaseLabel(
     '',
     'rgba(100, 100, 180, 0.9)',
     'rgba(180, 100, 60, 0.9)',
-    'rgba(0, 0, 0, 0.7)',
     'rgba(0, 0, 0, 0.7)',
   ];
   ctx.fillStyle = colors[phase] || 'rgba(0, 0, 0, 0.7)';
