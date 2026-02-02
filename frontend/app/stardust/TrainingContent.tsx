@@ -1451,34 +1451,24 @@ export function TrainingContent() {
             descent, running on sand we&apos;ve tricked into doing math.
           </p>
           <p>
-            The result is systems that can classify sentiment, recognize images,
-            and generate text. They&apos;re not intelligent in the way we are.
-            But they&apos;re getting better at predicting the world, which, by
-            our working definition, means they&apos;re getting better at
-            thinking.
+            This is the entire basis of deep learning. From here, it&apos;s
+            about scaling: more parameters, more data, more compute. And the
+            architectural innovations that make scaling possible: training
+            stability, representational capacity, gradient flow, parallelization,
+            and sample efficiency.
+          </p>
+          <p>
+            Our simple feedforward network is just that: simple. In the next
+            section, we&apos;ll explore the architectures that transformed AI:
+            recurrent networks, LSTMs, and the attention mechanism that powers
+            today&apos;s language models.
           </p>
         </Prose>
       </ArticleSection>
 
-      <ArticleSection>
-        <InsightBox title="What's Next">
-          <p>
-            We&apos;ve covered the foundations: how neural networks learn, how
-            we encode language, and the mechanics of training. But our simple
-            network is just that, simple.
-          </p>
-          <p className="mt-2">
-            In the next section, we&apos;ll explore the architectures that
-            transformed AI: recurrent networks, the vanishing gradient problem,
-            LSTMs, and finally the attention mechanism that powers today&apos;s
-            language models.
-          </p>
-        </InsightBox>
-      </ArticleSection>
-
       {/* Tab switch button */}
       <div className="mt-10 flex justify-center">
-        <TabSwitchButton targetTab="foundations" label="Back to Foundations" />
+        <TabSwitchButton targetTab="architectures" label="Continue to Architectures" />
       </div>
     </>
   );
