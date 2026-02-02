@@ -2,6 +2,7 @@
 
 import { ReactNode, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FiMaximize2 } from 'react-icons/fi';
 
 /**
  * Prose container for article text content.
@@ -426,13 +427,13 @@ function Lightbox({ src, alt, caption, href, isOpen, onClose }: LightboxProps) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="relative max-w-5xl max-h-[90vh] flex flex-col items-center"
+            className="relative flex flex-col items-center justify-center w-[90vw] h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
             <img
               src={src}
               alt={alt}
-              className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              className="w-full h-full object-contain rounded-lg"
             />
             {caption && (
               <figcaption className="mt-3 text-sm text-white/70 text-center">
@@ -460,7 +461,7 @@ function Lightbox({ src, alt, caption, href, isOpen, onClose }: LightboxProps) {
 /**
  * Figure with image and caption.
  * Caption can include a link (e.g., to source).
- * Side images are clickable and open in a lightbox modal.
+ * All images are clickable and open in a lightbox modal.
  *
  * @example
  * <Figure
@@ -478,7 +479,6 @@ interface FigureProps {
   /**
    * On desktop (xl+): render in the right margin (like `Aside`).
    * On mobile (<xl): render inline (default behavior).
-   * Side images are clickable and open in a lightbox modal.
    *
    * Must be used within an `ArticleSection` (position: relative) for correct positioning.
    */
@@ -503,47 +503,22 @@ export function Figure({
 }: FigureProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  const content = (
-    <>
-      <img
-        src={src}
-        alt={alt}
-        className="rounded-lg border border-neutral-200 w-full"
-      />
-      {caption && (
-        <figcaption className="mt-2 text-sm text-neutral-500 text-center">
-          {href ? (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-neutral-700 underline"
-            >
-              {caption}
-            </a>
-          ) : (
-            caption
-          )}
-        </figcaption>
-      )}
-    </>
-  );
-
-  if (!side && !leftSide) {
-    return <figure className={`mt-4 mb-2 ${className}`}>{content}</figure>;
-  }
-
   const clickableImage = (
     <button
       onClick={() => setLightboxOpen(true)}
       className="block w-full text-left cursor-zoom-in group"
       aria-label={`View ${alt} in full size`}
     >
-      <img
-        src={src}
-        alt={alt}
-        className="rounded-lg border border-neutral-200 w-full transition-all group-hover:border-neutral-400 group-hover:shadow-md"
-      />
+      <div className="relative">
+        <img
+          src={src}
+          alt={alt}
+          className="rounded-lg border border-neutral-200 w-full transition-all group-hover:border-neutral-400 group-hover:shadow-md"
+        />
+        <div className="absolute top-2 right-2 p-1.5 rounded bg-white/60 text-neutral-400 opacity-40 group-hover:opacity-70 transition-opacity">
+          <FiMaximize2 size={14} />
+        </div>
+      </div>
       {caption && (
         <figcaption className="mt-2 text-sm text-neutral-500 text-center">
           {href ? (
@@ -563,6 +538,23 @@ export function Figure({
       )}
     </button>
   );
+
+  // Inline figure (not positioned in margins)
+  if (!side && !leftSide) {
+    return (
+      <>
+        <figure className={`mt-4 mb-2 ${className}`}>{clickableImage}</figure>
+        <Lightbox
+          src={src}
+          alt={alt}
+          caption={caption}
+          href={href}
+          isOpen={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+        />
+      </>
+    );
+  }
 
   // Left side positioning
   if (leftSide) {
