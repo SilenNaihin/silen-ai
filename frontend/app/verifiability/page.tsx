@@ -532,6 +532,32 @@ export default function VerifiabilityArticle() {
               </p>
             </Aside>
 
+            <Aside title="Counterpoint: The Abductive Jump">
+              <p>
+                <a
+                  href="https://philsci-archive.pitt.edu/28024/1/Scientific_Invention_Position_Paper%20%2817%29.pdf"
+                  className="underline"
+                >
+                  Zahavy (2025)
+                </a>{' '}
+                argues there are three modes of inference: <strong>Deduction</strong>{' '}
+                (Rule + Case → Result), <strong>Induction</strong> (Case + Result → Rule),
+                and <strong>Abduction</strong> (Rule + Result → Case). LLMs have mastered
+                induction (pattern matching) and are conquering deduction (formal proof),
+                but lack the mechanism for abduction: generating novel explanatory hypotheses.
+              </p>
+              <p className="mt-2">
+                For General Relativity, there was no error signal to compress. Newtonian
+                gravity was accurate to 10⁻⁹. The one anomaly (Mercury&apos;s perihelion)
+                was attributed to an undiscovered planet, not flawed theory. Einstein&apos;s
+                &quot;happiest thought&quot; came from embodied simulation: imagining the
+                physical sensation of a falling observer, then abducting that acceleration
+                and gravity must be identical. This &quot;manipulative abduction&quot;
+                requires grounding symbols in physical experience, not just compressing
+                data.
+              </p>
+            </Aside>
+
             <TOCHeading id="leap-factor" level={3}>
               The Leap Factor
             </TOCHeading>
@@ -816,8 +842,7 @@ export default function VerifiabilityArticle() {
             </TOCHeading>
             <Prose>
               <p>
-                How long does it take from making a claim to knowing if it is
-                true?
+                <strong>How fast is the feedback loop?</strong> (Time from claim to verdict. Milliseconds for code, years for clinical trials.)
               </p>
               <p>
                 Speed is the most important dimension for AI training and
@@ -864,7 +889,9 @@ export default function VerifiabilityArticle() {
               Cost of Verification
             </TOCHeading>
             <Prose>
-              <p>Who can afford to verify this claim?</p>
+              <p>
+                <strong>Who can afford to verify?</strong> (Dollar cost per verification cycle. Free for unit tests, billions for particle physics.)
+              </p>
               <p>
                 Running a unit test costs nothing. Running a wet lab experiment
                 costs thousands. Running a clinical trial costs millions.
@@ -896,7 +923,7 @@ export default function VerifiabilityArticle() {
             </TOCHeading>
             <Prose>
               <p>
-                When you verify something, how confident are you in the result?
+                <strong>How noisy is the signal?</strong> (Confidence in the verdict itself. Deterministic for code, probabilistic for wet labs.)
               </p>
               <p>
                 Code execution is deterministic. The test either passes or
@@ -928,7 +955,9 @@ export default function VerifiabilityArticle() {
               Meta-Verifiability
             </TOCHeading>
             <Prose>
-              <p>How do you know your verifier is correct?</p>
+              <p>
+                <strong>Can you trust the verifier itself?</strong> (Whether the benchmark/test/oracle actually measures what you think it measures.)
+              </p>
               <p>
                 This is the turtles-all-the-way-down problem. You use a test
                 suite to verify code. But who verifies the test suite? You use a
@@ -964,7 +993,9 @@ export default function VerifiabilityArticle() {
               Reproducibility of Verification
             </TOCHeading>
             <Prose>
-              <p>If you verify something twice, do you get the same answer?</p>
+              <p>
+                <strong>Will it verify the same way twice?</strong> (Whether independent runs yield identical verdicts. Distinct from certainty, which is confidence in a single run.)
+              </p>
               <p>
                 This is different from certainty. A verification can be highly
                 certain in the moment but irreproducible. A wet lab result can
@@ -993,17 +1024,20 @@ export default function VerifiabilityArticle() {
               </p>
             </Prose>
 
-            <TOCHeading id="dim-granularity" level={3}>
-              Granularity of Verification
+            <TOCHeading id="dim-signal-richness" level={3}>
+              Signal Richness
             </TOCHeading>
             <Prose>
-              <p>Can you verify intermediate steps or only final outcomes?</p>
               <p>
-                Process Reward Models verify reasoning step-by-step. Outcome
-                Reward Models only verify the final answer. PRMs catch errors
-                earlier. They provide more signal per verification. But they are
-                harder to build because you need ground truth for intermediate
-                steps.
+                <strong>How much information per verification?</strong> (Granularity: steps vs final outcome. Continuity: binary pass/fail vs continuous scores.)
+              </p>
+              <p>
+                <strong>Granularity:</strong> Can you verify intermediate steps
+                or only final outcomes? Process Reward Models verify reasoning
+                step-by-step. Outcome Reward Models only verify the final
+                answer. PRMs catch errors earlier and provide more signal per
+                verification. But they are harder to build because you need
+                ground truth for intermediate steps.
               </p>
               <p>
                 In math, you can verify each step of a proof. If the conclusion
@@ -1012,11 +1046,26 @@ export default function VerifiabilityArticle() {
                 ground truth for intermediate steps of writing a novel.
               </p>
               <p>
-                Granularity affects credit assignment. When something fails,
-                coarse verification tells you it failed but not why. Fine
-                verification localizes the failure. This matters enormously for
-                learning. Sparse reward is hard to learn from. Dense reward is
-                easier.
+                <strong>Continuity:</strong> Is feedback binary (pass/fail) or
+                continuous (scored)? Binary verification tells you solution A
+                works and solution B fails. Continuous verification tells you A
+                scores 0.8, B scores 0.6, C scores 0.9. You can rank them. You
+                can compute gradients. You can do reinforcement learning
+                efficiently.
+              </p>
+              <p>
+                Most real-world tasks have continuous quality even if
+                verification is binary. A working website can be fast or slow,
+                beautiful or ugly. A correct proof can be elegant or convoluted.
+                A passing test suite can have 60% or 99% coverage. The challenge
+                is surfacing this continuous signal. Wei notes that even binary
+                benchmarks yield continuous reward by averaging across examples.
+              </p>
+              <p>
+                Rich signal (fine-grained + continuous) enables better credit
+                assignment. When something fails, you know where and by how
+                much. Sparse, binary signal is hard to learn from. Dense,
+                continuous signal accelerates learning.
               </p>
             </Prose>
 
@@ -1024,7 +1073,9 @@ export default function VerifiabilityArticle() {
               Complexity of Verification
             </TOCHeading>
             <Prose>
-              <p>How much infrastructure and expertise does verification require?</p>
+              <p>
+                <strong>Can you RUN the verification?</strong> (Infrastructure and expertise needed to execute it. Distinct from interpretability, which is understanding the result.)
+              </p>
               <p>
                 Running a Python script requires Python. Verifying a Lean proof
                 requires Lean. These are simple. Installing them takes minutes.
@@ -1053,7 +1104,7 @@ export default function VerifiabilityArticle() {
             </TOCHeading>
             <Prose>
               <p>
-                When verification succeeds or fails, do you understand why?
+                <strong>Can you UNDERSTAND the result?</strong> (Why did it pass or fail. Distinct from complexity, which is whether you can run it at all.)
               </p>
               <p>
                 A test passes. Good. But why did it pass? Did it pass because
@@ -1076,163 +1127,73 @@ export default function VerifiabilityArticle() {
               </p>
             </Prose>
 
-            <TOCHeading id="dim-falsifiability" level={3}>
-              Falsifiability of the Claim
-            </TOCHeading>
-            <Prose>
-              <p>Is there any outcome that would disprove the claim?</p>
-              <p>
-                This is not about the verification itself but about whether the
-                claim is even verifiable in principle. &quot;This model is
-                aligned&quot; is hard to falsify because alignment is not
-                precisely defined. &quot;This model refuses to generate harmful
-                content&quot; is falsifiable. Find one example where it does
-                not refuse.
-              </p>
-              <p>
-                Unfalsifiable claims are unverifiable by definition. They can
-                always be defended against contrary evidence. &quot;The model
-                understood the task, it just chose not to demonstrate
-                understanding.&quot; This is not science. It is unfalsifiable
-                speculation.
-              </p>
-              <p>
-                Good research practice requires falsifiable hypotheses. Before
-                running an experiment, you should know what result would
-                disprove your hypothesis. If no result would disprove it, you
-                are not doing science.
-              </p>
-            </Prose>
-
-            <TOCHeading id="dim-composability" level={3}>
-              Composability of Verification
-            </TOCHeading>
-            <Prose>
-              <p>Do verified components compose to verified systems?</p>
-              <p>
-                You verify module A works. You verify module B works. Does A + B
-                work? Not necessarily. Integration introduces new failure modes.
-                Interfaces can mismatch. Timing can diverge. Assumptions can
-                conflict.
-              </p>
-              <p>
-                Formal verification aims for composability. If A is proven
-                correct and B is proven correct and they satisfy certain
-                interface contracts, then A + B is proven correct. This is
-                powerful but rare outside formal methods.
-              </p>
-              <p>
-                In ML, composition is especially unreliable. A model trained on
-                distribution X works. A model trained on distribution Y works.
-                But the combined system operating on X + Y may fail in ways
-                neither component fails alone. Distribution shift, compounding
-                errors, and emergent behaviors break composition.
-              </p>
-            </Prose>
-
-            <TOCHeading id="dim-continuous" level={3}>
-              Continuous Reward
-            </TOCHeading>
-            <Prose>
-              <p>Can you rank multiple solutions against each other?</p>
-              <p>
-                Binary verification gives you pass or fail. Continuous
-                verification gives you a score. The difference is profound for
-                learning systems.
-              </p>
-              <p>
-                With binary feedback, you know solution A works and solution B
-                fails. With continuous feedback, you know solution A scores 0.8,
-                solution B scores 0.6, and solution C scores 0.9. You can rank
-                them. You can compute gradients. You can do reinforcement
-                learning efficiently.
-              </p>
-              <p>
-                Most real-world tasks have continuous quality even if
-                verification is binary. A working website can be fast or slow,
-                beautiful or ugly, accessible or not. A correct proof can be
-                elegant or convoluted. A passing test suite can have 60% or 99%
-                coverage.
-              </p>
-              <p>
-                The challenge is surfacing this continuous signal. Wei notes
-                that even binary benchmarks can yield continuous reward by
-                averaging across many examples. But richer verification that
-                directly measures quality gradients accelerates learning
-                further.
-              </p>
-            </Prose>
-
             {/* Summary Table */}
             <TOCHeading id="dimensions-summary" level={3}>
               Summary: The Dimensions
             </TOCHeading>
             <ComparisonTable
-              headers={['Dimension', 'Question', 'Why It Matters']}
+              headers={['Dimension', 'Core Question', 'Distinct From']}
               rows={[
                 [
                   'Speed',
-                  'How long until you know?',
-                  'Gates iteration rate; critical for RL and agents',
+                  'How fast is the feedback loop?',
+                  'Cost (time vs dollars)',
                 ],
                 [
                   'Cost',
-                  'How much does it cost?',
-                  'Determines who can participate; limits cycles',
+                  'Who can afford to run it?',
+                  'Speed (dollars vs time)',
                 ],
                 [
                   'Certainty',
-                  'How confident is the result?',
-                  'Noisy verification compounds errors; Wei calls this "low noise"',
-                ],
-                [
-                  'Meta-verifiability',
-                  'Is the verifier correct?',
-                  'Benchmarks can be gamed; proxies can mislead',
+                  'How noisy is one run?',
+                  'Reproducibility (single-run confidence vs cross-run consistency)',
                 ],
                 [
                   'Reproducibility',
                   'Same result twice?',
-                  'Science requires independent replication',
+                  'Certainty (cross-run consistency vs single-run confidence)',
                 ],
                 [
-                  'Granularity',
-                  'Steps or just outcome?',
-                  'Finer signal enables better credit assignment',
+                  'Meta-verifiability',
+                  'Can you trust the verifier?',
+                  'Certainty (verifier validity vs signal noise)',
+                ],
+                [
+                  'Signal Richness',
+                  'How much info per verification?',
+                  'Interpretability (quantity of signal vs understanding of signal)',
                 ],
                 [
                   'Complexity',
-                  'What infrastructure is needed?',
-                  'Barriers to entry; harder to catch errors',
+                  'Can you RUN it?',
+                  'Interpretability (executing vs understanding)',
                 ],
                 [
                   'Interpretability',
-                  'Do you understand why?',
-                  'Binary signals hide important information',
-                ],
-                [
-                  'Falsifiability',
-                  'Can it be disproven?',
-                  'Unfalsifiable claims are unverifiable',
-                ],
-                [
-                  'Composability',
-                  'Do parts compose?',
-                  'Systems fail where components do not',
-                ],
-                [
-                  'Continuous Reward',
-                  'Can you rank solutions?',
-                  'Enables gradient signal; binary pass/fail limits learning',
+                  'Can you UNDERSTAND the result?',
+                  'Complexity (understanding vs executing)',
                 ],
               ]}
             />
 
             <Figure
               src="/articles/verifiability/dimensions.png"
-              alt="Radar chart showing the 10 dimensions of verifiability"
+              alt="Radar chart showing the 8 dimensions of verifiability"
               caption="The dimensions of verifiability"
             />
+
+            <Aside title="Caveat: Falsifiability">
+              <p>
+                These dimensions only apply to falsifiable claims. &quot;This model is aligned&quot; is hard to falsify because alignment is not precisely defined. &quot;This model refuses harmful content&quot; is falsifiable: find one counterexample. Before measuring verification speed or cost, ensure the claim can be disproven at all.
+              </p>
+            </Aside>
+
+            <Aside title="Caveat: Composability">
+              <p>
+                Verified parts do not guarantee verified wholes. Module A works, module B works, but A+B may fail due to interface mismatches or distribution shift. In ML this is especially common: models trained on X and Y may fail on X+Y in ways neither fails alone. Local verification does not imply global verification.
+              </p>
+            </Aside>
           </ArticleSection>
 
           {/* Section 3: The Verifiability Spectrum */}
@@ -1448,23 +1409,101 @@ export default function VerifiabilityArticle() {
             </InsightBox>
           </ArticleSection>
 
-          {/* Section 4: Parts of AI Research */}
-          <TOCHeading id="ai-research-claims" level={2}>
-            Verifiability of AI Research Claims
+          {/* Section: Claim Strength */}
+          <TOCHeading id="claim-strength" level={2}>
+            Claim Strength and Verifiability
           </TOCHeading>
           <ArticleSection>
             <Prose>
               <p>
-                AI research involves many types of claims. Each has different
-                verifiability characteristics. Understanding this helps you
-                choose what to work on and how to structure experiments.
+                Before examining specific types of AI research claims, we need
+                to understand claim strength. The strength of a claim determines
+                how much evidence you need and how easy it is to falsify.
+              </p>
+            </Prose>
+
+            <ComparisonTable
+              headers={[
+                'Claim Type',
+                'What It Says',
+                'Evidence Required',
+                'To Falsify',
+              ]}
+              rows={[
+                [
+                  'Guarantee',
+                  '"X is mathematically certain"',
+                  'Formal proof',
+                  'One counterexample',
+                ],
+                [
+                  'Universal Claim',
+                  '"X is always true"',
+                  'Exhaustive proof or very strong evidence',
+                  'One counterexample',
+                ],
+                [
+                  'Systematic Claim',
+                  '"X generally happens across contexts"',
+                  'Many diverse examples',
+                  'Systematic counter-evidence',
+                ],
+                [
+                  'Hedged Claim',
+                  '"There is suggestive evidence for X"',
+                  'Multiple weak signals',
+                  'Stronger counter-evidence',
+                ],
+                [
+                  'Narrow Claim',
+                  '"X works in specific conditions Y"',
+                  'Controlled experiments',
+                  'Failure in those conditions',
+                ],
+                [
+                  'Existence Proof',
+                  '"At least one case of X exists"',
+                  'One clear example',
+                  'Prove the example is invalid',
+                ],
+              ]}
+            />
+
+            <Prose>
+              <p>
+                The key insight: stronger claims are easier to falsify but
+                harder to prove. A guarantee requires formal proof but can be
+                disproven by one counterexample. An existence proof only
+                requires one example but is nearly impossible to falsify.
               </p>
               <p>
-                A paper might contain multiple claims with different
-                verifiability levels. &quot;Our method achieves state of the art
-                on benchmark X&quot; is highly verifiable. &quot;Our method
-                represents a step toward AGI&quot; is not verifiable at all.
-                Strong papers have strongly verifiable core claims.
+                Most ML papers make systematic claims with hedged language. This
+                is appropriate given inherent uncertainty. The trap is making
+                universal claims with existence-proof evidence. &quot;We found
+                one example where X happens&quot; does not support &quot;X
+                always happens.&quot;
+              </p>
+            </Prose>
+            <Figure
+              src="/articles/verifiability/claim-strength-v4.png"
+              alt="Claim strength levels from guarantee (most verifiable) to existence proof"
+              caption="Stronger claims are easier to falsify: one counterexample disproves a guarantee"
+            />
+          </ArticleSection>
+
+          {/* Section: Types of AI Research Claims */}
+          <TOCHeading id="ai-research-claims" level={2}>
+            Types of AI Research Claims
+          </TOCHeading>
+          <ArticleSection>
+            <Prose>
+              <p>
+                AI research involves many types of claims, each with different
+                verifiability characteristics. A paper might contain multiple
+                claims at different levels. &quot;Our method achieves state of
+                the art on benchmark X&quot; is highly verifiable. &quot;Our
+                method represents a step toward AGI&quot; is not verifiable at
+                all. Strong papers have strongly verifiable core claims.
               </p>
             </Prose>
 
@@ -2147,92 +2186,6 @@ export default function VerifiabilityArticle() {
                 lenses. But be prepared for slower, more contested progress.
               </p>
             </InsightBox>
-
-            <TOCHeading id="claim-strength" level={3}>
-              Claim Strength and Verifiability
-            </TOCHeading>
-            <Prose>
-              <p>
-                Not all claims are created equal. The strength of a claim
-                determines how much evidence you need and how verifiable that
-                evidence must be.
-              </p>
-            </Prose>
-
-            <Figure
-              src="/articles/verifiability/claim-strength-v4.png"
-              alt="Claim strength levels - guarantee at top (most verifiable)"
-              caption="Guarantee at top: one counterexample falsifies it"
-            />
-
-            <ComparisonTable
-              headers={[
-                'Claim Type',
-                'What It Says',
-                'Evidence Required',
-                'Verifiability',
-                'Example',
-              ]}
-              rows={[
-                [
-                  'Existence Proof',
-                  '"At least one case of X exists"',
-                  'One clear example',
-                  'High',
-                  '"We found a neuron that detects Golden Gate Bridge"',
-                ],
-                [
-                  'Narrow Claim',
-                  '"X works in specific conditions Y"',
-                  'Controlled experiments',
-                  'High',
-                  '"LoRA works for language models under 10B parameters"',
-                ],
-                [
-                  'Hedged Claim',
-                  '"There is suggestive evidence for X"',
-                  'Multiple weak signals',
-                  'Medium',
-                  '"Results suggest attention may be interpretable"',
-                ],
-                [
-                  'Systematic Claim',
-                  '"X generally happens across contexts"',
-                  'Many diverse examples',
-                  'Medium',
-                  '"Induction heads appear in all transformer models"',
-                ],
-                [
-                  'Universal Claim',
-                  '"X is always true"',
-                  'Exhaustive proof or very strong evidence',
-                  'Low',
-                  '"All neural networks learn hierarchical features"',
-                ],
-                [
-                  'Guarantee',
-                  '"X is mathematically certain"',
-                  'Formal proof',
-                  'Very High (if proven)',
-                  '"This algorithm converges in O(n) steps" (rare in DL)',
-                ],
-              ]}
-            />
-
-            <Prose>
-              <p>
-                Existence proofs and narrow claims are easiest to verify.
-                Universal claims are hardest. Most ML papers make systematic
-                claims with hedged language. This is appropriate given the
-                inherent uncertainty.
-              </p>
-              <p>
-                The trap is making universal claims with existence-proof
-                evidence. &quot;We found one example where X happens&quot; does
-                not support &quot;X always happens.&quot; Watch for this in your
-                own work and in papers you read.
-              </p>
-            </Prose>
 
             <TOCHeading id="canonical-examples" level={3}>
               Case Studies: Verifiability in Practice
