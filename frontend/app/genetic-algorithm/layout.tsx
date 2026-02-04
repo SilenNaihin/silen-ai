@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'I spent 2 weeks playing god. Here are my learnings after evolving 597 genetic algorithm lineages with the help of Claude Code',
+  title: 'I spent 2 weeks playing god using genetic algorithms. Here are my learnings.',
   description:
     'A 2-week journey building an evolution simulator with NEAT, PyTorch, and Claude Code. Bugs, breakthroughs, and counterintuitive findings.',
   openGraph: {
-    title: 'I spent 2 weeks playing god. Here are my learnings after evolving 597 genetic algorithm lineages with the help of Claude Code',
+    title: 'I spent 2 weeks playing god using genetic algorithms. Here are my learnings.',
     description:
       'A 2-week journey building an evolution simulator with NEAT, PyTorch, and Claude Code.',
     type: 'article',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'I spent 2 weeks playing god. Here are my learnings after evolving 597 genetic algorithm lineages with the help of Claude Code',
+    title: 'I spent 2 weeks playing god using genetic algorithms. Here are my learnings.',
     description:
       'A 2-week journey building an evolution simulator with NEAT, PyTorch, and Claude Code.',
     images: ['/articles/genetic-algorithm/cover.png'],
