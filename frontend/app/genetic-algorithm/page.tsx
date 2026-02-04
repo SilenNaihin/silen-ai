@@ -117,11 +117,11 @@ export default function GeneticAlgorithmArticle() {
             </TOCHeading>
 
             <Prose>
-            <p>Evolution is the simple and a beautiful process. It created the most complex collections of matter in the universe (ourselves).</p>
-              <p>Nature doesn't have access to backpropagation or even local learning rules as in the brain. It has to use non differentiable rules that comply with the laws of physics.</p>
-              <p>That's what genetic algorithms are: measure how well a organism does in an environment, murder them in cold blood if they don't reach the cutoff, and the rest reproduce with a chance of mutation. Repeat. </p>
+            <p>Evolution was able to create the most complex collections of matter in the universe (ourselves).</p>
+              <p>Nature doesn't have access to backpropagation or even local learning rules as in the brain. It has to use population level rules that comply with the laws of physics.</p>
+              <p>Genetic algorithms simulate this Darwinian process: measure how well a organism does in an environment, murder them in cold blood if they aren't performing well, and the rest reproduce with a chance of mutation. Repeat. </p>
               <p>
-                Creatures are made of nodes (spheres) connected by muscles
+                Our creatures are made of nodes (spheres) connected by muscles
                 (springs).
               </p>
               <Figure
@@ -192,7 +192,6 @@ export default function GeneticAlgorithmArticle() {
                 ).
               </li>
             </UnorderedList>
-            And more bugs that are obvious in hindsight but near impossible to discover as bugs (some of which I'll mention later). Claude probably decided to teach me a lesson in delegating details. It worked.
           </ArticleSection>
 
           {/* ============================================ */}
@@ -217,7 +216,7 @@ export default function GeneticAlgorithmArticle() {
 
             <Prose>
               <p>
-                This is the fun part where we set the function for a creature getting annihilated into stale bits if it doesn't meet the bar. Or put simply (but just as accurately), the fitness function defines what "good" means.
+                This is how we calculate how well a creature performed. The fitness function defines what "good" means.
               </p>
             </Prose>
 
@@ -324,7 +323,7 @@ export default function GeneticAlgorithmArticle() {
               src="/articles/genetic-algorithm/distance-uncapped.gif"
               alt="Creature moving erratically with uncapped distance"
             />
-            <p>And much more. But I'll spare you the details for now.</p>
+            <p>And much more. Claude probably decided to teach me a lesson in delegating details. It worked.</p>
           </ArticleSection>
 
           {/* ============================================ */}
