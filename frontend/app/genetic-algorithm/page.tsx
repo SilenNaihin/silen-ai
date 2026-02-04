@@ -31,7 +31,7 @@ const commit = (hash: string) => `${GITHUB_REPO}/commit/${hash}`;
 export default function GeneticAlgorithmArticle() {
   return (
     <TOCProvider>
-      <StickyHeader title="I spent 2 weeks playing god. Here are my learnings after running 597 genetic algorithm trials with the help of Claude" />
+      <StickyHeader title="I spent 2 weeks playing god. Here are my learnings after evolving 597 genetic algorithm lineages with the help of Claude Code" />
 
       <div className="pt-14">
         <ArticleLayout className="bg-white">
@@ -39,7 +39,7 @@ export default function GeneticAlgorithmArticle() {
           {/* TITLE & HOOK */}
           {/* ============================================ */}
           <h1 className="text-4xl font-bold mb-4 text-black leading-tight">
-            I spent 2 weeks playing god. Here are my learnings after running 597 genetic algorithm trials with the help of Claude
+            I spent 2 weeks playing god. Here are my learnings after evolving 597 genetic algorithm lineages with the help of Claude Code
           </h1>
 
           <p className="text-lg text-neutral-600 mb-8">
