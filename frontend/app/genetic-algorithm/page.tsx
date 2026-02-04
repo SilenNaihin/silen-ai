@@ -39,7 +39,7 @@ export default function GeneticAlgorithmArticle() {
           {/* TITLE & HOOK */}
           {/* ============================================ */}
           <h1 className="text-4xl font-bold mb-4 text-black leading-tight">
-            I increased the IQ of blobs using genetic algorithms and Claude
+            I spent 2 weeks playing god. I ran 597 genetic algorithm trials. My learnings from discovering a new race
           </h1>
 
           <p className="text-lg text-neutral-600 mb-8">
