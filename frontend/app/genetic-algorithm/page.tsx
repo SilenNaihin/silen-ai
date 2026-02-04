@@ -43,9 +43,9 @@ export default function GeneticAlgorithmArticle() {
           </h1>
 
           <p className="text-lg text-neutral-600 mb-8">
-            I spent two weeks building an evolution simulator where soft bodied
-            creatures learn to &quot;walk&quot; toward food. This is a journal of that
-            process: the papers, bugs, fixes, and counterintuitive
+            I spent two weeks building an evolution simulator where my 
+            creatures learned to &quot;walk&quot; toward food. This is a journal of that
+            process: implementing the papers, fixing bugs, working with Claude, and counterintuitive
             walls I ran into.
           </p>
           <TableOfContentsBlock columns={3} />
@@ -53,7 +53,7 @@ export default function GeneticAlgorithmArticle() {
           <Figure
             src="/articles/genetic-algorithm/best-creature.gif"
             alt="Evolved creature collecting pellets"
-            caption="The end result: a full evolution simulator! The best creature at this generation seems to have evolved a pouncing mechanic with it's 'grabbing arm'."
+            caption="The end result. The best creature at this generation seems to have evolved a pouncing mechanic with it's 'grabbing arm'."
           />
 
           <ArticleSection>
@@ -1600,7 +1600,7 @@ python cli.py reproduce neat-full 68 \\
               level={3}
               className="text-xl font-bold mb-2 mt-6"
             >
-              So much confounding 
+              Confounding variables are a pain
             </TOCHeading>
 
             <Prose>
@@ -1620,7 +1620,7 @@ python cli.py reproduce neat-full 68 \\
               level={3}
               className="text-xl font-bold mb-2 mt-6"
             >
-              Details matter
+              Theoretical details matter
             </TOCHeading>
 
             <Prose>
@@ -1697,7 +1697,7 @@ python cli.py reproduce neat-full 68 \\
                 There's still a lot I don't understand. Why does crossover hurt?
                 Why does proprioception hurt when it should help? 
               </p>
-              <p >A great next goal would be to find a configuration that consistently generates creatures that can pick up at least 1 pellet within 150 generations.</p>
+              <p >A great next goal would be to find a configuration that consistently generates populations of creatures that can pick up at least 1 pellet within 150 generations.</p>
 <p> I have more
                 experiments I want to try: energy systems (metabolic cost for muscle
                 activation), multi-layer hidden networks, better NEAT crossover
