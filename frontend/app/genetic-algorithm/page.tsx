@@ -323,7 +323,6 @@ export default function GeneticAlgorithmArticle() {
               src="/articles/genetic-algorithm/distance-uncapped.gif"
               alt="Creature moving erratically with uncapped distance"
             />
-            <p>And much more. Claude probably decided to teach me a lesson in delegating details. It worked.</p>
           </ArticleSection>
 
           {/* ============================================ */}
@@ -401,14 +400,14 @@ export default function GeneticAlgorithmArticle() {
 
             <Prose>
               <p>
-                At this point our creatures are brainless oscillators. They have the intelligence of a bacteria. Maybe lower.
+                At this point our creatures are brainless oscillators.
                 
               </p>
               <p>Naturally, several problems emerged.</p>
 
               <p>
                 Sometimes the simulation would just explode. Creatures would
-                fly off to infinity. Had to add checks to disqualify creatures
+                fly off to infinity. I had to add checks to disqualify creatures
                 with invalid or NaN fitness values. I say this plainly, but there were many things that were causing this. For example: (
                 <a
                   href={commit('6715202')}
@@ -506,10 +505,10 @@ export default function GeneticAlgorithmArticle() {
                 velocities, ground contact) for up to 54 inputs total. Hidden layer size is configurable (8-32 neurons typical).
               </p>
               <p>
-                No base oscillation anymore. The network has full control over
+                Now there is no base oscillation anymore. The network has full control over
                 when and how each muscle contracts.
               </p>
-              <p>And the creatures failed to learn anything, even their spazzing was ineffective.</p>
+              <p>And the creatures failed to learn anything. Even their spazzing was ineffective.</p>
             </Prose>
 
             <Figure
@@ -519,8 +518,7 @@ export default function GeneticAlgorithmArticle() {
 
             <Prose>
               <p>I decided to take matters into my own hands. I asked Claude something like <Code>
-                pls analyze
-                the code without making changes: wtf is wrong with our creatures? And make no mistakes or else a random child across the world will lose their favorite stuffed animal
+                what is wrong with our creatures? make no mistakes or else a random child across the world will lose their favorite stuffed animal
               </Code></p>
               
             </Prose>
@@ -533,7 +531,7 @@ export default function GeneticAlgorithmArticle() {
 
             <Prose>
               <p>
-                Basically, a bunch had gotten lost in the details. Some examples:
+                Basically, a lot had gotten lost in the details. Some examples:
               </p>
             </Prose>
 
@@ -599,10 +597,7 @@ export default function GeneticAlgorithmArticle() {
 
             <Prose>
               <p>
-                There's nuance to pretty much everything I've glazed over above.
-              </p>
-              <p>
-                For example, there are many reproduction strategies
+                There are many reproduction strategies
               </p>
             </Prose>
             <ComparisonTable
@@ -978,8 +973,8 @@ export default function GeneticAlgorithmArticle() {
                 inputs, one hidden layer, N outputs. But some tasks may need more hidden neurons. And some connections could be useless.
                 </p>
                 <p>
-                Why are we still hand designing the topology of the network like troglodytes instead of
-                letting evolution figure it out? We should be EVOLUTION MAXXING.
+                Why am I still hand designing the topology of the network like a troglodyte instead of
+                letting evolution figure it out? I should be evolution maxxing.
               </p>
               <p>NEAT can mutate everything about the network topology:</p>
 
@@ -1082,7 +1077,7 @@ export default function GeneticAlgorithmArticle() {
                 to measure how different two genomes are. 
                 </p>
                 <p>
-                Instead of following our neanderthal truncation rules where the bottom 50% of creatures are brutalized into collateral context, we can use speciation to protect new structures.
+                Instead of following our neanderthal truncation rules where the bottom 50% of creatures are vaporized into context, we can use speciation to protect new structures.
                 </p>
                 <p>
                This is useful for a mutation that adds
