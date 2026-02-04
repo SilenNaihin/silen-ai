@@ -31,7 +31,7 @@ const commit = (hash: string) => `${GITHUB_REPO}/commit/${hash}`;
 export default function GeneticAlgorithmArticle() {
   return (
     <TOCProvider>
-      <StickyHeader title="I increased the IQ of blobs" />
+      <StickyHeader title="I spent 2 weeks playing god. I ran 597 genetic algorithm trials. My learnings from discovering a new race" />
 
       <div className="pt-14">
         <ArticleLayout className="bg-white">
@@ -59,37 +59,18 @@ export default function GeneticAlgorithmArticle() {
           <ArticleSection>
             <Prose>
               <p>
-                Anyone remember{' '}
+                There was a video I saw{" "}
                 <a
                   href="https://www.youtube.com/watch?v=LMQoLtBJcl8&list=PLrUdxfaFpuuK0rj55Rhc187Tn9vvxck7t&index=17"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
                 >
-                  this video from Carkh
+                   9 years ago on YouTube from Carkh
                 </a>{' '}
-                from 9 years ago showing simple creatures evolving to
-                pick up pellets? For the longest time I&apos;ve wanted to create my own version. But it was never a priority. 
+                from showing simple creatures evolving to
+                pick up pellets. For the longest time I&apos;ve wanted to create my own version but it was never a priority. 
               </p>
-              <Aside title="Initial Claude prompt that was the start of a 2 week rabbithole">we want to create an evolutionary algorithm simulation. where creatures with muscles and connections
-  between them can decide how they want to move in 3d space to pick up "pellets" (and the closer they get
-  give them reward signal, and even more if they actually get the pellet). We start with many differnt
-  combinations of these muscles and how they're connected and their strengths. Then we run a simulation to
-  evaluate fitness. We should be able to view any of the 100 or so 'creatures" and how they interacted with
-   the environment for that time step. And then it should visually sort them animated to their locations
-  sorted by fitness. Then we should see what creature configurations work best. And we can adjust the
-  physcs like gravity and rerun the simulation and see if anything changes. We should have a graph of the
-  different creature configurations. So to sum it up
-
-  UI starts with a "menu" which is a single creature front and center in the screen which is doing random
-  actions. Then you adjust parameters and click start. 100 different configurations are generated. Then you
-   run the step. This causes each fitness to be simulated given the physcis for each creature. All the
-  analytics, and fitness scores, etc update. Then we cull the bottom 50%, mutate the top 50% (and some
-  unmutated) (we should also have different mutation parameters we can change). This should all be animated
-   on a grid. You can click on any of the creatures and it enlarges the view and shows them acting in that
-  timestep visually. Then repeat over and over.
-
-  Create a comprehensive plan for this</Aside>
               <p>
                 Until I nerd sniped myself. While writing my{' '}&quot;
                 <a
@@ -103,7 +84,7 @@ export default function GeneticAlgorithmArticle() {
                 &quot; article I wanted to show off what Claude Code could do and thought this was one of the coolest things I could one shot, grab a gif, and move on.
               </p>
 
-              <p>281 commits later, with the computational application of Darwin's consecrated knowledge running through my cortical connections, I have a working evolution simulator that implements some of the foremost papers in the space. </p>
+              <p>281 commits later, with the computational application of Darwin's consecrated knowledge running through my cortical connections, I have a working evolution simulator. </p>
               <p>
                 I used Claude Code to help me build this. I'll be honest about where that
                 helped and where it didn't. TLDR; Claude is great at writing code, but not always the right code. The move is to read the papers and existing libraries to understand the details and theory so I can roll my sleeves up and jump in to do surgery on the code or even just so I could prompt Claude better.

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'I increased the IQ of blobs using genetic algorithms and Claude',
+  title: 'I spent 2 weeks playing god. I ran 597 genetic algorithm trials. My learnings from discovering a new race',
   description:
     'A 2-week journey building an evolution simulator with NEAT, PyTorch, and Claude Code. Bugs, breakthroughs, and counterintuitive findings.',
   openGraph: {
-    title: 'I increased the IQ of blobs using genetic algorithms and Claude',
+    title: 'I spent 2 weeks playing god. I ran 597 genetic algorithm trials. My learnings from discovering a new race',
     description:
       'A 2-week journey building an evolution simulator with NEAT, PyTorch, and Claude Code.',
     type: 'article',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'I increased the IQ of blobs using genetic algorithms and Claude',
+    title: 'I spent 2 weeks playing god. I ran 597 genetic algorithm trials. My learnings from discovering a new race',
     description:
       'A 2-week journey building an evolution simulator with NEAT, PyTorch, and Claude Code.',
     images: ['/articles/genetic-algorithm/cover.png'],
