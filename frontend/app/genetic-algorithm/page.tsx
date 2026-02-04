@@ -45,8 +45,7 @@ export default function GeneticAlgorithmArticle() {
           <p className="text-lg text-neutral-600 mb-8">
             I spent two weeks building an evolution simulator where my
             creatures learned to &quot;walk&quot; toward food. I ran millions of generations across 597 genetic lineages to create the optimal species. This is a journal of that
-            process: implementing the papers, fixing bugs, working with Claude Code, and counterintuitive
-            walls I ran into.
+            process: implementing the papers, fixing bugs, counterintuitive walls I ran into, and working with Claude Code.
           </p>
           <TableOfContentsBlock columns={3} />
 
