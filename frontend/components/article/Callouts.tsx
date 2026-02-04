@@ -427,13 +427,13 @@ function Lightbox({ src, alt, caption, href, isOpen, onClose }: LightboxProps) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="relative flex flex-col items-center justify-center w-[90vw] h-[85vh]"
+            className="relative flex flex-col items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
             <img
               src={src}
               alt={alt}
-              className="w-full h-full object-contain rounded-lg"
+              className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
             />
             {caption && (
               <figcaption className="mt-3 text-sm text-white/70 text-center">
@@ -515,9 +515,10 @@ export function Figure({
           alt={alt}
           className="rounded-lg border border-neutral-200 w-full transition-all group-hover:border-neutral-400 group-hover:shadow-md"
         />
-        <div className="absolute top-2 right-2 p-1.5 rounded bg-white/60 text-neutral-400 opacity-40 group-hover:opacity-70 transition-opacity">
-          <FiMaximize2 size={14} />
-        </div>
+        <FiMaximize2
+          size={16}
+          className="absolute top-2 right-2 text-neutral-500/30 group-hover:text-neutral-500/60 transition-colors drop-shadow-sm"
+        />
       </div>
       {caption && (
         <figcaption className="mt-2 text-sm text-neutral-500 text-center">

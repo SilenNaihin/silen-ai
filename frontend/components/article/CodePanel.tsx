@@ -31,6 +31,11 @@ interface CodePanelProps {
   outputOnly?: boolean;
   /** Enable hover effects (only for sidebar cells, not inline) */
   sidebar?: boolean;
+  /**
+   * Position in right margin on desktop (xl+), inline on mobile.
+   * Must be used within an ArticleSection for correct positioning.
+   */
+  side?: boolean;
 }
 
 /**
@@ -150,10 +155,29 @@ export function CodePanel({
   codeOnly = false,
   outputOnly = false,
   sidebar = false,
+  side = false,
 }: CodePanelProps) {
   // Hover classes only for sidebar cells
   const hoverClasses = sidebar ? 'hover:shadow-lg hover:border-neutral-300 transition-shadow' : '';
   const [internalCollapsed, setInternalCollapsed] = useState(collapsible && defaultCollapsed);
+
+  // Helper to wrap content in side positioning
+  const wrapWithSide = (content: React.ReactNode) => {
+    if (!side) return content;
+    return (
+      <>
+        {/* Desktop: Right margin positioning */}
+        <div
+          className="hidden xl:block absolute left-full ml-4 w-72 2xl:ml-8 2xl:w-88 my-4"
+          style={{ top: 'auto' }}
+        >
+          {content}
+        </div>
+        {/* Mobile: Inline */}
+        <div className="xl:hidden my-4">{content}</div>
+      </>
+    );
+  };
 
   // Support both controlled and uncontrolled modes
   const isControlled = collapsed !== undefined;
@@ -193,7 +217,7 @@ export function CodePanel({
       return null;
     }
 
-    return (
+    return wrapWithSide(
       <div className={`relative rounded-lg overflow-hidden ${className}`}>
         {/* Action buttons in top right corner */}
         <div className="absolute top-2 right-2 flex gap-1 z-10">
@@ -236,7 +260,7 @@ export function CodePanel({
       return null;
     }
 
-    return (
+    return wrapWithSide(
       <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white ${className}`}>
         {outputImage && (
           <img
@@ -258,7 +282,7 @@ export function CodePanel({
   if (collapsible && isCollapsed) {
     // Preview mode: show first N lines collapsed
     if (previewLines > 0) {
-      return (
+      return wrapWithSide(
         <div className={`border border-neutral-200 rounded-lg overflow-hidden bg-white ${hoverClasses} ${className}`}>
           {/* Code preview with action buttons */}
           <div className="relative">
@@ -324,7 +348,7 @@ export function CodePanel({
 
     // Simple collapsed bar
     const barHoverClass = sidebar ? 'hover:bg-neutral-50' : '';
-    return (
+    return wrapWithSide(
       <button
         onClick={() => setIsCollapsed(false)}
         className={`w-full flex items-center justify-between px-4 py-3 border border-neutral-200 rounded-lg bg-white transition-colors ${barHoverClass} ${className}`}
@@ -338,7 +362,7 @@ export function CodePanel({
     );
   }
 
-  return (
+  return wrapWithSide(
     <div
       className={`relative border border-neutral-200 rounded-lg overflow-hidden bg-white ${hoverClasses} ${className}`}
     >
