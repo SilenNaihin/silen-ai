@@ -86,9 +86,8 @@ export default function GeneticAlgorithmArticle() {
               <p>281 commits later, with the computational application of Darwin's consecrated knowledge running through my cortical connections, I have a working evolution simulator. </p>
               <p>
                 I used Claude Code to help me build this. I'll be honest about where that
-                helped and where it didn't. TLDR; Claude is great at writing code, but not always the right code. The move is to read the papers and existing libraries to understand the details and theory so I can roll my sleeves up and jump in to do surgery on the code or even just so I could prompt Claude better.
-              </p>
-              <p>There's lots more I can do here, but I'll move on before I create another race of intelligent creatures. You're welcome.</p>
+                helped and where it didn't. 
+                </p>
               
               <p>
                 All code is at{' '}
